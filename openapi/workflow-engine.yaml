@@ -1,0 +1,303 @@
+openapi: 3.0.3
+info:
+  title: Distributed Workflow Engine API
+  version: 1.0.0
+  description: |
+    API for managing workflows and workflow runs.
+servers:
+  - url: http://localhost:8080/v1
+paths:
+  /health:
+    get:
+      summary: Health check
+      responses:
+        "200":
+          description: OK
+  /workflows:
+    post:
+      summary: Create workflow
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateWorkflowRequest"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Workflow"
+        "400":
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    get:
+      summary: List workflows
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/WorkflowList"
+  /workflows/{id}:
+    get:
+      summary: Get workflow
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Workflow"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /workflows/{id}/versions:
+    post:
+      summary: Create workflow version
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateWorkflowVersionRequest"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/WorkflowVersion"
+  /workflow-runs:
+    post:
+      summary: Trigger workflow run
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateWorkflowRunRequest"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/WorkflowRun"
+  /workflow-runs/{id}:
+    get:
+      summary: Get workflow run
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/WorkflowRun"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /workflow-runs/{id}/tasks:
+    get:
+      summary: List tasks for a run
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TaskList"
+  /workflow-runs/{id}/cancel:
+    post:
+      summary: Cancel a workflow run
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "202":
+          description: Accepted
+components:
+  schemas:
+    CreateWorkflowRequest:
+      type: object
+      required: [name, spec]
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+        spec:
+          $ref: "#/components/schemas/WorkflowSpec"
+    CreateWorkflowVersionRequest:
+      type: object
+      required: [spec]
+      properties:
+        spec:
+          $ref: "#/components/schemas/WorkflowSpec"
+    CreateWorkflowRunRequest:
+      type: object
+      required: [workflow_id]
+      properties:
+        workflow_id:
+          type: string
+        input:
+          type: object
+    WorkflowSpec:
+      type: object
+      required: [steps]
+      properties:
+        steps:
+          type: array
+          items:
+            $ref: "#/components/schemas/WorkflowStep"
+    WorkflowStep:
+      type: object
+      required: [id, type]
+      properties:
+        id:
+          type: string
+        type:
+          type: string
+          enum: [http_request, sleep, echo]
+        params:
+          type: object
+        depends_on:
+          type: array
+          items:
+            type: string
+    Workflow:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+        active:
+          type: boolean
+        created_at:
+          type: string
+        updated_at:
+          type: string
+    WorkflowVersion:
+      type: object
+      properties:
+        id:
+          type: string
+        workflow_id:
+          type: string
+        version:
+          type: integer
+        spec:
+          $ref: "#/components/schemas/WorkflowSpec"
+    WorkflowRun:
+      type: object
+      properties:
+        id:
+          type: string
+        workflow_id:
+          type: string
+        version:
+          type: integer
+        status:
+          type: string
+        input:
+          type: object
+        output:
+          type: object
+        created_at:
+          type: string
+        started_at:
+          type: string
+        finished_at:
+          type: string
+        shard_id:
+          type: integer
+    Task:
+      type: object
+      properties:
+        id:
+          type: string
+        run_id:
+          type: string
+        step_id:
+          type: string
+        status:
+          type: string
+        attempt:
+          type: integer
+        max_attempts:
+          type: integer
+        run_after:
+          type: string
+        payload:
+          type: object
+        created_at:
+          type: string
+        updated_at:
+          type: string
+    WorkflowList:
+      type: object
+      properties:
+        workflows:
+          type: array
+          items:
+            $ref: "#/components/schemas/Workflow"
+    TaskList:
+      type: object
+      properties:
+        tasks:
+          type: array
+          items:
+            $ref: "#/components/schemas/Task"
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: object
+          properties:
+            code:
+              type: string
+            message:
+              type: string
+            details:
+              type: object
