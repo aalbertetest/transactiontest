@@ -1,0 +1,44 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: dwe-api
+  namespace: workflow-engine
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: dwe-scheduler
+  namespace: workflow-engine
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: dwe-executor
+  namespace: workflow-engine
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: dwe-read-config
+  namespace: workflow-engine
+rules:
+  - apiGroups: [""]
+    resources: ["configmaps", "secrets"]
+    verbs: ["get", "list", "watch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: dwe-read-config-binding
+  namespace: workflow-engine
+subjects:
+  - kind: ServiceAccount
+    name: dwe-api
+  - kind: ServiceAccount
+    name: dwe-scheduler
+  - kind: ServiceAccount
+    name: dwe-executor
+roleRef:
+  kind: Role
+  name: dwe-read-config
+  apiGroup: rbac.authorization.k8s.io

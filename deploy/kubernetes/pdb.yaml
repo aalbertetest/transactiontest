@@ -1,0 +1,32 @@
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: dwe-api-pdb
+  namespace: workflow-engine
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app: dwe-api
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: dwe-scheduler-pdb
+  namespace: workflow-engine
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app: dwe-scheduler
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: dwe-executor-pdb
+  namespace: workflow-engine
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app: dwe-executor

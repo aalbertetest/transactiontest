@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dwe-executor
+spec:
+  replicas: {{ .Values.replicas.executor }}
+  selector:
+    matchLabels:
+      app: dwe-executor
+  template:
+    metadata:
+      labels:
+        app: dwe-executor
+    spec:
+      containers:
+        - name: executor
+          image: {{ .Values.image.executor }}
+          ports:
+            - containerPort: 8001
+          envFrom:
+            - configMapRef:
+                name: dwe-config
+            - secretRef:
+                name: dwe-secrets
+          env:
+            - name: EXECUTOR_ID
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+          readinessProbe:
+            httpGet:
+              path: /metrics
+              port: 8001
+            initialDelaySeconds: 5
+            periodSeconds: 10
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: dwe-executor
+spec:
+  selector:
+    app: dwe-executor
+  ports:
+    - name: metrics
+      port: 8001
+      targetPort: 8001

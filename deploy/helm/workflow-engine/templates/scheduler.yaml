@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dwe-scheduler
+spec:
+  replicas: {{ .Values.replicas.scheduler }}
+  selector:
+    matchLabels:
+      app: dwe-scheduler
+  template:
+    metadata:
+      labels:
+        app: dwe-scheduler
+    spec:
+      containers:
+        - name: scheduler
+          image: {{ .Values.image.scheduler }}
+          ports:
+            - containerPort: 9091
+          envFrom:
+            - configMapRef:
+                name: dwe-config
+            - secretRef:
+                name: dwe-secrets
+          env:
+            - name: SCHEDULER_ID
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 9091
+            initialDelaySeconds: 5
+            periodSeconds: 10
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: dwe-scheduler
+spec:
+  selector:
+    app: dwe-scheduler
+  ports:
+    - name: metrics
+      port: 9091
+      targetPort: 9091

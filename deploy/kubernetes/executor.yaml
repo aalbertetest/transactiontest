@@ -1,0 +1,73 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dwe-executor
+  namespace: workflow-engine
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: dwe-executor
+  template:
+    metadata:
+      labels:
+        app: dwe-executor
+    spec:
+      serviceAccountName: dwe-executor
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 10003
+        fsGroup: 10003
+      containers:
+        - name: executor
+          image: dwe-executor:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8001
+          envFrom:
+            - configMapRef:
+                name: dwe-config
+            - secretRef:
+                name: dwe-secrets
+          env:
+            - name: EXECUTOR_ID
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+          readinessProbe:
+            httpGet:
+              path: /metrics
+              port: 8001
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /metrics
+              port: 8001
+            initialDelaySeconds: 10
+            periodSeconds: 20
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop: ["ALL"]
+          resources:
+            requests:
+              cpu: "200m"
+              memory: "256Mi"
+            limits:
+              cpu: "1"
+              memory: "512Mi"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: dwe-executor
+  namespace: workflow-engine
+spec:
+  selector:
+    app: dwe-executor
+  ports:
+    - name: metrics
+      port: 8001
+      targetPort: 8001

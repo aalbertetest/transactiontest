@@ -1,0 +1,73 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dwe-scheduler
+  namespace: workflow-engine
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: dwe-scheduler
+  template:
+    metadata:
+      labels:
+        app: dwe-scheduler
+    spec:
+      serviceAccountName: dwe-scheduler
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 10002
+        fsGroup: 10002
+      containers:
+        - name: scheduler
+          image: dwe-scheduler:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 9091
+          envFrom:
+            - configMapRef:
+                name: dwe-config
+            - secretRef:
+                name: dwe-secrets
+          env:
+            - name: SCHEDULER_ID
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 9091
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 9091
+            initialDelaySeconds: 10
+            periodSeconds: 20
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop: ["ALL"]
+          resources:
+            requests:
+              cpu: "200m"
+              memory: "256Mi"
+            limits:
+              cpu: "1"
+              memory: "512Mi"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: dwe-scheduler
+  namespace: workflow-engine
+spec:
+  selector:
+    app: dwe-scheduler
+  ports:
+    - name: metrics
+      port: 9091
+      targetPort: 9091
