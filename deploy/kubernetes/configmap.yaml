@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: dwe-config
+  namespace: workflow-engine
+data:
+  SHARD_COUNT: "16"
+  POLL_INTERVAL_MS: "2000"
+  LOCK_TTL_SECONDS: "60"
+  MAX_WORKFLOW_STEPS: "200"

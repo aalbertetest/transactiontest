@@ -1,0 +1,19 @@
+{
+  "name": "basic-workflow",
+  "description": "A simple workflow with echo and sleep.",
+  "spec": {
+    "steps": [
+      {
+        "id": "echo",
+        "type": "echo",
+        "params": {"message": "hello world"}
+      },
+      {
+        "id": "sleep",
+        "type": "sleep",
+        "params": {"seconds": 1},
+        "depends_on": ["echo"]
+      }
+    ]
+  }
+}

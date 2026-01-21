@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: dwe-config
+data:
+  SHARD_COUNT: "{{ .Values.config.shardCount }}"
+  POLL_INTERVAL_MS: "{{ .Values.config.pollIntervalMs }}"
+  LOCK_TTL_SECONDS: "{{ .Values.config.lockTtlSeconds }}"
+  MAX_WORKFLOW_STEPS: "{{ .Values.config.maxWorkflowSteps }}"

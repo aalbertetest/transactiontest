@@ -1,0 +1,49 @@
+{
+  "annotations": {
+    "list": []
+  },
+  "title": "Workflow Engine Overview",
+  "panels": [
+    {
+      "type": "timeseries",
+      "title": "API Request Duration",
+      "targets": [
+        {
+          "expr": "histogram_quantile(0.95, sum(rate(api_http_request_duration_seconds_bucket[5m])) by (le))"
+        }
+      ]
+    },
+    {
+      "type": "timeseries",
+      "title": "Scheduler Loop Duration",
+      "targets": [
+        {
+          "expr": "histogram_quantile(0.95, sum(rate(scheduler_loop_duration_seconds_bucket[5m])) by (le))"
+        }
+      ]
+    },
+    {
+      "type": "timeseries",
+      "title": "Executor Queue Depth",
+      "targets": [
+        {
+          "expr": "executor_queue_depth"
+        }
+      ]
+    },
+    {
+      "type": "timeseries",
+      "title": "Tasks Succeeded vs Failed",
+      "targets": [
+        {
+          "expr": "rate(executor_tasks_succeeded_total[5m])"
+        },
+        {
+          "expr": "rate(executor_tasks_failed_total[5m])"
+        }
+      ]
+    }
+  ],
+  "schemaVersion": 38,
+  "version": 1
+}

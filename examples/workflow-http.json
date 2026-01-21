@@ -1,0 +1,19 @@
+{
+  "name": "http-workflow",
+  "description": "Fetch a URL and then echo the status.",
+  "spec": {
+    "steps": [
+      {
+        "id": "fetch",
+        "type": "http_request",
+        "params": {"url": "https://example.com", "method": "GET"}
+      },
+      {
+        "id": "echo",
+        "type": "echo",
+        "params": {"message": "fetch complete"},
+        "depends_on": ["fetch"]
+      }
+    ]
+  }
+}

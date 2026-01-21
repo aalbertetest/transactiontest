@@ -1,0 +1,18 @@
+image:
+  api: dwe-api:latest
+  scheduler: dwe-scheduler:latest
+  executor: dwe-executor:latest
+
+replicas:
+  api: 2
+  scheduler: 2
+  executor: 3
+
+config:
+  shardCount: 16
+  pollIntervalMs: 2000
+  lockTtlSeconds: 60
+  maxWorkflowSteps: 200
+
+secrets:
+  databaseUrl: "postgres://postgres:postgres@postgres.workflow-engine.svc.cluster.local:5432/workflow"
