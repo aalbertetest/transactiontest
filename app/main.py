@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import asyncio
 import json
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Optional
 
 from fastapi import Depends, FastAPI, Header, HTTPException, Request, WebSocket, WebSocketDisconnect
@@ -180,6 +180,8 @@ def create_app(settings: Optional[Settings] = None) -> FastAPI:
         if before:
             try:
                 before_dt = datetime.fromisoformat(before)
+                if before_dt.tzinfo is not None:
+                    before_dt = before_dt.astimezone(timezone.utc).replace(tzinfo=None)
                 query = query.where(Message.created_at < before_dt)
             except ValueError as exc:
                 raise HTTPException(status_code=400, detail="Invalid 'before' timestamp") from exc
