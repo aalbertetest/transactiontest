@@ -30,7 +30,7 @@ class IndexResponse(BaseModel):
 
 
 class CrawlRequest(BaseModel):
-    seeds: List[str] = Field(..., min_items=1)
+    seeds: List[str] = Field(..., min_length=1)
     max_pages: int = 50
     max_depth: int = 2
     same_domain: bool = True
