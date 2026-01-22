@@ -1,0 +1,93 @@
+openapi: 3.0.3
+info:
+  title: Payment Processing API
+  version: 1.0.0
+servers:
+  - url: https://api.example.com
+paths:
+  /v1/payment_intents:
+    post:
+      summary: Create payment intent
+      parameters:
+        - in: header
+          name: Idempotency-Key
+          schema: { type: string }
+          required: true
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PaymentIntentCreate"
+      responses:
+        "200":
+          description: Payment intent
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PaymentIntent"
+  /v1/payment_intents/{id}/confirm:
+    post:
+      summary: Confirm payment intent
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string }
+        - in: header
+          name: Idempotency-Key
+          schema: { type: string }
+          required: true
+      responses:
+        "200":
+          description: Payment intent
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PaymentIntent"
+  /v1/charges/{id}/refunds:
+    post:
+      summary: Create refund
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string }
+        - in: header
+          name: Idempotency-Key
+          schema: { type: string }
+          required: true
+      responses:
+        "200":
+          description: Refund
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Refund"
+components:
+  schemas:
+    PaymentIntentCreate:
+      type: object
+      required: [amount, currency, payment_method_token]
+      properties:
+        amount: { type: integer }
+        currency: { type: string }
+        payment_method_token: { type: string }
+        customer_id: { type: string }
+        capture_method: { type: string }
+        metadata: { type: object }
+        return_url: { type: string }
+    PaymentIntent:
+      type: object
+      properties:
+        id: { type: string }
+        status: { type: string }
+        amount: { type: integer }
+        currency: { type: string }
+        client_secret: { type: string }
+    Refund:
+      type: object
+      properties:
+        id: { type: string }
+        status: { type: string }
+        amount: { type: integer }
