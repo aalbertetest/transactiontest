@@ -1,0 +1,12 @@
+{
+  "users": [
+    { "id": "usr_1", "email": "alice@example.com", "display_name": "Alice" },
+    { "id": "usr_2", "email": "bob@example.com", "display_name": "Bob" }
+  ],
+  "payments": [
+    { "id": "pi_1", "user_id": "usr_1", "amount": 4999, "currency": "USD" }
+  ],
+  "workflows": [
+    { "id": "wf_1", "name": "order_fulfillment", "definition": { "steps": ["charge", "ship"] } }
+  ]
+}
