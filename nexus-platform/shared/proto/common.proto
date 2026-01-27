@@ -1,0 +1,628 @@
+// =============================================================================
+// NEXUS PLATFORM - COMMON PROTOCOL BUFFER DEFINITIONS
+// =============================================================================
+// This file contains shared message types and enums used across all services
+// in the Nexus Platform distributed system.
+// =============================================================================
+
+syntax = "proto3";
+
+package nexus.common;
+
+option go_package = "github.com/nexus-platform/nexus/shared/proto/common";
+
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/any.proto";
+import "google/protobuf/duration.proto";
+
+// =============================================================================
+// STANDARD REQUEST/RESPONSE METADATA
+// =============================================================================
+
+// RequestMetadata contains standard metadata included with every request
+message RequestMetadata {
+  // Unique identifier for this request, used for tracing
+  string request_id = 1;
+  
+  // Correlation ID for tracking requests across services
+  string correlation_id = 2;
+  
+  // Timestamp when the request was initiated
+  google.protobuf.Timestamp timestamp = 3;
+  
+  // Client application identifier
+  string client_id = 4;
+  
+  // Client application version
+  string client_version = 5;
+  
+  // User agent string
+  string user_agent = 6;
+  
+  // IP address of the original client
+  string client_ip = 7;
+  
+  // Locale/language preference (e.g., "en-US")
+  string locale = 8;
+  
+  // Timezone (e.g., "America/New_York")
+  string timezone = 9;
+  
+  // Idempotency key for safe retries
+  string idempotency_key = 10;
+  
+  // Additional custom headers as key-value pairs
+  map<string, string> custom_headers = 11;
+}
+
+// ResponseMetadata contains standard metadata included with every response
+message ResponseMetadata {
+  // Request ID echoed back for correlation
+  string request_id = 1;
+  
+  // Time taken to process the request
+  google.protobuf.Duration processing_time = 2;
+  
+  // Server instance that handled the request
+  string server_id = 3;
+  
+  // API version used
+  string api_version = 4;
+  
+  // Timestamp of the response
+  google.protobuf.Timestamp timestamp = 5;
+  
+  // Rate limit information
+  RateLimitInfo rate_limit = 6;
+  
+  // Deprecation warnings if any
+  repeated string deprecation_warnings = 7;
+}
+
+// RateLimitInfo provides information about rate limiting
+message RateLimitInfo {
+  // Maximum requests allowed in the window
+  int32 limit = 1;
+  
+  // Remaining requests in the current window
+  int32 remaining = 2;
+  
+  // Unix timestamp when the rate limit resets
+  int64 reset_at = 3;
+  
+  // Name of the rate limit policy applied
+  string policy = 4;
+}
+
+// =============================================================================
+// PAGINATION
+// =============================================================================
+
+// PaginationRequest contains pagination parameters for list operations
+message PaginationRequest {
+  // Page number (1-indexed)
+  int32 page = 1;
+  
+  // Number of items per page (max 100)
+  int32 page_size = 2;
+  
+  // Cursor for cursor-based pagination (alternative to page)
+  string cursor = 3;
+  
+  // Sort field
+  string sort_by = 4;
+  
+  // Sort direction
+  SortDirection sort_direction = 5;
+}
+
+// PaginationResponse contains pagination metadata in responses
+message PaginationResponse {
+  // Total number of items across all pages
+  int64 total_count = 1;
+  
+  // Total number of pages
+  int32 total_pages = 2;
+  
+  // Current page number
+  int32 current_page = 3;
+  
+  // Number of items per page
+  int32 page_size = 4;
+  
+  // Whether there's a next page
+  bool has_next = 5;
+  
+  // Whether there's a previous page
+  bool has_previous = 6;
+  
+  // Cursor for the next page (cursor-based pagination)
+  string next_cursor = 7;
+  
+  // Cursor for the previous page
+  string previous_cursor = 8;
+}
+
+// SortDirection specifies the order of results
+enum SortDirection {
+  SORT_DIRECTION_UNSPECIFIED = 0;
+  SORT_DIRECTION_ASC = 1;
+  SORT_DIRECTION_DESC = 2;
+}
+
+// =============================================================================
+// ERROR HANDLING
+// =============================================================================
+
+// Error represents a detailed error response
+message Error {
+  // Machine-readable error code
+  string code = 1;
+  
+  // Human-readable error message
+  string message = 2;
+  
+  // Detailed description for debugging
+  string details = 3;
+  
+  // Field-level validation errors
+  repeated FieldError field_errors = 4;
+  
+  // Link to documentation about this error
+  string documentation_url = 5;
+  
+  // Request ID for support reference
+  string request_id = 6;
+  
+  // HTTP status code equivalent
+  int32 http_status = 7;
+  
+  // gRPC status code
+  int32 grpc_code = 8;
+  
+  // Stack trace (only in debug mode)
+  string stack_trace = 9;
+  
+  // Timestamp when error occurred
+  google.protobuf.Timestamp timestamp = 10;
+  
+  // Suggested retry delay if retryable
+  google.protobuf.Duration retry_after = 11;
+  
+  // Whether this error is retryable
+  bool retryable = 12;
+}
+
+// FieldError represents a validation error for a specific field
+message FieldError {
+  // Name of the field with the error
+  string field = 1;
+  
+  // Error code for this field
+  string code = 2;
+  
+  // Human-readable error message
+  string message = 3;
+  
+  // The rejected value (if safe to include)
+  string rejected_value = 4;
+}
+
+// ErrorCode defines standard error codes across the platform
+enum ErrorCode {
+  ERROR_CODE_UNSPECIFIED = 0;
+  
+  // Client errors (4xx equivalent)
+  ERROR_CODE_INVALID_ARGUMENT = 1;
+  ERROR_CODE_NOT_FOUND = 2;
+  ERROR_CODE_ALREADY_EXISTS = 3;
+  ERROR_CODE_PERMISSION_DENIED = 4;
+  ERROR_CODE_UNAUTHENTICATED = 5;
+  ERROR_CODE_RESOURCE_EXHAUSTED = 6;
+  ERROR_CODE_FAILED_PRECONDITION = 7;
+  ERROR_CODE_ABORTED = 8;
+  ERROR_CODE_OUT_OF_RANGE = 9;
+  ERROR_CODE_UNIMPLEMENTED = 10;
+  
+  // Server errors (5xx equivalent)
+  ERROR_CODE_INTERNAL = 11;
+  ERROR_CODE_UNAVAILABLE = 12;
+  ERROR_CODE_DATA_LOSS = 13;
+  ERROR_CODE_DEADLINE_EXCEEDED = 14;
+}
+
+// =============================================================================
+// COMMON DATA TYPES
+// =============================================================================
+
+// UUID wrapper for type safety
+message UUID {
+  string value = 1;
+}
+
+// Money represents a monetary amount with currency
+message Money {
+  // Amount in smallest currency unit (e.g., cents for USD)
+  int64 amount = 1;
+  
+  // ISO 4217 currency code (e.g., "USD", "EUR")
+  string currency = 2;
+  
+  // Number of decimal places
+  int32 decimal_places = 3;
+}
+
+// Address represents a physical address
+message Address {
+  // Street address line 1
+  string line1 = 1;
+  
+  // Street address line 2
+  string line2 = 2;
+  
+  // City name
+  string city = 3;
+  
+  // State/Province/Region
+  string state = 4;
+  
+  // Postal/ZIP code
+  string postal_code = 5;
+  
+  // ISO 3166-1 alpha-2 country code
+  string country = 6;
+  
+  // Optional latitude for geocoding
+  double latitude = 7;
+  
+  // Optional longitude for geocoding
+  double longitude = 8;
+}
+
+// PhoneNumber represents a phone number
+message PhoneNumber {
+  // Country code (e.g., "1" for US)
+  string country_code = 1;
+  
+  // National number without country code
+  string national_number = 2;
+  
+  // E.164 formatted number
+  string e164 = 3;
+  
+  // Phone number type
+  PhoneNumberType type = 4;
+  
+  // Whether this number is verified
+  bool verified = 5;
+}
+
+// PhoneNumberType indicates the type of phone number
+enum PhoneNumberType {
+  PHONE_NUMBER_TYPE_UNSPECIFIED = 0;
+  PHONE_NUMBER_TYPE_MOBILE = 1;
+  PHONE_NUMBER_TYPE_LANDLINE = 2;
+  PHONE_NUMBER_TYPE_VOIP = 3;
+  PHONE_NUMBER_TYPE_TOLL_FREE = 4;
+}
+
+// Email represents an email address
+message Email {
+  // The email address
+  string address = 1;
+  
+  // Whether this email is verified
+  bool verified = 2;
+  
+  // When the email was verified
+  google.protobuf.Timestamp verified_at = 3;
+  
+  // Whether this is the primary email
+  bool primary = 4;
+}
+
+// DateRange represents a date range for filtering
+message DateRange {
+  // Start date (inclusive)
+  google.protobuf.Timestamp start = 1;
+  
+  // End date (inclusive)
+  google.protobuf.Timestamp end = 2;
+}
+
+// =============================================================================
+// AUDIT AND TRACKING
+// =============================================================================
+
+// AuditInfo contains audit trail information
+message AuditInfo {
+  // When the entity was created
+  google.protobuf.Timestamp created_at = 1;
+  
+  // User ID who created the entity
+  string created_by = 2;
+  
+  // When the entity was last updated
+  google.protobuf.Timestamp updated_at = 3;
+  
+  // User ID who last updated the entity
+  string updated_by = 4;
+  
+  // Entity version for optimistic locking
+  int64 version = 5;
+  
+  // When the entity was soft deleted
+  google.protobuf.Timestamp deleted_at = 6;
+  
+  // User ID who deleted the entity
+  string deleted_by = 7;
+}
+
+// AuditEvent represents an audit log entry
+message AuditEvent {
+  // Unique event ID
+  string id = 1;
+  
+  // Type of action performed
+  AuditAction action = 2;
+  
+  // Resource type affected
+  string resource_type = 3;
+  
+  // Resource ID affected
+  string resource_id = 4;
+  
+  // User who performed the action
+  string actor_id = 5;
+  
+  // Actor type (user, service, system)
+  string actor_type = 6;
+  
+  // Timestamp of the event
+  google.protobuf.Timestamp timestamp = 7;
+  
+  // IP address of the actor
+  string ip_address = 8;
+  
+  // User agent string
+  string user_agent = 9;
+  
+  // Request ID for correlation
+  string request_id = 10;
+  
+  // Previous state (JSON)
+  string previous_state = 11;
+  
+  // New state (JSON)
+  string new_state = 12;
+  
+  // Additional context
+  map<string, string> metadata = 13;
+  
+  // Outcome of the action
+  AuditOutcome outcome = 14;
+  
+  // Error message if failed
+  string error_message = 15;
+}
+
+// AuditAction defines types of auditable actions
+enum AuditAction {
+  AUDIT_ACTION_UNSPECIFIED = 0;
+  AUDIT_ACTION_CREATE = 1;
+  AUDIT_ACTION_READ = 2;
+  AUDIT_ACTION_UPDATE = 3;
+  AUDIT_ACTION_DELETE = 4;
+  AUDIT_ACTION_LOGIN = 5;
+  AUDIT_ACTION_LOGOUT = 6;
+  AUDIT_ACTION_PASSWORD_CHANGE = 7;
+  AUDIT_ACTION_PERMISSION_CHANGE = 8;
+  AUDIT_ACTION_EXPORT = 9;
+  AUDIT_ACTION_IMPORT = 10;
+}
+
+// AuditOutcome indicates the result of an audited action
+enum AuditOutcome {
+  AUDIT_OUTCOME_UNSPECIFIED = 0;
+  AUDIT_OUTCOME_SUCCESS = 1;
+  AUDIT_OUTCOME_FAILURE = 2;
+  AUDIT_OUTCOME_PARTIAL = 3;
+}
+
+// =============================================================================
+// HEALTH CHECK
+// =============================================================================
+
+// HealthCheckRequest for service health checks
+message HealthCheckRequest {
+  // Optional service name to check
+  string service = 1;
+  
+  // Whether to include dependency health
+  bool include_dependencies = 2;
+}
+
+// HealthCheckResponse contains health status information
+message HealthCheckResponse {
+  // Overall health status
+  HealthStatus status = 1;
+  
+  // Service name
+  string service = 2;
+  
+  // Service version
+  string version = 3;
+  
+  // Uptime duration
+  google.protobuf.Duration uptime = 4;
+  
+  // Timestamp of the check
+  google.protobuf.Timestamp timestamp = 5;
+  
+  // Health of dependencies
+  repeated DependencyHealth dependencies = 6;
+  
+  // Additional health metrics
+  map<string, string> metrics = 7;
+}
+
+// DependencyHealth represents health of a service dependency
+message DependencyHealth {
+  // Name of the dependency
+  string name = 1;
+  
+  // Type of dependency (database, cache, service, etc.)
+  string type = 2;
+  
+  // Health status
+  HealthStatus status = 3;
+  
+  // Latency to the dependency
+  google.protobuf.Duration latency = 4;
+  
+  // Error message if unhealthy
+  string error = 5;
+  
+  // Last successful check
+  google.protobuf.Timestamp last_success = 6;
+}
+
+// HealthStatus indicates the health of a service
+enum HealthStatus {
+  HEALTH_STATUS_UNSPECIFIED = 0;
+  HEALTH_STATUS_HEALTHY = 1;
+  HEALTH_STATUS_DEGRADED = 2;
+  HEALTH_STATUS_UNHEALTHY = 3;
+}
+
+// =============================================================================
+// EVENTS
+// =============================================================================
+
+// Event represents a domain event in the system
+message Event {
+  // Unique event ID
+  string id = 1;
+  
+  // Event type (e.g., "user.created", "payment.completed")
+  string type = 2;
+  
+  // Source service that generated the event
+  string source = 3;
+  
+  // Event data (serialized as JSON or protobuf)
+  google.protobuf.Any data = 4;
+  
+  // Event metadata
+  EventMetadata metadata = 5;
+  
+  // Timestamp when event occurred
+  google.protobuf.Timestamp timestamp = 6;
+  
+  // Event version for schema evolution
+  string version = 7;
+  
+  // Correlation ID for tracing
+  string correlation_id = 8;
+  
+  // Causation ID (ID of event that caused this)
+  string causation_id = 9;
+}
+
+// EventMetadata contains additional event information
+message EventMetadata {
+  // User who triggered the event
+  string user_id = 1;
+  
+  // Tenant ID for multi-tenant systems
+  string tenant_id = 2;
+  
+  // Request ID that generated this event
+  string request_id = 3;
+  
+  // Custom key-value metadata
+  map<string, string> attributes = 4;
+}
+
+// =============================================================================
+// RETRY CONFIGURATION
+// =============================================================================
+
+// RetryPolicy defines retry behavior for operations
+message RetryPolicy {
+  // Maximum number of retry attempts
+  int32 max_attempts = 1;
+  
+  // Initial backoff duration
+  google.protobuf.Duration initial_backoff = 2;
+  
+  // Maximum backoff duration
+  google.protobuf.Duration max_backoff = 3;
+  
+  // Backoff multiplier
+  double backoff_multiplier = 4;
+  
+  // Whether to add jitter to backoff
+  bool jitter = 5;
+  
+  // Error codes that are retryable
+  repeated string retryable_codes = 6;
+}
+
+// CircuitBreakerConfig defines circuit breaker settings
+message CircuitBreakerConfig {
+  // Number of failures before opening circuit
+  int32 failure_threshold = 1;
+  
+  // Duration the circuit stays open
+  google.protobuf.Duration open_duration = 2;
+  
+  // Number of successes needed to close circuit
+  int32 success_threshold = 3;
+  
+  // Timeout for operations
+  google.protobuf.Duration timeout = 4;
+}
+
+// =============================================================================
+// FEATURE FLAGS
+// =============================================================================
+
+// FeatureFlag represents a feature flag configuration
+message FeatureFlag {
+  // Flag name/key
+  string name = 1;
+  
+  // Whether the flag is enabled
+  bool enabled = 2;
+  
+  // Description of the feature
+  string description = 3;
+  
+  // Percentage of users to enable for (0-100)
+  int32 percentage = 4;
+  
+  // Specific user IDs to enable for
+  repeated string user_ids = 5;
+  
+  // Specific tenant IDs to enable for
+  repeated string tenant_ids = 6;
+  
+  // Custom rules as JSON
+  string rules = 7;
+  
+  // Variants for A/B testing
+  repeated FeatureFlagVariant variants = 8;
+}
+
+// FeatureFlagVariant represents a variant in an A/B test
+message FeatureFlagVariant {
+  // Variant name
+  string name = 1;
+  
+  // Weight (percentage) for this variant
+  int32 weight = 2;
+  
+  // Variant payload as JSON
+  string payload = 3;
+}

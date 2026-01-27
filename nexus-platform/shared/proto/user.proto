@@ -1,0 +1,1224 @@
+// =============================================================================
+// NEXUS PLATFORM - USER SERVICE PROTOCOL BUFFER DEFINITIONS
+// =============================================================================
+// Defines the gRPC service interface for user management, profiles,
+// preferences, and organization management.
+// =============================================================================
+
+syntax = "proto3";
+
+package nexus.user;
+
+option go_package = "github.com/nexus-platform/nexus/shared/proto/user";
+
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/field_mask.proto";
+import "common.proto";
+
+// =============================================================================
+// USER SERVICE
+// =============================================================================
+
+// UserService handles user management operations
+service UserService {
+  // Create a new user
+  rpc CreateUser(CreateUserRequest) returns (CreateUserResponse);
+  
+  // Get user by ID
+  rpc GetUser(GetUserRequest) returns (GetUserResponse);
+  
+  // Get user by email
+  rpc GetUserByEmail(GetUserByEmailRequest) returns (GetUserByEmailResponse);
+  
+  // List users with filtering and pagination
+  rpc ListUsers(ListUsersRequest) returns (ListUsersResponse);
+  
+  // Update user
+  rpc UpdateUser(UpdateUserRequest) returns (UpdateUserResponse);
+  
+  // Delete user (soft delete)
+  rpc DeleteUser(DeleteUserRequest) returns (DeleteUserResponse);
+  
+  // Restore deleted user
+  rpc RestoreUser(RestoreUserRequest) returns (RestoreUserResponse);
+  
+  // Permanently delete user (GDPR)
+  rpc PermanentlyDeleteUser(PermanentlyDeleteUserRequest) returns (PermanentlyDeleteUserResponse);
+  
+  // Search users
+  rpc SearchUsers(SearchUsersRequest) returns (SearchUsersResponse);
+  
+  // Get user statistics
+  rpc GetUserStats(GetUserStatsRequest) returns (GetUserStatsResponse);
+  
+  // Bulk get users
+  rpc BatchGetUsers(BatchGetUsersRequest) returns (BatchGetUsersResponse);
+  
+  // Check if email exists
+  rpc CheckEmailExists(CheckEmailExistsRequest) returns (CheckEmailExistsResponse);
+  
+  // Check if username exists
+  rpc CheckUsernameExists(CheckUsernameExistsRequest) returns (CheckUsernameExistsResponse);
+}
+
+// =============================================================================
+// PROFILE SERVICE
+// =============================================================================
+
+// ProfileService handles user profile operations
+service ProfileService {
+  // Get user profile
+  rpc GetProfile(GetProfileRequest) returns (GetProfileResponse);
+  
+  // Update profile
+  rpc UpdateProfile(UpdateProfileRequest) returns (UpdateProfileResponse);
+  
+  // Upload avatar
+  rpc UploadAvatar(UploadAvatarRequest) returns (UploadAvatarResponse);
+  
+  // Delete avatar
+  rpc DeleteAvatar(DeleteAvatarRequest) returns (DeleteAvatarResponse);
+  
+  // Get public profile
+  rpc GetPublicProfile(GetPublicProfileRequest) returns (GetPublicProfileResponse);
+  
+  // Update profile visibility
+  rpc UpdateProfileVisibility(UpdateProfileVisibilityRequest) returns (UpdateProfileVisibilityResponse);
+}
+
+// =============================================================================
+// PREFERENCES SERVICE
+// =============================================================================
+
+// PreferencesService handles user preferences
+service PreferencesService {
+  // Get user preferences
+  rpc GetPreferences(GetPreferencesRequest) returns (GetPreferencesResponse);
+  
+  // Update preferences
+  rpc UpdatePreferences(UpdatePreferencesRequest) returns (UpdatePreferencesResponse);
+  
+  // Reset preferences to defaults
+  rpc ResetPreferences(ResetPreferencesRequest) returns (ResetPreferencesResponse);
+  
+  // Get notification settings
+  rpc GetNotificationSettings(GetNotificationSettingsRequest) returns (GetNotificationSettingsResponse);
+  
+  // Update notification settings
+  rpc UpdateNotificationSettings(UpdateNotificationSettingsRequest) returns (UpdateNotificationSettingsResponse);
+}
+
+// =============================================================================
+// ORGANIZATION SERVICE
+// =============================================================================
+
+// OrganizationService handles organization/tenant management
+service OrganizationService {
+  // Create organization
+  rpc CreateOrganization(CreateOrganizationRequest) returns (CreateOrganizationResponse);
+  
+  // Get organization
+  rpc GetOrganization(GetOrganizationRequest) returns (GetOrganizationResponse);
+  
+  // List organizations
+  rpc ListOrganizations(ListOrganizationsRequest) returns (ListOrganizationsResponse);
+  
+  // Update organization
+  rpc UpdateOrganization(UpdateOrganizationRequest) returns (UpdateOrganizationResponse);
+  
+  // Delete organization
+  rpc DeleteOrganization(DeleteOrganizationRequest) returns (DeleteOrganizationResponse);
+  
+  // Add member to organization
+  rpc AddMember(AddMemberRequest) returns (AddMemberResponse);
+  
+  // Remove member from organization
+  rpc RemoveMember(RemoveMemberRequest) returns (RemoveMemberResponse);
+  
+  // Update member role
+  rpc UpdateMemberRole(UpdateMemberRoleRequest) returns (UpdateMemberRoleResponse);
+  
+  // List organization members
+  rpc ListMembers(ListMembersRequest) returns (ListMembersResponse);
+  
+  // Invite user to organization
+  rpc InviteMember(InviteMemberRequest) returns (InviteMemberResponse);
+  
+  // Accept invitation
+  rpc AcceptInvitation(AcceptInvitationRequest) returns (AcceptInvitationResponse);
+  
+  // Get user's organizations
+  rpc GetUserOrganizations(GetUserOrganizationsRequest) returns (GetUserOrganizationsResponse);
+}
+
+// =============================================================================
+// USER MESSAGES
+// =============================================================================
+
+// User represents a user in the system
+message User {
+  // Unique user identifier
+  string id = 1;
+  
+  // Email address
+  string email = 2;
+  
+  // Username (optional, unique)
+  string username = 3;
+  
+  // Display name
+  string display_name = 4;
+  
+  // First name
+  string first_name = 5;
+  
+  // Last name
+  string last_name = 6;
+  
+  // Avatar URL
+  string avatar_url = 7;
+  
+  // Phone number
+  nexus.common.PhoneNumber phone = 8;
+  
+  // User status
+  UserStatus status = 9;
+  
+  // User type
+  UserType type = 10;
+  
+  // Email verified
+  bool email_verified = 11;
+  
+  // Phone verified
+  bool phone_verified = 12;
+  
+  // MFA enabled
+  bool mfa_enabled = 13;
+  
+  // Roles assigned to user
+  repeated string roles = 14;
+  
+  // Permissions
+  repeated string permissions = 15;
+  
+  // Primary organization/tenant
+  string organization_id = 16;
+  
+  // Organizations user belongs to
+  repeated string organization_ids = 17;
+  
+  // User metadata
+  map<string, string> metadata = 18;
+  
+  // User preferences
+  UserPreferences preferences = 19;
+  
+  // User profile
+  UserProfile profile = 20;
+  
+  // Audit information
+  nexus.common.AuditInfo audit = 21;
+  
+  // Last login timestamp
+  google.protobuf.Timestamp last_login_at = 22;
+  
+  // Password changed timestamp
+  google.protobuf.Timestamp password_changed_at = 23;
+  
+  // Account locked until
+  google.protobuf.Timestamp locked_until = 24;
+  
+  // Failed login attempts
+  int32 failed_login_attempts = 25;
+}
+
+// UserStatus indicates user account status
+enum UserStatus {
+  USER_STATUS_UNSPECIFIED = 0;
+  USER_STATUS_PENDING = 1;        // Awaiting email verification
+  USER_STATUS_ACTIVE = 2;         // Normal active state
+  USER_STATUS_INACTIVE = 3;       // Manually deactivated
+  USER_STATUS_SUSPENDED = 4;      // Temporarily suspended
+  USER_STATUS_LOCKED = 5;         // Locked due to failed attempts
+  USER_STATUS_DELETED = 6;        // Soft deleted
+}
+
+// UserType indicates the type of user
+enum UserType {
+  USER_TYPE_UNSPECIFIED = 0;
+  USER_TYPE_REGULAR = 1;          // Standard user
+  USER_TYPE_ADMIN = 2;            // Administrator
+  USER_TYPE_SERVICE = 3;          // Service account
+  USER_TYPE_BOT = 4;              // Automated bot account
+}
+
+// =============================================================================
+// PROFILE MESSAGES
+// =============================================================================
+
+// UserProfile contains extended profile information
+message UserProfile {
+  // User ID
+  string user_id = 1;
+  
+  // Bio/description
+  string bio = 2;
+  
+  // Company/organization name
+  string company = 3;
+  
+  // Job title
+  string job_title = 4;
+  
+  // Website URL
+  string website = 5;
+  
+  // Location
+  string location = 6;
+  
+  // Address
+  nexus.common.Address address = 7;
+  
+  // Social links
+  SocialLinks social_links = 8;
+  
+  // Date of birth
+  google.protobuf.Timestamp date_of_birth = 9;
+  
+  // Gender
+  string gender = 10;
+  
+  // Profile visibility
+  ProfileVisibility visibility = 11;
+  
+  // Custom fields
+  map<string, string> custom_fields = 12;
+  
+  // Skills/tags
+  repeated string skills = 13;
+  
+  // Languages spoken
+  repeated string languages = 14;
+}
+
+// SocialLinks contains social media profile URLs
+message SocialLinks {
+  string twitter = 1;
+  string linkedin = 2;
+  string github = 3;
+  string facebook = 4;
+  string instagram = 5;
+  map<string, string> other = 6;
+}
+
+// ProfileVisibility controls who can see profile information
+enum ProfileVisibility {
+  PROFILE_VISIBILITY_UNSPECIFIED = 0;
+  PROFILE_VISIBILITY_PUBLIC = 1;       // Anyone can view
+  PROFILE_VISIBILITY_PRIVATE = 2;      // Only user and admins
+  PROFILE_VISIBILITY_ORGANIZATION = 3; // Only organization members
+  PROFILE_VISIBILITY_CONNECTIONS = 4;  // Only connected users
+}
+
+// =============================================================================
+// PREFERENCES MESSAGES
+// =============================================================================
+
+// UserPreferences contains user settings
+message UserPreferences {
+  // User ID
+  string user_id = 1;
+  
+  // Timezone (e.g., "America/New_York")
+  string timezone = 2;
+  
+  // Locale (e.g., "en-US")
+  string locale = 3;
+  
+  // Date format preference
+  string date_format = 4;
+  
+  // Time format (12h/24h)
+  string time_format = 5;
+  
+  // Theme preference
+  ThemePreference theme = 6;
+  
+  // Notification preferences
+  NotificationPreferences notifications = 7;
+  
+  // Privacy settings
+  PrivacySettings privacy = 8;
+  
+  // Accessibility settings
+  AccessibilitySettings accessibility = 9;
+  
+  // Custom preferences as key-value pairs
+  map<string, string> custom = 10;
+}
+
+// ThemePreference for UI
+enum ThemePreference {
+  THEME_PREFERENCE_UNSPECIFIED = 0;
+  THEME_PREFERENCE_LIGHT = 1;
+  THEME_PREFERENCE_DARK = 2;
+  THEME_PREFERENCE_SYSTEM = 3;
+}
+
+// NotificationPreferences
+message NotificationPreferences {
+  // Email notifications
+  bool email_enabled = 1;
+  EmailNotificationSettings email_settings = 2;
+  
+  // Push notifications
+  bool push_enabled = 3;
+  PushNotificationSettings push_settings = 4;
+  
+  // SMS notifications
+  bool sms_enabled = 5;
+  SMSNotificationSettings sms_settings = 6;
+  
+  // In-app notifications
+  bool in_app_enabled = 7;
+  
+  // Digest frequency
+  DigestFrequency digest_frequency = 8;
+  
+  // Quiet hours
+  QuietHours quiet_hours = 9;
+}
+
+// EmailNotificationSettings
+message EmailNotificationSettings {
+  bool marketing = 1;
+  bool product_updates = 2;
+  bool security_alerts = 3;
+  bool billing = 4;
+  bool team_activity = 5;
+  bool mentions = 6;
+  bool weekly_digest = 7;
+}
+
+// PushNotificationSettings
+message PushNotificationSettings {
+  bool messages = 1;
+  bool mentions = 2;
+  bool comments = 3;
+  bool team_activity = 4;
+  bool reminders = 5;
+}
+
+// SMSNotificationSettings
+message SMSNotificationSettings {
+  bool security_alerts = 1;
+  bool two_factor = 2;
+  bool urgent_only = 3;
+}
+
+// DigestFrequency
+enum DigestFrequency {
+  DIGEST_FREQUENCY_UNSPECIFIED = 0;
+  DIGEST_FREQUENCY_REALTIME = 1;
+  DIGEST_FREQUENCY_DAILY = 2;
+  DIGEST_FREQUENCY_WEEKLY = 3;
+  DIGEST_FREQUENCY_NEVER = 4;
+}
+
+// QuietHours settings
+message QuietHours {
+  bool enabled = 1;
+  string start_time = 2;  // HH:MM format
+  string end_time = 3;    // HH:MM format
+  repeated int32 days = 4; // 0=Sunday, 6=Saturday
+}
+
+// PrivacySettings
+message PrivacySettings {
+  bool show_email = 1;
+  bool show_phone = 2;
+  bool show_location = 3;
+  bool show_activity_status = 4;
+  bool allow_search_engines = 5;
+  bool allow_data_collection = 6;
+}
+
+// AccessibilitySettings
+message AccessibilitySettings {
+  bool high_contrast = 1;
+  bool reduce_motion = 2;
+  bool screen_reader_optimized = 3;
+  int32 font_size = 4;
+}
+
+// =============================================================================
+// ORGANIZATION MESSAGES
+// =============================================================================
+
+// Organization represents a tenant/organization
+message Organization {
+  // Unique organization ID
+  string id = 1;
+  
+  // Organization name
+  string name = 2;
+  
+  // URL-friendly slug
+  string slug = 3;
+  
+  // Description
+  string description = 4;
+  
+  // Logo URL
+  string logo_url = 5;
+  
+  // Website URL
+  string website = 6;
+  
+  // Organization type
+  OrganizationType type = 7;
+  
+  // Organization status
+  OrganizationStatus status = 8;
+  
+  // Billing email
+  string billing_email = 9;
+  
+  // Address
+  nexus.common.Address address = 10;
+  
+  // Owner user ID
+  string owner_id = 11;
+  
+  // Settings
+  OrganizationSettings settings = 12;
+  
+  // Plan/subscription
+  string plan_id = 13;
+  
+  // Member count
+  int32 member_count = 14;
+  
+  // Custom metadata
+  map<string, string> metadata = 15;
+  
+  // Audit information
+  nexus.common.AuditInfo audit = 16;
+}
+
+// OrganizationType
+enum OrganizationType {
+  ORGANIZATION_TYPE_UNSPECIFIED = 0;
+  ORGANIZATION_TYPE_PERSONAL = 1;
+  ORGANIZATION_TYPE_TEAM = 2;
+  ORGANIZATION_TYPE_COMPANY = 3;
+  ORGANIZATION_TYPE_ENTERPRISE = 4;
+}
+
+// OrganizationStatus
+enum OrganizationStatus {
+  ORGANIZATION_STATUS_UNSPECIFIED = 0;
+  ORGANIZATION_STATUS_ACTIVE = 1;
+  ORGANIZATION_STATUS_SUSPENDED = 2;
+  ORGANIZATION_STATUS_DELETED = 3;
+}
+
+// OrganizationSettings
+message OrganizationSettings {
+  // Require MFA for all members
+  bool require_mfa = 1;
+  
+  // Allowed email domains for members
+  repeated string allowed_email_domains = 2;
+  
+  // Default role for new members
+  string default_role = 3;
+  
+  // SSO configuration
+  SSOConfig sso_config = 4;
+  
+  // Session timeout
+  int32 session_timeout_minutes = 5;
+  
+  // IP allowlist
+  repeated string ip_allowlist = 6;
+  
+  // Custom branding
+  BrandingConfig branding = 7;
+}
+
+// SSOConfig for organization SSO
+message SSOConfig {
+  bool enabled = 1;
+  string provider = 2;  // okta, azure-ad, etc.
+  string entity_id = 3;
+  string sso_url = 4;
+  string certificate = 5;
+  bool enforce_sso = 6;
+}
+
+// BrandingConfig for white-labeling
+message BrandingConfig {
+  string primary_color = 1;
+  string secondary_color = 2;
+  string logo_url = 3;
+  string favicon_url = 4;
+  string custom_css = 5;
+}
+
+// OrganizationMember represents membership
+message OrganizationMember {
+  string id = 1;
+  string user_id = 2;
+  string organization_id = 3;
+  string role = 4;
+  MemberStatus status = 5;
+  google.protobuf.Timestamp joined_at = 6;
+  string invited_by = 7;
+  User user = 8;  // Populated when requested
+}
+
+// MemberStatus
+enum MemberStatus {
+  MEMBER_STATUS_UNSPECIFIED = 0;
+  MEMBER_STATUS_PENDING = 1;
+  MEMBER_STATUS_ACTIVE = 2;
+  MEMBER_STATUS_INACTIVE = 3;
+  MEMBER_STATUS_REMOVED = 4;
+}
+
+// OrganizationInvitation
+message OrganizationInvitation {
+  string id = 1;
+  string organization_id = 2;
+  string email = 3;
+  string role = 4;
+  string invited_by = 5;
+  google.protobuf.Timestamp created_at = 6;
+  google.protobuf.Timestamp expires_at = 7;
+  InvitationStatus status = 8;
+  string token = 9;
+}
+
+// InvitationStatus
+enum InvitationStatus {
+  INVITATION_STATUS_UNSPECIFIED = 0;
+  INVITATION_STATUS_PENDING = 1;
+  INVITATION_STATUS_ACCEPTED = 2;
+  INVITATION_STATUS_DECLINED = 3;
+  INVITATION_STATUS_EXPIRED = 4;
+  INVITATION_STATUS_REVOKED = 5;
+}
+
+// =============================================================================
+// REQUEST/RESPONSE MESSAGES
+// =============================================================================
+
+// CreateUserRequest
+message CreateUserRequest {
+  nexus.common.RequestMetadata metadata = 1;
+  string email = 2;
+  string username = 3;
+  string display_name = 4;
+  string first_name = 5;
+  string last_name = 6;
+  string password = 7;
+  UserType type = 8;
+  repeated string roles = 9;
+  string organization_id = 10;
+  map<string, string> custom_metadata = 11;
+  bool send_welcome_email = 12;
+  bool skip_email_verification = 13;
+}
+
+// CreateUserResponse
+message CreateUserResponse {
+  nexus.common.ResponseMetadata metadata = 1;
+  bool success = 2;
+  User user = 3;
+  nexus.common.Error error = 4;
+}
+
+// GetUserRequest
+message GetUserRequest {
+  nexus.common.RequestMetadata metadata = 1;
+  string user_id = 2;
+  bool include_profile = 3;
+  bool include_preferences = 4;
+  bool include_organizations = 5;
+}
+
+// GetUserResponse
+message GetUserResponse {
+  nexus.common.ResponseMetadata metadata = 1;
+  User user = 2;
+  nexus.common.Error error = 3;
+}
+
+// GetUserByEmailRequest
+message GetUserByEmailRequest {
+  nexus.common.RequestMetadata metadata = 1;
+  string email = 2;
+}
+
+// GetUserByEmailResponse
+message GetUserByEmailResponse {
+  nexus.common.ResponseMetadata metadata = 1;
+  User user = 2;
+  nexus.common.Error error = 3;
+}
+
+// ListUsersRequest
+message ListUsersRequest {
+  nexus.common.RequestMetadata metadata = 1;
+  nexus.common.PaginationRequest pagination = 2;
+  UserFilters filters = 3;
+}
+
+// UserFilters for filtering users
+message UserFilters {
+  repeated UserStatus statuses = 1;
+  repeated UserType types = 2;
+  string organization_id = 3;
+  repeated string roles = 4;
+  bool email_verified = 5;
+  nexus.common.DateRange created_at = 6;
+  nexus.common.DateRange last_login_at = 7;
+  string search_query = 8;
+}
+
+// ListUsersResponse
+message ListUsersResponse {
+  nexus.common.ResponseMetadata metadata = 1;
+  repeated User users = 2;
+  nexus.common.PaginationResponse pagination = 3;
+}
+
+// UpdateUserRequest
+message UpdateUserRequest {
+  nexus.common.RequestMetadata metadata = 1;
+  string user_id = 2;
+  google.protobuf.FieldMask update_mask = 3;
+  string email = 4;
+  string username = 5;
+  string display_name = 6;
+  string first_name = 7;
+  string last_name = 8;
+  UserStatus status = 9;
+  repeated string roles = 10;
+  map<string, string> metadata = 11;
+}
+
+// UpdateUserResponse
+message UpdateUserResponse {
+  nexus.common.ResponseMetadata metadata = 1;
+  bool success = 2;
+  User user = 3;
+  nexus.common.Error error = 4;
+}
+
+// DeleteUserRequest
+message DeleteUserRequest {
+  nexus.common.RequestMetadata metadata = 1;
+  string user_id = 2;
+  bool hard_delete = 3;
+}
+
+// DeleteUserResponse
+message DeleteUserResponse {
+  nexus.common.ResponseMetadata metadata = 1;
+  bool success = 2;
+  nexus.common.Error error = 3;
+}
+
+// RestoreUserRequest
+message RestoreUserRequest {
+  nexus.common.RequestMetadata metadata = 1;
+  string user_id = 2;
+}
+
+// RestoreUserResponse
+message RestoreUserResponse {
+  nexus.common.ResponseMetadata metadata = 1;
+  bool success = 2;
+  User user = 3;
+  nexus.common.Error error = 4;
+}
+
+// PermanentlyDeleteUserRequest (GDPR right to be forgotten)
+message PermanentlyDeleteUserRequest {
+  nexus.common.RequestMetadata metadata = 1;
+  string user_id = 2;
+  string confirmation = 3;  // Requires typing "DELETE" for safety
+}
+
+// PermanentlyDeleteUserResponse
+message PermanentlyDeleteUserResponse {
+  nexus.common.ResponseMetadata metadata = 1;
+  bool success = 2;
+  nexus.common.Error error = 3;
+}
+
+// SearchUsersRequest
+message SearchUsersRequest {
+  nexus.common.RequestMetadata metadata = 1;
+  string query = 2;
+  nexus.common.PaginationRequest pagination = 3;
+  UserFilters filters = 4;
+}
+
+// SearchUsersResponse
+message SearchUsersResponse {
+  nexus.common.ResponseMetadata metadata = 1;
+  repeated User users = 2;
+  nexus.common.PaginationResponse pagination = 3;
+}
+
+// GetUserStatsRequest
+message GetUserStatsRequest {
+  nexus.common.RequestMetadata metadata = 1;
+  string organization_id = 2;
+  nexus.common.DateRange date_range = 3;
+}
+
+// GetUserStatsResponse
+message GetUserStatsResponse {
+  nexus.common.ResponseMetadata metadata = 1;
+  int64 total_users = 2;
+  int64 active_users = 3;
+  int64 new_users = 4;
+  int64 deleted_users = 5;
+  map<string, int64> users_by_status = 6;
+  map<string, int64> users_by_role = 7;
+  repeated DailyUserStats daily_stats = 8;
+}
+
+// DailyUserStats
+message DailyUserStats {
+  google.protobuf.Timestamp date = 1;
+  int64 new_signups = 2;
+  int64 active_users = 3;
+  int64 deleted_users = 4;
+}
+
+// BatchGetUsersRequest
+message BatchGetUsersRequest {
+  nexus.common.RequestMetadata metadata = 1;
+  repeated string user_ids = 2;
+}
+
+// BatchGetUsersResponse
+message BatchGetUsersResponse {
+  nexus.common.ResponseMetadata metadata = 1;
+  map<string, User> users = 2;
+  repeated string not_found = 3;
+}
+
+// CheckEmailExistsRequest
+message CheckEmailExistsRequest {
+  nexus.common.RequestMetadata metadata = 1;
+  string email = 2;
+}
+
+// CheckEmailExistsResponse
+message CheckEmailExistsResponse {
+  nexus.common.ResponseMetadata metadata = 1;
+  bool exists = 2;
+}
+
+// CheckUsernameExistsRequest
+message CheckUsernameExistsRequest {
+  nexus.common.RequestMetadata metadata = 1;
+  string username = 2;
+}
+
+// CheckUsernameExistsResponse
+message CheckUsernameExistsResponse {
+  nexus.common.ResponseMetadata metadata = 1;
+  bool exists = 2;
+}
+
+// =============================================================================
+// PROFILE REQUEST/RESPONSE
+// =============================================================================
+
+// GetProfileRequest
+message GetProfileRequest {
+  nexus.common.RequestMetadata metadata = 1;
+  string user_id = 2;
+}
+
+// GetProfileResponse
+message GetProfileResponse {
+  nexus.common.ResponseMetadata metadata = 1;
+  UserProfile profile = 2;
+  nexus.common.Error error = 3;
+}
+
+// UpdateProfileRequest
+message UpdateProfileRequest {
+  nexus.common.RequestMetadata metadata = 1;
+  string user_id = 2;
+  google.protobuf.FieldMask update_mask = 3;
+  UserProfile profile = 4;
+}
+
+// UpdateProfileResponse
+message UpdateProfileResponse {
+  nexus.common.ResponseMetadata metadata = 1;
+  bool success = 2;
+  UserProfile profile = 3;
+  nexus.common.Error error = 4;
+}
+
+// UploadAvatarRequest
+message UploadAvatarRequest {
+  nexus.common.RequestMetadata metadata = 1;
+  string user_id = 2;
+  bytes image_data = 3;
+  string content_type = 4;
+}
+
+// UploadAvatarResponse
+message UploadAvatarResponse {
+  nexus.common.ResponseMetadata metadata = 1;
+  bool success = 2;
+  string avatar_url = 3;
+  nexus.common.Error error = 4;
+}
+
+// DeleteAvatarRequest
+message DeleteAvatarRequest {
+  nexus.common.RequestMetadata metadata = 1;
+  string user_id = 2;
+}
+
+// DeleteAvatarResponse
+message DeleteAvatarResponse {
+  nexus.common.ResponseMetadata metadata = 1;
+  bool success = 2;
+  nexus.common.Error error = 3;
+}
+
+// GetPublicProfileRequest
+message GetPublicProfileRequest {
+  nexus.common.RequestMetadata metadata = 1;
+  string user_id = 2;
+}
+
+// GetPublicProfileResponse
+message GetPublicProfileResponse {
+  nexus.common.ResponseMetadata metadata = 1;
+  PublicProfile profile = 2;
+  nexus.common.Error error = 3;
+}
+
+// PublicProfile is a subset of profile visible to others
+message PublicProfile {
+  string user_id = 1;
+  string display_name = 2;
+  string avatar_url = 3;
+  string bio = 4;
+  string company = 5;
+  string location = 6;
+  string website = 7;
+  SocialLinks social_links = 8;
+  repeated string skills = 9;
+}
+
+// UpdateProfileVisibilityRequest
+message UpdateProfileVisibilityRequest {
+  nexus.common.RequestMetadata metadata = 1;
+  string user_id = 2;
+  ProfileVisibility visibility = 3;
+}
+
+// UpdateProfileVisibilityResponse
+message UpdateProfileVisibilityResponse {
+  nexus.common.ResponseMetadata metadata = 1;
+  bool success = 2;
+  nexus.common.Error error = 3;
+}
+
+// =============================================================================
+// PREFERENCES REQUEST/RESPONSE
+// =============================================================================
+
+// GetPreferencesRequest
+message GetPreferencesRequest {
+  nexus.common.RequestMetadata metadata = 1;
+  string user_id = 2;
+}
+
+// GetPreferencesResponse
+message GetPreferencesResponse {
+  nexus.common.ResponseMetadata metadata = 1;
+  UserPreferences preferences = 2;
+  nexus.common.Error error = 3;
+}
+
+// UpdatePreferencesRequest
+message UpdatePreferencesRequest {
+  nexus.common.RequestMetadata metadata = 1;
+  string user_id = 2;
+  google.protobuf.FieldMask update_mask = 3;
+  UserPreferences preferences = 4;
+}
+
+// UpdatePreferencesResponse
+message UpdatePreferencesResponse {
+  nexus.common.ResponseMetadata metadata = 1;
+  bool success = 2;
+  UserPreferences preferences = 3;
+  nexus.common.Error error = 4;
+}
+
+// ResetPreferencesRequest
+message ResetPreferencesRequest {
+  nexus.common.RequestMetadata metadata = 1;
+  string user_id = 2;
+}
+
+// ResetPreferencesResponse
+message ResetPreferencesResponse {
+  nexus.common.ResponseMetadata metadata = 1;
+  bool success = 2;
+  UserPreferences preferences = 3;
+  nexus.common.Error error = 4;
+}
+
+// GetNotificationSettingsRequest
+message GetNotificationSettingsRequest {
+  nexus.common.RequestMetadata metadata = 1;
+  string user_id = 2;
+}
+
+// GetNotificationSettingsResponse
+message GetNotificationSettingsResponse {
+  nexus.common.ResponseMetadata metadata = 1;
+  NotificationPreferences settings = 2;
+  nexus.common.Error error = 3;
+}
+
+// UpdateNotificationSettingsRequest
+message UpdateNotificationSettingsRequest {
+  nexus.common.RequestMetadata metadata = 1;
+  string user_id = 2;
+  NotificationPreferences settings = 3;
+}
+
+// UpdateNotificationSettingsResponse
+message UpdateNotificationSettingsResponse {
+  nexus.common.ResponseMetadata metadata = 1;
+  bool success = 2;
+  NotificationPreferences settings = 3;
+  nexus.common.Error error = 4;
+}
+
+// =============================================================================
+// ORGANIZATION REQUEST/RESPONSE
+// =============================================================================
+
+// CreateOrganizationRequest
+message CreateOrganizationRequest {
+  nexus.common.RequestMetadata metadata = 1;
+  string name = 2;
+  string slug = 3;
+  string description = 4;
+  OrganizationType type = 5;
+  string billing_email = 6;
+  nexus.common.Address address = 7;
+}
+
+// CreateOrganizationResponse
+message CreateOrganizationResponse {
+  nexus.common.ResponseMetadata metadata = 1;
+  bool success = 2;
+  Organization organization = 3;
+  nexus.common.Error error = 4;
+}
+
+// GetOrganizationRequest
+message GetOrganizationRequest {
+  nexus.common.RequestMetadata metadata = 1;
+  string organization_id = 2;
+  bool include_members = 3;
+}
+
+// GetOrganizationResponse
+message GetOrganizationResponse {
+  nexus.common.ResponseMetadata metadata = 1;
+  Organization organization = 2;
+  repeated OrganizationMember members = 3;
+  nexus.common.Error error = 4;
+}
+
+// ListOrganizationsRequest
+message ListOrganizationsRequest {
+  nexus.common.RequestMetadata metadata = 1;
+  nexus.common.PaginationRequest pagination = 2;
+  OrganizationFilters filters = 3;
+}
+
+// OrganizationFilters
+message OrganizationFilters {
+  repeated OrganizationType types = 1;
+  repeated OrganizationStatus statuses = 2;
+  string search_query = 3;
+}
+
+// ListOrganizationsResponse
+message ListOrganizationsResponse {
+  nexus.common.ResponseMetadata metadata = 1;
+  repeated Organization organizations = 2;
+  nexus.common.PaginationResponse pagination = 3;
+}
+
+// UpdateOrganizationRequest
+message UpdateOrganizationRequest {
+  nexus.common.RequestMetadata metadata = 1;
+  string organization_id = 2;
+  google.protobuf.FieldMask update_mask = 3;
+  string name = 4;
+  string description = 5;
+  string logo_url = 6;
+  string website = 7;
+  string billing_email = 8;
+  nexus.common.Address address = 9;
+  OrganizationSettings settings = 10;
+}
+
+// UpdateOrganizationResponse
+message UpdateOrganizationResponse {
+  nexus.common.ResponseMetadata metadata = 1;
+  bool success = 2;
+  Organization organization = 3;
+  nexus.common.Error error = 4;
+}
+
+// DeleteOrganizationRequest
+message DeleteOrganizationRequest {
+  nexus.common.RequestMetadata metadata = 1;
+  string organization_id = 2;
+  string confirmation = 3;
+}
+
+// DeleteOrganizationResponse
+message DeleteOrganizationResponse {
+  nexus.common.ResponseMetadata metadata = 1;
+  bool success = 2;
+  nexus.common.Error error = 3;
+}
+
+// AddMemberRequest
+message AddMemberRequest {
+  nexus.common.RequestMetadata metadata = 1;
+  string organization_id = 2;
+  string user_id = 3;
+  string role = 4;
+}
+
+// AddMemberResponse
+message AddMemberResponse {
+  nexus.common.ResponseMetadata metadata = 1;
+  bool success = 2;
+  OrganizationMember member = 3;
+  nexus.common.Error error = 4;
+}
+
+// RemoveMemberRequest
+message RemoveMemberRequest {
+  nexus.common.RequestMetadata metadata = 1;
+  string organization_id = 2;
+  string user_id = 3;
+}
+
+// RemoveMemberResponse
+message RemoveMemberResponse {
+  nexus.common.ResponseMetadata metadata = 1;
+  bool success = 2;
+  nexus.common.Error error = 3;
+}
+
+// UpdateMemberRoleRequest
+message UpdateMemberRoleRequest {
+  nexus.common.RequestMetadata metadata = 1;
+  string organization_id = 2;
+  string user_id = 3;
+  string role = 4;
+}
+
+// UpdateMemberRoleResponse
+message UpdateMemberRoleResponse {
+  nexus.common.ResponseMetadata metadata = 1;
+  bool success = 2;
+  OrganizationMember member = 3;
+  nexus.common.Error error = 4;
+}
+
+// ListMembersRequest
+message ListMembersRequest {
+  nexus.common.RequestMetadata metadata = 1;
+  string organization_id = 2;
+  nexus.common.PaginationRequest pagination = 3;
+  repeated string roles = 4;
+  repeated MemberStatus statuses = 5;
+}
+
+// ListMembersResponse
+message ListMembersResponse {
+  nexus.common.ResponseMetadata metadata = 1;
+  repeated OrganizationMember members = 2;
+  nexus.common.PaginationResponse pagination = 3;
+}
+
+// InviteMemberRequest
+message InviteMemberRequest {
+  nexus.common.RequestMetadata metadata = 1;
+  string organization_id = 2;
+  string email = 3;
+  string role = 4;
+  string message = 5;
+}
+
+// InviteMemberResponse
+message InviteMemberResponse {
+  nexus.common.ResponseMetadata metadata = 1;
+  bool success = 2;
+  OrganizationInvitation invitation = 3;
+  nexus.common.Error error = 4;
+}
+
+// AcceptInvitationRequest
+message AcceptInvitationRequest {
+  nexus.common.RequestMetadata metadata = 1;
+  string token = 2;
+}
+
+// AcceptInvitationResponse
+message AcceptInvitationResponse {
+  nexus.common.ResponseMetadata metadata = 1;
+  bool success = 2;
+  Organization organization = 3;
+  nexus.common.Error error = 4;
+}
+
+// GetUserOrganizationsRequest
+message GetUserOrganizationsRequest {
+  nexus.common.RequestMetadata metadata = 1;
+  string user_id = 2;
+}
+
+// GetUserOrganizationsResponse
+message GetUserOrganizationsResponse {
+  nexus.common.ResponseMetadata metadata = 1;
+  repeated OrganizationMembership memberships = 2;
+}
+
+// OrganizationMembership
+message OrganizationMembership {
+  Organization organization = 1;
+  string role = 2;
+  google.protobuf.Timestamp joined_at = 3;
+}

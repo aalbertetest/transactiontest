@@ -1,0 +1,992 @@
+// =============================================================================
+// NEXUS PLATFORM - AUTHENTICATION SERVICE PROTOCOL BUFFER DEFINITIONS
+// =============================================================================
+// Defines the gRPC service interface for authentication, authorization,
+// token management, and multi-factor authentication.
+// =============================================================================
+
+syntax = "proto3";
+
+package nexus.auth;
+
+option go_package = "github.com/nexus-platform/nexus/shared/proto/auth";
+
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/duration.proto";
+import "common.proto";
+
+// =============================================================================
+// AUTH SERVICE
+// =============================================================================
+
+// AuthService handles authentication and authorization
+service AuthService {
+  // Register a new user account
+  rpc Register(RegisterRequest) returns (RegisterResponse);
+  
+  // Authenticate with credentials
+  rpc Login(LoginRequest) returns (LoginResponse);
+  
+  // Logout and invalidate tokens
+  rpc Logout(LogoutRequest) returns (LogoutResponse);
+  
+  // Refresh an access token
+  rpc RefreshToken(RefreshTokenRequest) returns (RefreshTokenResponse);
+  
+  // Validate an access token
+  rpc ValidateToken(ValidateTokenRequest) returns (ValidateTokenResponse);
+  
+  // Revoke a specific token
+  rpc RevokeToken(RevokeTokenRequest) returns (RevokeTokenResponse);
+  
+  // Revoke all tokens for a user
+  rpc RevokeAllTokens(RevokeAllTokensRequest) returns (RevokeAllTokensResponse);
+  
+  // Initiate password reset
+  rpc RequestPasswordReset(PasswordResetRequest) returns (PasswordResetResponse);
+  
+  // Complete password reset with token
+  rpc ResetPassword(ResetPasswordRequest) returns (ResetPasswordResponse);
+  
+  // Change password (authenticated)
+  rpc ChangePassword(ChangePasswordRequest) returns (ChangePasswordResponse);
+  
+  // Verify email address
+  rpc VerifyEmail(VerifyEmailRequest) returns (VerifyEmailResponse);
+  
+  // Resend email verification
+  rpc ResendVerificationEmail(ResendVerificationRequest) returns (ResendVerificationResponse);
+  
+  // OAuth2 authorization code exchange
+  rpc ExchangeAuthCode(ExchangeAuthCodeRequest) returns (ExchangeAuthCodeResponse);
+  
+  // Get user's active sessions
+  rpc GetSessions(GetSessionsRequest) returns (GetSessionsResponse);
+  
+  // Terminate a specific session
+  rpc TerminateSession(TerminateSessionRequest) returns (TerminateSessionResponse);
+}
+
+// =============================================================================
+// MFA SERVICE
+// =============================================================================
+
+// MFAService handles multi-factor authentication
+service MFAService {
+  // Enable MFA for a user
+  rpc EnableMFA(EnableMFARequest) returns (EnableMFAResponse);
+  
+  // Disable MFA for a user
+  rpc DisableMFA(DisableMFARequest) returns (DisableMFAResponse);
+  
+  // Verify MFA code during login
+  rpc VerifyMFA(VerifyMFARequest) returns (VerifyMFAResponse);
+  
+  // Generate backup codes
+  rpc GenerateBackupCodes(GenerateBackupCodesRequest) returns (GenerateBackupCodesResponse);
+  
+  // Verify backup code
+  rpc VerifyBackupCode(VerifyBackupCodeRequest) returns (VerifyBackupCodeResponse);
+  
+  // Get MFA status for a user
+  rpc GetMFAStatus(GetMFAStatusRequest) returns (GetMFAStatusResponse);
+  
+  // Register a WebAuthn device
+  rpc RegisterWebAuthnDevice(RegisterWebAuthnRequest) returns (RegisterWebAuthnResponse);
+  
+  // Verify WebAuthn assertion
+  rpc VerifyWebAuthn(VerifyWebAuthnRequest) returns (VerifyWebAuthnResponse);
+}
+
+// =============================================================================
+// API KEY SERVICE
+// =============================================================================
+
+// APIKeyService handles API key management
+service APIKeyService {
+  // Create a new API key
+  rpc CreateAPIKey(CreateAPIKeyRequest) returns (CreateAPIKeyResponse);
+  
+  // List API keys for a user
+  rpc ListAPIKeys(ListAPIKeysRequest) returns (ListAPIKeysResponse);
+  
+  // Get details of an API key
+  rpc GetAPIKey(GetAPIKeyRequest) returns (GetAPIKeyResponse);
+  
+  // Update API key permissions
+  rpc UpdateAPIKey(UpdateAPIKeyRequest) returns (UpdateAPIKeyResponse);
+  
+  // Revoke an API key
+  rpc RevokeAPIKey(RevokeAPIKeyRequest) returns (RevokeAPIKeyResponse);
+  
+  // Validate an API key
+  rpc ValidateAPIKey(ValidateAPIKeyRequest) returns (ValidateAPIKeyResponse);
+}
+
+// =============================================================================
+// REGISTRATION
+// =============================================================================
+
+// RegisterRequest contains user registration data
+message RegisterRequest {
+  nexus.common.RequestMetadata metadata = 1;
+  
+  // User's email address
+  string email = 2;
+  
+  // User's password (min 12 chars, mixed case, numbers, symbols)
+  string password = 3;
+  
+  // User's display name
+  string display_name = 4;
+  
+  // Optional: First name
+  string first_name = 5;
+  
+  // Optional: Last name
+  string last_name = 6;
+  
+  // Optional: Phone number for SMS verification
+  string phone_number = 7;
+  
+  // Accepted terms of service version
+  string accepted_tos_version = 8;
+  
+  // Marketing email opt-in
+  bool marketing_opt_in = 9;
+  
+  // Invite code if registration requires one
+  string invite_code = 10;
+  
+  // reCAPTCHA response token
+  string captcha_response = 11;
+  
+  // Timezone
+  string timezone = 12;
+  
+  // Preferred language
+  string language = 13;
+}
+
+// RegisterResponse contains registration result
+message RegisterResponse {
+  nexus.common.ResponseMetadata metadata = 1;
+  
+  // Whether registration was successful
+  bool success = 2;
+  
+  // User ID if successful
+  string user_id = 3;
+  
+  // Access token (if auto-login enabled)
+  TokenPair tokens = 4;
+  
+  // Whether email verification is required
+  bool email_verification_required = 5;
+  
+  // Whether phone verification is required
+  bool phone_verification_required = 6;
+  
+  // Error if registration failed
+  nexus.common.Error error = 7;
+}
+
+// =============================================================================
+// LOGIN
+// =============================================================================
+
+// LoginRequest contains login credentials
+message LoginRequest {
+  nexus.common.RequestMetadata metadata = 1;
+  
+  // Authentication method
+  AuthMethod method = 2;
+  
+  // Credentials based on method
+  oneof credentials {
+    // Email/password login
+    EmailPasswordCredentials email_password = 3;
+    
+    // OAuth2 login
+    OAuthCredentials oauth = 4;
+    
+    // API key login
+    APIKeyCredentials api_key = 5;
+    
+    // SSO/SAML login
+    SSOCredentials sso = 6;
+  }
+  
+  // Device information for session tracking
+  DeviceInfo device = 7;
+  
+  // Remember me option (extends token lifetime)
+  bool remember_me = 8;
+  
+  // reCAPTCHA response for suspicious logins
+  string captcha_response = 9;
+}
+
+// EmailPasswordCredentials for email/password auth
+message EmailPasswordCredentials {
+  string email = 1;
+  string password = 2;
+}
+
+// OAuthCredentials for OAuth2 authentication
+message OAuthCredentials {
+  string provider = 1;  // google, github, etc.
+  string code = 2;      // Authorization code
+  string state = 3;     // State parameter
+  string redirect_uri = 4;
+}
+
+// APIKeyCredentials for API key authentication
+message APIKeyCredentials {
+  string api_key = 1;
+  string api_secret = 2;
+}
+
+// SSOCredentials for SSO/SAML authentication
+message SSOCredentials {
+  string provider = 1;
+  string assertion = 2;
+}
+
+// DeviceInfo contains information about the client device
+message DeviceInfo {
+  // Unique device identifier
+  string device_id = 1;
+  
+  // Device type
+  DeviceType device_type = 2;
+  
+  // Operating system
+  string os = 3;
+  
+  // OS version
+  string os_version = 4;
+  
+  // Browser or app name
+  string browser = 5;
+  
+  // Browser or app version
+  string browser_version = 6;
+  
+  // Screen resolution
+  string screen_resolution = 7;
+  
+  // Push notification token
+  string push_token = 8;
+}
+
+// DeviceType indicates the type of device
+enum DeviceType {
+  DEVICE_TYPE_UNSPECIFIED = 0;
+  DEVICE_TYPE_DESKTOP = 1;
+  DEVICE_TYPE_MOBILE = 2;
+  DEVICE_TYPE_TABLET = 3;
+  DEVICE_TYPE_IOT = 4;
+  DEVICE_TYPE_SERVER = 5;
+}
+
+// AuthMethod indicates the authentication method
+enum AuthMethod {
+  AUTH_METHOD_UNSPECIFIED = 0;
+  AUTH_METHOD_EMAIL_PASSWORD = 1;
+  AUTH_METHOD_OAUTH2 = 2;
+  AUTH_METHOD_API_KEY = 3;
+  AUTH_METHOD_SSO = 4;
+  AUTH_METHOD_PASSWORDLESS = 5;
+  AUTH_METHOD_WEBAUTHN = 6;
+}
+
+// LoginResponse contains login result
+message LoginResponse {
+  nexus.common.ResponseMetadata metadata = 1;
+  
+  // Whether login was successful
+  bool success = 2;
+  
+  // Login status
+  LoginStatus status = 3;
+  
+  // Token pair if successful
+  TokenPair tokens = 4;
+  
+  // User information
+  AuthUser user = 5;
+  
+  // Session information
+  Session session = 6;
+  
+  // MFA challenge if required
+  MFAChallenge mfa_challenge = 7;
+  
+  // Error if login failed
+  nexus.common.Error error = 8;
+}
+
+// LoginStatus indicates the result of a login attempt
+enum LoginStatus {
+  LOGIN_STATUS_UNSPECIFIED = 0;
+  LOGIN_STATUS_SUCCESS = 1;
+  LOGIN_STATUS_MFA_REQUIRED = 2;
+  LOGIN_STATUS_PASSWORD_EXPIRED = 3;
+  LOGIN_STATUS_ACCOUNT_LOCKED = 4;
+  LOGIN_STATUS_EMAIL_NOT_VERIFIED = 5;
+  LOGIN_STATUS_INVALID_CREDENTIALS = 6;
+  LOGIN_STATUS_ACCOUNT_DISABLED = 7;
+}
+
+// MFAChallenge contains MFA challenge information
+message MFAChallenge {
+  // Challenge ID
+  string challenge_id = 1;
+  
+  // Available MFA methods
+  repeated MFAMethod methods = 2;
+  
+  // Expires at
+  google.protobuf.Timestamp expires_at = 3;
+}
+
+// MFAMethod represents an available MFA method
+enum MFAMethod {
+  MFA_METHOD_UNSPECIFIED = 0;
+  MFA_METHOD_TOTP = 1;
+  MFA_METHOD_SMS = 2;
+  MFA_METHOD_EMAIL = 3;
+  MFA_METHOD_WEBAUTHN = 4;
+  MFA_METHOD_BACKUP_CODE = 5;
+}
+
+// =============================================================================
+// TOKEN MANAGEMENT
+// =============================================================================
+
+// TokenPair contains access and refresh tokens
+message TokenPair {
+  // JWT access token
+  string access_token = 1;
+  
+  // Refresh token
+  string refresh_token = 2;
+  
+  // Access token type (Bearer)
+  string token_type = 3;
+  
+  // Access token expiration in seconds
+  int64 expires_in = 4;
+  
+  // Refresh token expiration in seconds
+  int64 refresh_expires_in = 5;
+  
+  // Token scope
+  repeated string scope = 6;
+  
+  // ID token for OIDC
+  string id_token = 7;
+}
+
+// RefreshTokenRequest to refresh an access token
+message RefreshTokenRequest {
+  nexus.common.RequestMetadata metadata = 1;
+  string refresh_token = 2;
+  DeviceInfo device = 3;
+}
+
+// RefreshTokenResponse with new tokens
+message RefreshTokenResponse {
+  nexus.common.ResponseMetadata metadata = 1;
+  bool success = 2;
+  TokenPair tokens = 3;
+  nexus.common.Error error = 4;
+}
+
+// ValidateTokenRequest to validate an access token
+message ValidateTokenRequest {
+  nexus.common.RequestMetadata metadata = 1;
+  string access_token = 2;
+  repeated string required_scopes = 3;
+  repeated string required_permissions = 4;
+}
+
+// ValidateTokenResponse with token validity and claims
+message ValidateTokenResponse {
+  nexus.common.ResponseMetadata metadata = 1;
+  bool valid = 2;
+  TokenClaims claims = 3;
+  string invalid_reason = 4;
+}
+
+// TokenClaims contains JWT claims
+message TokenClaims {
+  // Subject (user ID)
+  string sub = 1;
+  
+  // Issuer
+  string iss = 2;
+  
+  // Audience
+  repeated string aud = 3;
+  
+  // Expiration time
+  google.protobuf.Timestamp exp = 4;
+  
+  // Not before
+  google.protobuf.Timestamp nbf = 5;
+  
+  // Issued at
+  google.protobuf.Timestamp iat = 6;
+  
+  // JWT ID
+  string jti = 7;
+  
+  // User email
+  string email = 8;
+  
+  // Email verified
+  bool email_verified = 9;
+  
+  // User roles
+  repeated string roles = 10;
+  
+  // User permissions
+  repeated string permissions = 11;
+  
+  // Token scopes
+  repeated string scope = 12;
+  
+  // Tenant ID
+  string tenant_id = 13;
+  
+  // Session ID
+  string session_id = 14;
+  
+  // Custom claims
+  map<string, string> custom_claims = 15;
+}
+
+// RevokeTokenRequest to revoke a specific token
+message RevokeTokenRequest {
+  nexus.common.RequestMetadata metadata = 1;
+  string token = 2;
+  string token_type_hint = 3;  // access_token or refresh_token
+}
+
+// RevokeTokenResponse
+message RevokeTokenResponse {
+  nexus.common.ResponseMetadata metadata = 1;
+  bool success = 2;
+  nexus.common.Error error = 3;
+}
+
+// RevokeAllTokensRequest to revoke all user tokens
+message RevokeAllTokensRequest {
+  nexus.common.RequestMetadata metadata = 1;
+  string user_id = 2;
+  bool exclude_current_session = 3;
+}
+
+// RevokeAllTokensResponse
+message RevokeAllTokensResponse {
+  nexus.common.ResponseMetadata metadata = 1;
+  bool success = 2;
+  int32 revoked_count = 3;
+  nexus.common.Error error = 4;
+}
+
+// =============================================================================
+// LOGOUT
+// =============================================================================
+
+// LogoutRequest to end a session
+message LogoutRequest {
+  nexus.common.RequestMetadata metadata = 1;
+  string access_token = 2;
+  string refresh_token = 3;
+  bool logout_all_devices = 4;
+}
+
+// LogoutResponse
+message LogoutResponse {
+  nexus.common.ResponseMetadata metadata = 1;
+  bool success = 2;
+  nexus.common.Error error = 3;
+}
+
+// =============================================================================
+// PASSWORD MANAGEMENT
+// =============================================================================
+
+// PasswordResetRequest to initiate password reset
+message PasswordResetRequest {
+  nexus.common.RequestMetadata metadata = 1;
+  string email = 2;
+  string captcha_response = 3;
+}
+
+// PasswordResetResponse
+message PasswordResetResponse {
+  nexus.common.ResponseMetadata metadata = 1;
+  bool success = 2;
+  // Always true to prevent email enumeration
+  string message = 3;
+  nexus.common.Error error = 4;
+}
+
+// ResetPasswordRequest to complete password reset
+message ResetPasswordRequest {
+  nexus.common.RequestMetadata metadata = 1;
+  string reset_token = 2;
+  string new_password = 3;
+}
+
+// ResetPasswordResponse
+message ResetPasswordResponse {
+  nexus.common.ResponseMetadata metadata = 1;
+  bool success = 2;
+  nexus.common.Error error = 3;
+}
+
+// ChangePasswordRequest for authenticated password change
+message ChangePasswordRequest {
+  nexus.common.RequestMetadata metadata = 1;
+  string current_password = 2;
+  string new_password = 3;
+  bool logout_other_sessions = 4;
+}
+
+// ChangePasswordResponse
+message ChangePasswordResponse {
+  nexus.common.ResponseMetadata metadata = 1;
+  bool success = 2;
+  nexus.common.Error error = 3;
+}
+
+// =============================================================================
+// EMAIL VERIFICATION
+// =============================================================================
+
+// VerifyEmailRequest to verify email with token
+message VerifyEmailRequest {
+  nexus.common.RequestMetadata metadata = 1;
+  string verification_token = 2;
+}
+
+// VerifyEmailResponse
+message VerifyEmailResponse {
+  nexus.common.ResponseMetadata metadata = 1;
+  bool success = 2;
+  nexus.common.Error error = 3;
+}
+
+// ResendVerificationRequest to resend verification email
+message ResendVerificationRequest {
+  nexus.common.RequestMetadata metadata = 1;
+  string email = 2;
+}
+
+// ResendVerificationResponse
+message ResendVerificationResponse {
+  nexus.common.ResponseMetadata metadata = 1;
+  bool success = 2;
+  nexus.common.Error error = 3;
+}
+
+// =============================================================================
+// OAUTH2
+// =============================================================================
+
+// ExchangeAuthCodeRequest for OAuth2 code exchange
+message ExchangeAuthCodeRequest {
+  nexus.common.RequestMetadata metadata = 1;
+  string grant_type = 2;
+  string code = 3;
+  string redirect_uri = 4;
+  string client_id = 5;
+  string client_secret = 6;
+  string code_verifier = 7;  // PKCE
+}
+
+// ExchangeAuthCodeResponse
+message ExchangeAuthCodeResponse {
+  nexus.common.ResponseMetadata metadata = 1;
+  bool success = 2;
+  TokenPair tokens = 3;
+  nexus.common.Error error = 4;
+}
+
+// =============================================================================
+// SESSIONS
+// =============================================================================
+
+// Session represents an active user session
+message Session {
+  // Unique session ID
+  string id = 1;
+  
+  // User ID
+  string user_id = 2;
+  
+  // Device information
+  DeviceInfo device = 3;
+  
+  // IP address
+  string ip_address = 4;
+  
+  // Approximate location
+  string location = 5;
+  
+  // When session was created
+  google.protobuf.Timestamp created_at = 6;
+  
+  // When session was last active
+  google.protobuf.Timestamp last_active_at = 7;
+  
+  // When session expires
+  google.protobuf.Timestamp expires_at = 8;
+  
+  // Whether this is the current session
+  bool is_current = 9;
+}
+
+// GetSessionsRequest to list active sessions
+message GetSessionsRequest {
+  nexus.common.RequestMetadata metadata = 1;
+  string user_id = 2;
+  nexus.common.PaginationRequest pagination = 3;
+}
+
+// GetSessionsResponse with session list
+message GetSessionsResponse {
+  nexus.common.ResponseMetadata metadata = 1;
+  repeated Session sessions = 2;
+  nexus.common.PaginationResponse pagination = 3;
+}
+
+// TerminateSessionRequest to end a specific session
+message TerminateSessionRequest {
+  nexus.common.RequestMetadata metadata = 1;
+  string session_id = 2;
+}
+
+// TerminateSessionResponse
+message TerminateSessionResponse {
+  nexus.common.ResponseMetadata metadata = 1;
+  bool success = 2;
+  nexus.common.Error error = 3;
+}
+
+// =============================================================================
+// MFA
+// =============================================================================
+
+// EnableMFARequest to enable MFA
+message EnableMFARequest {
+  nexus.common.RequestMetadata metadata = 1;
+  string user_id = 2;
+  MFAMethod method = 3;
+  string phone_number = 4;  // For SMS method
+}
+
+// EnableMFAResponse
+message EnableMFAResponse {
+  nexus.common.ResponseMetadata metadata = 1;
+  bool success = 2;
+  
+  // TOTP setup data
+  string secret = 3;
+  string qr_code_url = 4;
+  repeated string backup_codes = 5;
+  
+  nexus.common.Error error = 6;
+}
+
+// DisableMFARequest to disable MFA
+message DisableMFARequest {
+  nexus.common.RequestMetadata metadata = 1;
+  string user_id = 2;
+  string verification_code = 3;
+  string password = 4;
+}
+
+// DisableMFAResponse
+message DisableMFAResponse {
+  nexus.common.ResponseMetadata metadata = 1;
+  bool success = 2;
+  nexus.common.Error error = 3;
+}
+
+// VerifyMFARequest to verify MFA code
+message VerifyMFARequest {
+  nexus.common.RequestMetadata metadata = 1;
+  string challenge_id = 2;
+  MFAMethod method = 3;
+  string code = 4;
+  DeviceInfo device = 5;
+  bool trust_device = 6;
+}
+
+// VerifyMFAResponse
+message VerifyMFAResponse {
+  nexus.common.ResponseMetadata metadata = 1;
+  bool success = 2;
+  TokenPair tokens = 3;
+  Session session = 4;
+  nexus.common.Error error = 5;
+}
+
+// GenerateBackupCodesRequest
+message GenerateBackupCodesRequest {
+  nexus.common.RequestMetadata metadata = 1;
+  string user_id = 2;
+  string password = 3;
+}
+
+// GenerateBackupCodesResponse
+message GenerateBackupCodesResponse {
+  nexus.common.ResponseMetadata metadata = 1;
+  bool success = 2;
+  repeated string backup_codes = 3;
+  nexus.common.Error error = 4;
+}
+
+// VerifyBackupCodeRequest
+message VerifyBackupCodeRequest {
+  nexus.common.RequestMetadata metadata = 1;
+  string challenge_id = 2;
+  string code = 3;
+}
+
+// VerifyBackupCodeResponse
+message VerifyBackupCodeResponse {
+  nexus.common.ResponseMetadata metadata = 1;
+  bool success = 2;
+  TokenPair tokens = 3;
+  int32 remaining_codes = 4;
+  nexus.common.Error error = 5;
+}
+
+// GetMFAStatusRequest
+message GetMFAStatusRequest {
+  nexus.common.RequestMetadata metadata = 1;
+  string user_id = 2;
+}
+
+// GetMFAStatusResponse
+message GetMFAStatusResponse {
+  nexus.common.ResponseMetadata metadata = 1;
+  bool mfa_enabled = 2;
+  repeated MFAMethod enabled_methods = 3;
+  int32 backup_codes_remaining = 4;
+  repeated TrustedDevice trusted_devices = 5;
+}
+
+// TrustedDevice represents a trusted MFA device
+message TrustedDevice {
+  string id = 1;
+  string name = 2;
+  DeviceType type = 3;
+  google.protobuf.Timestamp trusted_at = 4;
+  google.protobuf.Timestamp last_used_at = 5;
+}
+
+// RegisterWebAuthnRequest for WebAuthn registration
+message RegisterWebAuthnRequest {
+  nexus.common.RequestMetadata metadata = 1;
+  string user_id = 2;
+  string device_name = 3;
+  bytes attestation_object = 4;
+  bytes client_data_json = 5;
+}
+
+// RegisterWebAuthnResponse
+message RegisterWebAuthnResponse {
+  nexus.common.ResponseMetadata metadata = 1;
+  bool success = 2;
+  string credential_id = 3;
+  nexus.common.Error error = 4;
+}
+
+// VerifyWebAuthnRequest for WebAuthn verification
+message VerifyWebAuthnRequest {
+  nexus.common.RequestMetadata metadata = 1;
+  string challenge_id = 2;
+  string credential_id = 3;
+  bytes authenticator_data = 4;
+  bytes client_data_json = 5;
+  bytes signature = 6;
+}
+
+// VerifyWebAuthnResponse
+message VerifyWebAuthnResponse {
+  nexus.common.ResponseMetadata metadata = 1;
+  bool success = 2;
+  TokenPair tokens = 3;
+  nexus.common.Error error = 4;
+}
+
+// =============================================================================
+// API KEYS
+// =============================================================================
+
+// APIKey represents an API key
+message APIKey {
+  // Key ID
+  string id = 1;
+  
+  // Key name/description
+  string name = 2;
+  
+  // Key prefix for identification (first 8 chars)
+  string prefix = 3;
+  
+  // Scopes/permissions
+  repeated string scopes = 4;
+  
+  // When the key was created
+  google.protobuf.Timestamp created_at = 5;
+  
+  // When the key was last used
+  google.protobuf.Timestamp last_used_at = 6;
+  
+  // When the key expires
+  google.protobuf.Timestamp expires_at = 7;
+  
+  // IP allowlist
+  repeated string allowed_ips = 8;
+  
+  // Rate limit override
+  int32 rate_limit = 9;
+  
+  // Whether the key is active
+  bool active = 10;
+  
+  // Custom metadata
+  map<string, string> metadata = 11;
+}
+
+// CreateAPIKeyRequest to create a new API key
+message CreateAPIKeyRequest {
+  nexus.common.RequestMetadata metadata = 1;
+  string user_id = 2;
+  string name = 3;
+  repeated string scopes = 4;
+  google.protobuf.Duration expires_in = 5;
+  repeated string allowed_ips = 6;
+  int32 rate_limit = 7;
+  map<string, string> custom_metadata = 8;
+}
+
+// CreateAPIKeyResponse with the new API key
+message CreateAPIKeyResponse {
+  nexus.common.ResponseMetadata metadata = 1;
+  bool success = 2;
+  APIKey api_key = 3;
+  // Full key (only shown once)
+  string key = 4;
+  // Secret (only shown once)
+  string secret = 5;
+  nexus.common.Error error = 6;
+}
+
+// ListAPIKeysRequest
+message ListAPIKeysRequest {
+  nexus.common.RequestMetadata metadata = 1;
+  string user_id = 2;
+  nexus.common.PaginationRequest pagination = 3;
+  bool include_revoked = 4;
+}
+
+// ListAPIKeysResponse
+message ListAPIKeysResponse {
+  nexus.common.ResponseMetadata metadata = 1;
+  repeated APIKey api_keys = 2;
+  nexus.common.PaginationResponse pagination = 3;
+}
+
+// GetAPIKeyRequest
+message GetAPIKeyRequest {
+  nexus.common.RequestMetadata metadata = 1;
+  string key_id = 2;
+}
+
+// GetAPIKeyResponse
+message GetAPIKeyResponse {
+  nexus.common.ResponseMetadata metadata = 1;
+  APIKey api_key = 2;
+  nexus.common.Error error = 3;
+}
+
+// UpdateAPIKeyRequest
+message UpdateAPIKeyRequest {
+  nexus.common.RequestMetadata metadata = 1;
+  string key_id = 2;
+  string name = 3;
+  repeated string scopes = 4;
+  repeated string allowed_ips = 5;
+  int32 rate_limit = 6;
+  bool active = 7;
+}
+
+// UpdateAPIKeyResponse
+message UpdateAPIKeyResponse {
+  nexus.common.ResponseMetadata metadata = 1;
+  bool success = 2;
+  APIKey api_key = 3;
+  nexus.common.Error error = 4;
+}
+
+// RevokeAPIKeyRequest
+message RevokeAPIKeyRequest {
+  nexus.common.RequestMetadata metadata = 1;
+  string key_id = 2;
+}
+
+// RevokeAPIKeyResponse
+message RevokeAPIKeyResponse {
+  nexus.common.ResponseMetadata metadata = 1;
+  bool success = 2;
+  nexus.common.Error error = 3;
+}
+
+// ValidateAPIKeyRequest
+message ValidateAPIKeyRequest {
+  nexus.common.RequestMetadata metadata = 1;
+  string api_key = 2;
+  string api_secret = 3;
+  repeated string required_scopes = 4;
+}
+
+// ValidateAPIKeyResponse
+message ValidateAPIKeyResponse {
+  nexus.common.ResponseMetadata metadata = 1;
+  bool valid = 2;
+  string user_id = 3;
+  repeated string scopes = 4;
+  string invalid_reason = 5;
+}
+
+// =============================================================================
+// USER (for auth context)
+// =============================================================================
+
+// AuthUser contains user information for auth responses
+message AuthUser {
+  string id = 1;
+  string email = 2;
+  string display_name = 3;
+  string first_name = 4;
+  string last_name = 5;
+  string avatar_url = 6;
+  bool email_verified = 7;
+  bool phone_verified = 8;
+  bool mfa_enabled = 9;
+  repeated string roles = 10;
+  repeated string permissions = 11;
+  string tenant_id = 12;
+  google.protobuf.Timestamp created_at = 13;
+  google.protobuf.Timestamp last_login_at = 14;
+}

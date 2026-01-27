@@ -1,0 +1,1464 @@
+// =============================================================================
+// NEXUS PLATFORM - PAYMENT SERVICE PROTOCOL BUFFER DEFINITIONS
+// =============================================================================
+// Defines the gRPC service interface for payment processing, subscriptions,
+// invoicing, and billing management (Stripe-like functionality).
+// =============================================================================
+
+syntax = "proto3";
+
+package nexus.payment;
+
+option go_package = "github.com/nexus-platform/nexus/shared/proto/payment";
+
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/field_mask.proto";
+import "common.proto";
+
+// =============================================================================
+// PAYMENT SERVICE
+// =============================================================================
+
+// PaymentService handles payment processing
+service PaymentService {
+  // Create a payment intent
+  rpc CreatePaymentIntent(CreatePaymentIntentRequest) returns (CreatePaymentIntentResponse);
+  
+  // Confirm a payment intent
+  rpc ConfirmPaymentIntent(ConfirmPaymentIntentRequest) returns (ConfirmPaymentIntentResponse);
+  
+  // Cancel a payment intent
+  rpc CancelPaymentIntent(CancelPaymentIntentRequest) returns (CancelPaymentIntentResponse);
+  
+  // Get payment intent details
+  rpc GetPaymentIntent(GetPaymentIntentRequest) returns (GetPaymentIntentResponse);
+  
+  // List payment intents
+  rpc ListPaymentIntents(ListPaymentIntentsRequest) returns (ListPaymentIntentsResponse);
+  
+  // Create a refund
+  rpc CreateRefund(CreateRefundRequest) returns (CreateRefundResponse);
+  
+  // Get refund details
+  rpc GetRefund(GetRefundRequest) returns (GetRefundResponse);
+  
+  // List refunds
+  rpc ListRefunds(ListRefundsRequest) returns (ListRefundsResponse);
+  
+  // Process a charge
+  rpc Charge(ChargeRequest) returns (ChargeResponse);
+  
+  // Capture a pre-authorized charge
+  rpc CaptureCharge(CaptureChargeRequest) returns (CaptureChargeResponse);
+}
+
+// =============================================================================
+// CUSTOMER SERVICE
+// =============================================================================
+
+// CustomerService handles customer management
+service CustomerService {
+  // Create a customer
+  rpc CreateCustomer(CreateCustomerRequest) returns (CreateCustomerResponse);
+  
+  // Get customer
+  rpc GetCustomer(GetCustomerRequest) returns (GetCustomerResponse);
+  
+  // Update customer
+  rpc UpdateCustomer(UpdateCustomerRequest) returns (UpdateCustomerResponse);
+  
+  // Delete customer
+  rpc DeleteCustomer(DeleteCustomerRequest) returns (DeleteCustomerResponse);
+  
+  // List customers
+  rpc ListCustomers(ListCustomersRequest) returns (ListCustomersResponse);
+  
+  // Add payment method
+  rpc AddPaymentMethod(AddPaymentMethodRequest) returns (AddPaymentMethodResponse);
+  
+  // Remove payment method
+  rpc RemovePaymentMethod(RemovePaymentMethodRequest) returns (RemovePaymentMethodResponse);
+  
+  // Set default payment method
+  rpc SetDefaultPaymentMethod(SetDefaultPaymentMethodRequest) returns (SetDefaultPaymentMethodResponse);
+  
+  // List payment methods
+  rpc ListPaymentMethods(ListPaymentMethodsRequest) returns (ListPaymentMethodsResponse);
+}
+
+// =============================================================================
+// SUBSCRIPTION SERVICE
+// =============================================================================
+
+// SubscriptionService handles recurring billing
+service SubscriptionService {
+  // Create a subscription
+  rpc CreateSubscription(CreateSubscriptionRequest) returns (CreateSubscriptionResponse);
+  
+  // Get subscription
+  rpc GetSubscription(GetSubscriptionRequest) returns (GetSubscriptionResponse);
+  
+  // Update subscription
+  rpc UpdateSubscription(UpdateSubscriptionRequest) returns (UpdateSubscriptionResponse);
+  
+  // Cancel subscription
+  rpc CancelSubscription(CancelSubscriptionRequest) returns (CancelSubscriptionResponse);
+  
+  // Pause subscription
+  rpc PauseSubscription(PauseSubscriptionRequest) returns (PauseSubscriptionResponse);
+  
+  // Resume subscription
+  rpc ResumeSubscription(ResumeSubscriptionRequest) returns (ResumeSubscriptionResponse);
+  
+  // List subscriptions
+  rpc ListSubscriptions(ListSubscriptionsRequest) returns (ListSubscriptionsResponse);
+  
+  // Create a plan
+  rpc CreatePlan(CreatePlanRequest) returns (CreatePlanResponse);
+  
+  // Get plan
+  rpc GetPlan(GetPlanRequest) returns (GetPlanResponse);
+  
+  // List plans
+  rpc ListPlans(ListPlansRequest) returns (ListPlansResponse);
+  
+  // Update plan
+  rpc UpdatePlan(UpdatePlanRequest) returns (UpdatePlanResponse);
+  
+  // Archive plan
+  rpc ArchivePlan(ArchivePlanRequest) returns (ArchivePlanResponse);
+  
+  // Apply coupon
+  rpc ApplyCoupon(ApplyCouponRequest) returns (ApplyCouponResponse);
+}
+
+// =============================================================================
+// INVOICE SERVICE
+// =============================================================================
+
+// InvoiceService handles invoicing
+service InvoiceService {
+  // Create an invoice
+  rpc CreateInvoice(CreateInvoiceRequest) returns (CreateInvoiceResponse);
+  
+  // Get invoice
+  rpc GetInvoice(GetInvoiceRequest) returns (GetInvoiceResponse);
+  
+  // Update invoice
+  rpc UpdateInvoice(UpdateInvoiceRequest) returns (UpdateInvoiceResponse);
+  
+  // Finalize invoice
+  rpc FinalizeInvoice(FinalizeInvoiceRequest) returns (FinalizeInvoiceResponse);
+  
+  // Pay invoice
+  rpc PayInvoice(PayInvoiceRequest) returns (PayInvoiceResponse);
+  
+  // Void invoice
+  rpc VoidInvoice(VoidInvoiceRequest) returns (VoidInvoiceResponse);
+  
+  // List invoices
+  rpc ListInvoices(ListInvoicesRequest) returns (ListInvoicesResponse);
+  
+  // Send invoice
+  rpc SendInvoice(SendInvoiceRequest) returns (SendInvoiceResponse);
+  
+  // Add invoice item
+  rpc AddInvoiceItem(AddInvoiceItemRequest) returns (AddInvoiceItemResponse);
+  
+  // Remove invoice item
+  rpc RemoveInvoiceItem(RemoveInvoiceItemRequest) returns (RemoveInvoiceItemResponse);
+  
+  // Download invoice PDF
+  rpc DownloadInvoice(DownloadInvoiceRequest) returns (DownloadInvoiceResponse);
+}
+
+// =============================================================================
+// PAYOUT SERVICE
+// =============================================================================
+
+// PayoutService handles payouts (for marketplace scenarios)
+service PayoutService {
+  // Create a payout
+  rpc CreatePayout(CreatePayoutRequest) returns (CreatePayoutResponse);
+  
+  // Get payout
+  rpc GetPayout(GetPayoutRequest) returns (GetPayoutResponse);
+  
+  // List payouts
+  rpc ListPayouts(ListPayoutsRequest) returns (ListPayoutsResponse);
+  
+  // Cancel payout
+  rpc CancelPayout(CancelPayoutRequest) returns (CancelPayoutResponse);
+  
+  // Get balance
+  rpc GetBalance(GetBalanceRequest) returns (GetBalanceResponse);
+  
+  // List balance transactions
+  rpc ListBalanceTransactions(ListBalanceTransactionsRequest) returns (ListBalanceTransactionsResponse);
+}
+
+// =============================================================================
+// PAYMENT INTENT
+// =============================================================================
+
+// PaymentIntent represents an intent to collect payment
+message PaymentIntent {
+  // Unique identifier
+  string id = 1;
+  
+  // Amount in smallest currency unit
+  int64 amount = 2;
+  
+  // Currency code (ISO 4217)
+  string currency = 3;
+  
+  // Customer ID
+  string customer_id = 4;
+  
+  // Payment method ID
+  string payment_method_id = 5;
+  
+  // Payment status
+  PaymentStatus status = 6;
+  
+  // Description
+  string description = 7;
+  
+  // Statement descriptor
+  string statement_descriptor = 8;
+  
+  // Metadata
+  map<string, string> metadata = 9;
+  
+  // Capture method
+  CaptureMethod capture_method = 10;
+  
+  // Confirmation method
+  ConfirmationMethod confirmation_method = 11;
+  
+  // Client secret for frontend confirmation
+  string client_secret = 12;
+  
+  // Receipt email
+  string receipt_email = 13;
+  
+  // Setup future usage
+  SetupFutureUsage setup_future_usage = 14;
+  
+  // Shipping information
+  ShippingInfo shipping = 15;
+  
+  // Last payment error
+  PaymentError last_error = 16;
+  
+  // Charges
+  repeated Charge charges = 17;
+  
+  // Created timestamp
+  google.protobuf.Timestamp created_at = 18;
+  
+  // Amount capturable
+  int64 amount_capturable = 19;
+  
+  // Amount received
+  int64 amount_received = 20;
+  
+  // Cancellation reason
+  string cancellation_reason = 21;
+  
+  // Cancelled timestamp
+  google.protobuf.Timestamp canceled_at = 22;
+}
+
+// PaymentStatus indicates the status of a payment
+enum PaymentStatus {
+  PAYMENT_STATUS_UNSPECIFIED = 0;
+  PAYMENT_STATUS_REQUIRES_PAYMENT_METHOD = 1;
+  PAYMENT_STATUS_REQUIRES_CONFIRMATION = 2;
+  PAYMENT_STATUS_REQUIRES_ACTION = 3;
+  PAYMENT_STATUS_PROCESSING = 4;
+  PAYMENT_STATUS_REQUIRES_CAPTURE = 5;
+  PAYMENT_STATUS_CANCELED = 6;
+  PAYMENT_STATUS_SUCCEEDED = 7;
+  PAYMENT_STATUS_FAILED = 8;
+}
+
+// CaptureMethod
+enum CaptureMethod {
+  CAPTURE_METHOD_UNSPECIFIED = 0;
+  CAPTURE_METHOD_AUTOMATIC = 1;
+  CAPTURE_METHOD_MANUAL = 2;
+}
+
+// ConfirmationMethod
+enum ConfirmationMethod {
+  CONFIRMATION_METHOD_UNSPECIFIED = 0;
+  CONFIRMATION_METHOD_AUTOMATIC = 1;
+  CONFIRMATION_METHOD_MANUAL = 2;
+}
+
+// SetupFutureUsage
+enum SetupFutureUsage {
+  SETUP_FUTURE_USAGE_UNSPECIFIED = 0;
+  SETUP_FUTURE_USAGE_ON_SESSION = 1;
+  SETUP_FUTURE_USAGE_OFF_SESSION = 2;
+}
+
+// ShippingInfo
+message ShippingInfo {
+  string name = 1;
+  nexus.common.Address address = 2;
+  string phone = 3;
+  string carrier = 4;
+  string tracking_number = 5;
+}
+
+// PaymentError
+message PaymentError {
+  string code = 1;
+  string message = 2;
+  string decline_code = 3;
+  string param = 4;
+  string payment_method_id = 5;
+}
+
+// Charge represents a completed charge
+message Charge {
+  string id = 1;
+  int64 amount = 2;
+  int64 amount_captured = 3;
+  int64 amount_refunded = 4;
+  string currency = 5;
+  string customer_id = 6;
+  string payment_method_id = 7;
+  string payment_intent_id = 8;
+  ChargeStatus status = 9;
+  bool paid = 10;
+  bool refunded = 11;
+  bool captured = 12;
+  string description = 13;
+  string receipt_url = 14;
+  string receipt_number = 15;
+  string failure_code = 16;
+  string failure_message = 17;
+  map<string, string> metadata = 18;
+  google.protobuf.Timestamp created_at = 19;
+}
+
+// ChargeStatus
+enum ChargeStatus {
+  CHARGE_STATUS_UNSPECIFIED = 0;
+  CHARGE_STATUS_PENDING = 1;
+  CHARGE_STATUS_SUCCEEDED = 2;
+  CHARGE_STATUS_FAILED = 3;
+}
+
+// =============================================================================
+// REFUND
+// =============================================================================
+
+// Refund represents a refund
+message Refund {
+  string id = 1;
+  int64 amount = 2;
+  string currency = 3;
+  string charge_id = 4;
+  string payment_intent_id = 5;
+  RefundStatus status = 6;
+  RefundReason reason = 7;
+  string description = 8;
+  map<string, string> metadata = 9;
+  string receipt_number = 10;
+  string failure_reason = 11;
+  google.protobuf.Timestamp created_at = 12;
+}
+
+// RefundStatus
+enum RefundStatus {
+  REFUND_STATUS_UNSPECIFIED = 0;
+  REFUND_STATUS_PENDING = 1;
+  REFUND_STATUS_SUCCEEDED = 2;
+  REFUND_STATUS_FAILED = 3;
+  REFUND_STATUS_CANCELED = 4;
+}
+
+// RefundReason
+enum RefundReason {
+  REFUND_REASON_UNSPECIFIED = 0;
+  REFUND_REASON_DUPLICATE = 1;
+  REFUND_REASON_FRAUDULENT = 2;
+  REFUND_REASON_REQUESTED_BY_CUSTOMER = 3;
+  REFUND_REASON_EXPIRED_UNCAPTURED_CHARGE = 4;
+}
+
+// =============================================================================
+// CUSTOMER
+// =============================================================================
+
+// Customer represents a customer
+message Customer {
+  string id = 1;
+  string email = 2;
+  string name = 3;
+  string phone = 4;
+  string description = 5;
+  nexus.common.Address address = 6;
+  ShippingInfo shipping = 7;
+  string default_payment_method_id = 8;
+  int64 balance = 9;
+  string currency = 10;
+  bool delinquent = 11;
+  map<string, string> metadata = 12;
+  google.protobuf.Timestamp created_at = 13;
+  string tax_id = 14;
+  TaxInfo tax_info = 15;
+}
+
+// TaxInfo
+message TaxInfo {
+  string tax_id = 1;
+  string tax_id_type = 2;  // vat, gst, etc.
+  bool verified = 3;
+}
+
+// =============================================================================
+// PAYMENT METHOD
+// =============================================================================
+
+// PaymentMethod represents a payment method
+message PaymentMethod {
+  string id = 1;
+  PaymentMethodType type = 2;
+  string customer_id = 3;
+  CardDetails card = 4;
+  BankAccountDetails bank_account = 5;
+  map<string, string> metadata = 6;
+  google.protobuf.Timestamp created_at = 7;
+  BillingDetails billing_details = 8;
+}
+
+// PaymentMethodType
+enum PaymentMethodType {
+  PAYMENT_METHOD_TYPE_UNSPECIFIED = 0;
+  PAYMENT_METHOD_TYPE_CARD = 1;
+  PAYMENT_METHOD_TYPE_BANK_TRANSFER = 2;
+  PAYMENT_METHOD_TYPE_SEPA_DEBIT = 3;
+  PAYMENT_METHOD_TYPE_ACH_DEBIT = 4;
+  PAYMENT_METHOD_TYPE_PAYPAL = 5;
+  PAYMENT_METHOD_TYPE_APPLE_PAY = 6;
+  PAYMENT_METHOD_TYPE_GOOGLE_PAY = 7;
+}
+
+// CardDetails
+message CardDetails {
+  string brand = 1;  // visa, mastercard, etc.
+  string last4 = 2;
+  int32 exp_month = 3;
+  int32 exp_year = 4;
+  string fingerprint = 5;
+  string funding = 6;  // credit, debit, prepaid
+  string country = 7;
+  CardChecks checks = 8;
+}
+
+// CardChecks
+message CardChecks {
+  string address_line1_check = 1;
+  string address_postal_code_check = 2;
+  string cvc_check = 3;
+}
+
+// BankAccountDetails
+message BankAccountDetails {
+  string bank_name = 1;
+  string last4 = 2;
+  string routing_number = 3;
+  string account_holder_name = 4;
+  string account_holder_type = 5;
+  string country = 6;
+  string currency = 7;
+  string fingerprint = 8;
+}
+
+// BillingDetails
+message BillingDetails {
+  string email = 1;
+  string name = 2;
+  string phone = 3;
+  nexus.common.Address address = 4;
+}
+
+// =============================================================================
+// SUBSCRIPTION
+// =============================================================================
+
+// Subscription represents a recurring subscription
+message Subscription {
+  string id = 1;
+  string customer_id = 2;
+  string plan_id = 3;
+  SubscriptionStatus status = 4;
+  google.protobuf.Timestamp current_period_start = 5;
+  google.protobuf.Timestamp current_period_end = 6;
+  google.protobuf.Timestamp cancel_at = 7;
+  google.protobuf.Timestamp canceled_at = 8;
+  bool cancel_at_period_end = 9;
+  google.protobuf.Timestamp trial_start = 10;
+  google.protobuf.Timestamp trial_end = 11;
+  string default_payment_method_id = 12;
+  repeated SubscriptionItem items = 13;
+  map<string, string> metadata = 14;
+  int64 quantity = 15;
+  string collection_method = 16;  // charge_automatically or send_invoice
+  int32 days_until_due = 17;
+  google.protobuf.Timestamp created_at = 18;
+  google.protobuf.Timestamp ended_at = 19;
+  string latest_invoice_id = 20;
+  google.protobuf.Timestamp pause_collection_start = 21;
+  google.protobuf.Timestamp pause_collection_end = 22;
+}
+
+// SubscriptionStatus
+enum SubscriptionStatus {
+  SUBSCRIPTION_STATUS_UNSPECIFIED = 0;
+  SUBSCRIPTION_STATUS_INCOMPLETE = 1;
+  SUBSCRIPTION_STATUS_INCOMPLETE_EXPIRED = 2;
+  SUBSCRIPTION_STATUS_TRIALING = 3;
+  SUBSCRIPTION_STATUS_ACTIVE = 4;
+  SUBSCRIPTION_STATUS_PAST_DUE = 5;
+  SUBSCRIPTION_STATUS_CANCELED = 6;
+  SUBSCRIPTION_STATUS_UNPAID = 7;
+  SUBSCRIPTION_STATUS_PAUSED = 8;
+}
+
+// SubscriptionItem
+message SubscriptionItem {
+  string id = 1;
+  string price_id = 2;
+  int64 quantity = 3;
+  map<string, string> metadata = 4;
+}
+
+// Plan represents a subscription plan
+message Plan {
+  string id = 1;
+  string name = 2;
+  string description = 3;
+  bool active = 4;
+  int64 amount = 5;
+  string currency = 6;
+  BillingInterval interval = 7;
+  int32 interval_count = 8;
+  int32 trial_period_days = 9;
+  map<string, string> metadata = 10;
+  repeated PlanFeature features = 11;
+  UsageType usage_type = 12;
+  string aggregate_usage = 13;  // sum, last_during_period, max, last_ever
+  int64 tiers_mode = 14;
+  repeated PriceTier tiers = 15;
+  google.protobuf.Timestamp created_at = 16;
+}
+
+// BillingInterval
+enum BillingInterval {
+  BILLING_INTERVAL_UNSPECIFIED = 0;
+  BILLING_INTERVAL_DAY = 1;
+  BILLING_INTERVAL_WEEK = 2;
+  BILLING_INTERVAL_MONTH = 3;
+  BILLING_INTERVAL_YEAR = 4;
+}
+
+// UsageType
+enum UsageType {
+  USAGE_TYPE_UNSPECIFIED = 0;
+  USAGE_TYPE_LICENSED = 1;
+  USAGE_TYPE_METERED = 2;
+}
+
+// PlanFeature
+message PlanFeature {
+  string name = 1;
+  string value = 2;
+  bool included = 3;
+}
+
+// PriceTier
+message PriceTier {
+  int64 up_to = 1;  // -1 for infinity
+  int64 flat_amount = 2;
+  int64 unit_amount = 3;
+}
+
+// =============================================================================
+// INVOICE
+// =============================================================================
+
+// Invoice represents an invoice
+message Invoice {
+  string id = 1;
+  string number = 2;
+  string customer_id = 3;
+  string subscription_id = 4;
+  InvoiceStatus status = 5;
+  int64 amount_due = 6;
+  int64 amount_paid = 7;
+  int64 amount_remaining = 8;
+  int64 subtotal = 9;
+  int64 tax = 10;
+  int64 total = 11;
+  string currency = 12;
+  string description = 13;
+  repeated InvoiceLineItem lines = 14;
+  string collection_method = 15;
+  int32 days_until_due = 16;
+  google.protobuf.Timestamp due_date = 17;
+  google.protobuf.Timestamp created_at = 18;
+  google.protobuf.Timestamp finalized_at = 19;
+  google.protobuf.Timestamp paid_at = 20;
+  google.protobuf.Timestamp voided_at = 21;
+  google.protobuf.Timestamp period_start = 22;
+  google.protobuf.Timestamp period_end = 23;
+  string hosted_invoice_url = 24;
+  string invoice_pdf = 25;
+  map<string, string> metadata = 26;
+  string footer = 27;
+  Discount discount = 28;
+  int64 discount_amount = 29;
+}
+
+// InvoiceStatus
+enum InvoiceStatus {
+  INVOICE_STATUS_UNSPECIFIED = 0;
+  INVOICE_STATUS_DRAFT = 1;
+  INVOICE_STATUS_OPEN = 2;
+  INVOICE_STATUS_PAID = 3;
+  INVOICE_STATUS_VOID = 4;
+  INVOICE_STATUS_UNCOLLECTIBLE = 5;
+}
+
+// InvoiceLineItem
+message InvoiceLineItem {
+  string id = 1;
+  string description = 2;
+  int64 amount = 3;
+  int64 quantity = 4;
+  int64 unit_amount = 5;
+  string currency = 6;
+  google.protobuf.Timestamp period_start = 7;
+  google.protobuf.Timestamp period_end = 8;
+  string price_id = 9;
+  string subscription_id = 10;
+  string subscription_item_id = 11;
+  map<string, string> metadata = 12;
+}
+
+// Discount
+message Discount {
+  string id = 1;
+  string coupon_id = 2;
+  string customer_id = 3;
+  google.protobuf.Timestamp start = 4;
+  google.protobuf.Timestamp end = 5;
+}
+
+// Coupon
+message Coupon {
+  string id = 1;
+  string name = 2;
+  int64 amount_off = 3;
+  double percent_off = 4;
+  string currency = 5;
+  CouponDuration duration = 6;
+  int32 duration_in_months = 7;
+  int64 max_redemptions = 8;
+  int64 times_redeemed = 9;
+  google.protobuf.Timestamp redeem_by = 10;
+  bool valid = 11;
+  map<string, string> metadata = 12;
+  google.protobuf.Timestamp created_at = 13;
+}
+
+// CouponDuration
+enum CouponDuration {
+  COUPON_DURATION_UNSPECIFIED = 0;
+  COUPON_DURATION_ONCE = 1;
+  COUPON_DURATION_REPEATING = 2;
+  COUPON_DURATION_FOREVER = 3;
+}
+
+// =============================================================================
+// PAYOUT
+// =============================================================================
+
+// Payout represents a payout to an external account
+message Payout {
+  string id = 1;
+  int64 amount = 2;
+  string currency = 3;
+  PayoutStatus status = 4;
+  string method = 5;  // standard, instant
+  string destination = 6;  // bank account or card ID
+  string description = 7;
+  google.protobuf.Timestamp arrival_date = 8;
+  string failure_code = 9;
+  string failure_message = 10;
+  map<string, string> metadata = 11;
+  google.protobuf.Timestamp created_at = 12;
+}
+
+// PayoutStatus
+enum PayoutStatus {
+  PAYOUT_STATUS_UNSPECIFIED = 0;
+  PAYOUT_STATUS_PENDING = 1;
+  PAYOUT_STATUS_IN_TRANSIT = 2;
+  PAYOUT_STATUS_PAID = 3;
+  PAYOUT_STATUS_FAILED = 4;
+  PAYOUT_STATUS_CANCELED = 5;
+}
+
+// Balance
+message Balance {
+  int64 available = 1;
+  int64 pending = 2;
+  string currency = 3;
+}
+
+// BalanceTransaction
+message BalanceTransaction {
+  string id = 1;
+  int64 amount = 2;
+  string currency = 3;
+  int64 fee = 4;
+  int64 net = 5;
+  string type = 6;  // charge, refund, payout, etc.
+  string source_id = 7;
+  string description = 8;
+  BalanceTransactionStatus status = 9;
+  google.protobuf.Timestamp created_at = 10;
+  google.protobuf.Timestamp available_on = 11;
+}
+
+// BalanceTransactionStatus
+enum BalanceTransactionStatus {
+  BALANCE_TRANSACTION_STATUS_UNSPECIFIED = 0;
+  BALANCE_TRANSACTION_STATUS_PENDING = 1;
+  BALANCE_TRANSACTION_STATUS_AVAILABLE = 2;
+}
+
+// =============================================================================
+// REQUEST/RESPONSE MESSAGES
+// =============================================================================
+
+// CreatePaymentIntentRequest
+message CreatePaymentIntentRequest {
+  nexus.common.RequestMetadata metadata = 1;
+  int64 amount = 2;
+  string currency = 3;
+  string customer_id = 4;
+  string payment_method_id = 5;
+  string description = 6;
+  string statement_descriptor = 7;
+  map<string, string> custom_metadata = 8;
+  CaptureMethod capture_method = 9;
+  ConfirmationMethod confirmation_method = 10;
+  bool confirm = 11;
+  string receipt_email = 12;
+  SetupFutureUsage setup_future_usage = 13;
+  ShippingInfo shipping = 14;
+  string idempotency_key = 15;
+}
+
+// CreatePaymentIntentResponse
+message CreatePaymentIntentResponse {
+  nexus.common.ResponseMetadata metadata = 1;
+  bool success = 2;
+  PaymentIntent payment_intent = 3;
+  nexus.common.Error error = 4;
+}
+
+// ConfirmPaymentIntentRequest
+message ConfirmPaymentIntentRequest {
+  nexus.common.RequestMetadata metadata = 1;
+  string payment_intent_id = 2;
+  string payment_method_id = 3;
+  string return_url = 4;
+}
+
+// ConfirmPaymentIntentResponse
+message ConfirmPaymentIntentResponse {
+  nexus.common.ResponseMetadata metadata = 1;
+  bool success = 2;
+  PaymentIntent payment_intent = 3;
+  nexus.common.Error error = 4;
+}
+
+// CancelPaymentIntentRequest
+message CancelPaymentIntentRequest {
+  nexus.common.RequestMetadata metadata = 1;
+  string payment_intent_id = 2;
+  string cancellation_reason = 3;
+}
+
+// CancelPaymentIntentResponse
+message CancelPaymentIntentResponse {
+  nexus.common.ResponseMetadata metadata = 1;
+  bool success = 2;
+  PaymentIntent payment_intent = 3;
+  nexus.common.Error error = 4;
+}
+
+// GetPaymentIntentRequest
+message GetPaymentIntentRequest {
+  nexus.common.RequestMetadata metadata = 1;
+  string payment_intent_id = 2;
+}
+
+// GetPaymentIntentResponse
+message GetPaymentIntentResponse {
+  nexus.common.ResponseMetadata metadata = 1;
+  PaymentIntent payment_intent = 2;
+  nexus.common.Error error = 3;
+}
+
+// ListPaymentIntentsRequest
+message ListPaymentIntentsRequest {
+  nexus.common.RequestMetadata metadata = 1;
+  nexus.common.PaginationRequest pagination = 2;
+  string customer_id = 3;
+  repeated PaymentStatus statuses = 4;
+  nexus.common.DateRange created_at = 5;
+}
+
+// ListPaymentIntentsResponse
+message ListPaymentIntentsResponse {
+  nexus.common.ResponseMetadata metadata = 1;
+  repeated PaymentIntent payment_intents = 2;
+  nexus.common.PaginationResponse pagination = 3;
+}
+
+// CreateRefundRequest
+message CreateRefundRequest {
+  nexus.common.RequestMetadata metadata = 1;
+  string charge_id = 2;
+  string payment_intent_id = 3;
+  int64 amount = 4;  // If not specified, full refund
+  RefundReason reason = 5;
+  map<string, string> custom_metadata = 6;
+  string idempotency_key = 7;
+}
+
+// CreateRefundResponse
+message CreateRefundResponse {
+  nexus.common.ResponseMetadata metadata = 1;
+  bool success = 2;
+  Refund refund = 3;
+  nexus.common.Error error = 4;
+}
+
+// GetRefundRequest
+message GetRefundRequest {
+  nexus.common.RequestMetadata metadata = 1;
+  string refund_id = 2;
+}
+
+// GetRefundResponse
+message GetRefundResponse {
+  nexus.common.ResponseMetadata metadata = 1;
+  Refund refund = 2;
+  nexus.common.Error error = 3;
+}
+
+// ListRefundsRequest
+message ListRefundsRequest {
+  nexus.common.RequestMetadata metadata = 1;
+  nexus.common.PaginationRequest pagination = 2;
+  string charge_id = 3;
+  string payment_intent_id = 4;
+  nexus.common.DateRange created_at = 5;
+}
+
+// ListRefundsResponse
+message ListRefundsResponse {
+  nexus.common.ResponseMetadata metadata = 1;
+  repeated Refund refunds = 2;
+  nexus.common.PaginationResponse pagination = 3;
+}
+
+// ChargeRequest
+message ChargeRequest {
+  nexus.common.RequestMetadata metadata = 1;
+  int64 amount = 2;
+  string currency = 3;
+  string customer_id = 4;
+  string payment_method_id = 5;
+  string description = 6;
+  bool capture = 7;  // False for pre-auth only
+  map<string, string> custom_metadata = 8;
+  string idempotency_key = 9;
+}
+
+// ChargeResponse
+message ChargeResponse {
+  nexus.common.ResponseMetadata metadata = 1;
+  bool success = 2;
+  Charge charge = 3;
+  nexus.common.Error error = 4;
+}
+
+// CaptureChargeRequest
+message CaptureChargeRequest {
+  nexus.common.RequestMetadata metadata = 1;
+  string charge_id = 2;
+  int64 amount = 3;  // If not specified, full capture
+}
+
+// CaptureChargeResponse
+message CaptureChargeResponse {
+  nexus.common.ResponseMetadata metadata = 1;
+  bool success = 2;
+  Charge charge = 3;
+  nexus.common.Error error = 4;
+}
+
+// Customer requests
+message CreateCustomerRequest {
+  nexus.common.RequestMetadata metadata = 1;
+  string email = 2;
+  string name = 3;
+  string phone = 4;
+  string description = 5;
+  nexus.common.Address address = 6;
+  map<string, string> custom_metadata = 7;
+  string payment_method_id = 8;
+  TaxInfo tax_info = 9;
+}
+
+message CreateCustomerResponse {
+  nexus.common.ResponseMetadata metadata = 1;
+  bool success = 2;
+  Customer customer = 3;
+  nexus.common.Error error = 4;
+}
+
+message GetCustomerRequest {
+  nexus.common.RequestMetadata metadata = 1;
+  string customer_id = 2;
+}
+
+message GetCustomerResponse {
+  nexus.common.ResponseMetadata metadata = 1;
+  Customer customer = 2;
+  nexus.common.Error error = 3;
+}
+
+message UpdateCustomerRequest {
+  nexus.common.RequestMetadata metadata = 1;
+  string customer_id = 2;
+  google.protobuf.FieldMask update_mask = 3;
+  string email = 4;
+  string name = 5;
+  string phone = 6;
+  string description = 7;
+  nexus.common.Address address = 8;
+  map<string, string> custom_metadata = 9;
+}
+
+message UpdateCustomerResponse {
+  nexus.common.ResponseMetadata metadata = 1;
+  bool success = 2;
+  Customer customer = 3;
+  nexus.common.Error error = 4;
+}
+
+message DeleteCustomerRequest {
+  nexus.common.RequestMetadata metadata = 1;
+  string customer_id = 2;
+}
+
+message DeleteCustomerResponse {
+  nexus.common.ResponseMetadata metadata = 1;
+  bool success = 2;
+  nexus.common.Error error = 3;
+}
+
+message ListCustomersRequest {
+  nexus.common.RequestMetadata metadata = 1;
+  nexus.common.PaginationRequest pagination = 2;
+  string email = 3;
+  nexus.common.DateRange created_at = 4;
+}
+
+message ListCustomersResponse {
+  nexus.common.ResponseMetadata metadata = 1;
+  repeated Customer customers = 2;
+  nexus.common.PaginationResponse pagination = 3;
+}
+
+// Payment method requests
+message AddPaymentMethodRequest {
+  nexus.common.RequestMetadata metadata = 1;
+  string customer_id = 2;
+  PaymentMethodType type = 3;
+  string token = 4;  // From frontend tokenization
+  BillingDetails billing_details = 5;
+  bool set_default = 6;
+}
+
+message AddPaymentMethodResponse {
+  nexus.common.ResponseMetadata metadata = 1;
+  bool success = 2;
+  PaymentMethod payment_method = 3;
+  nexus.common.Error error = 4;
+}
+
+message RemovePaymentMethodRequest {
+  nexus.common.RequestMetadata metadata = 1;
+  string payment_method_id = 2;
+}
+
+message RemovePaymentMethodResponse {
+  nexus.common.ResponseMetadata metadata = 1;
+  bool success = 2;
+  nexus.common.Error error = 3;
+}
+
+message SetDefaultPaymentMethodRequest {
+  nexus.common.RequestMetadata metadata = 1;
+  string customer_id = 2;
+  string payment_method_id = 3;
+}
+
+message SetDefaultPaymentMethodResponse {
+  nexus.common.ResponseMetadata metadata = 1;
+  bool success = 2;
+  nexus.common.Error error = 3;
+}
+
+message ListPaymentMethodsRequest {
+  nexus.common.RequestMetadata metadata = 1;
+  string customer_id = 2;
+  PaymentMethodType type = 3;
+}
+
+message ListPaymentMethodsResponse {
+  nexus.common.ResponseMetadata metadata = 1;
+  repeated PaymentMethod payment_methods = 2;
+}
+
+// Subscription requests
+message CreateSubscriptionRequest {
+  nexus.common.RequestMetadata metadata = 1;
+  string customer_id = 2;
+  string plan_id = 3;
+  string payment_method_id = 4;
+  int64 quantity = 5;
+  map<string, string> custom_metadata = 6;
+  int32 trial_period_days = 7;
+  string coupon_code = 8;
+  string collection_method = 9;
+  int32 days_until_due = 10;
+  google.protobuf.Timestamp billing_cycle_anchor = 11;
+}
+
+message CreateSubscriptionResponse {
+  nexus.common.ResponseMetadata metadata = 1;
+  bool success = 2;
+  Subscription subscription = 3;
+  nexus.common.Error error = 4;
+}
+
+message GetSubscriptionRequest {
+  nexus.common.RequestMetadata metadata = 1;
+  string subscription_id = 2;
+}
+
+message GetSubscriptionResponse {
+  nexus.common.ResponseMetadata metadata = 1;
+  Subscription subscription = 2;
+  nexus.common.Error error = 3;
+}
+
+message UpdateSubscriptionRequest {
+  nexus.common.RequestMetadata metadata = 1;
+  string subscription_id = 2;
+  string plan_id = 3;
+  int64 quantity = 4;
+  string payment_method_id = 5;
+  bool proration = 6;
+  map<string, string> custom_metadata = 7;
+}
+
+message UpdateSubscriptionResponse {
+  nexus.common.ResponseMetadata metadata = 1;
+  bool success = 2;
+  Subscription subscription = 3;
+  nexus.common.Error error = 4;
+}
+
+message CancelSubscriptionRequest {
+  nexus.common.RequestMetadata metadata = 1;
+  string subscription_id = 2;
+  bool cancel_at_period_end = 3;
+  string cancellation_reason = 4;
+}
+
+message CancelSubscriptionResponse {
+  nexus.common.ResponseMetadata metadata = 1;
+  bool success = 2;
+  Subscription subscription = 3;
+  nexus.common.Error error = 4;
+}
+
+message PauseSubscriptionRequest {
+  nexus.common.RequestMetadata metadata = 1;
+  string subscription_id = 2;
+  google.protobuf.Timestamp resume_at = 3;
+}
+
+message PauseSubscriptionResponse {
+  nexus.common.ResponseMetadata metadata = 1;
+  bool success = 2;
+  Subscription subscription = 3;
+  nexus.common.Error error = 4;
+}
+
+message ResumeSubscriptionRequest {
+  nexus.common.RequestMetadata metadata = 1;
+  string subscription_id = 2;
+}
+
+message ResumeSubscriptionResponse {
+  nexus.common.ResponseMetadata metadata = 1;
+  bool success = 2;
+  Subscription subscription = 3;
+  nexus.common.Error error = 4;
+}
+
+message ListSubscriptionsRequest {
+  nexus.common.RequestMetadata metadata = 1;
+  nexus.common.PaginationRequest pagination = 2;
+  string customer_id = 3;
+  repeated SubscriptionStatus statuses = 4;
+  string plan_id = 5;
+}
+
+message ListSubscriptionsResponse {
+  nexus.common.ResponseMetadata metadata = 1;
+  repeated Subscription subscriptions = 2;
+  nexus.common.PaginationResponse pagination = 3;
+}
+
+// Plan requests
+message CreatePlanRequest {
+  nexus.common.RequestMetadata metadata = 1;
+  string id = 2;
+  string name = 3;
+  string description = 4;
+  int64 amount = 5;
+  string currency = 6;
+  BillingInterval interval = 7;
+  int32 interval_count = 8;
+  int32 trial_period_days = 9;
+  map<string, string> custom_metadata = 10;
+  repeated PlanFeature features = 11;
+  UsageType usage_type = 12;
+}
+
+message CreatePlanResponse {
+  nexus.common.ResponseMetadata metadata = 1;
+  bool success = 2;
+  Plan plan = 3;
+  nexus.common.Error error = 4;
+}
+
+message GetPlanRequest {
+  nexus.common.RequestMetadata metadata = 1;
+  string plan_id = 2;
+}
+
+message GetPlanResponse {
+  nexus.common.ResponseMetadata metadata = 1;
+  Plan plan = 2;
+  nexus.common.Error error = 3;
+}
+
+message ListPlansRequest {
+  nexus.common.RequestMetadata metadata = 1;
+  nexus.common.PaginationRequest pagination = 2;
+  bool active_only = 3;
+}
+
+message ListPlansResponse {
+  nexus.common.ResponseMetadata metadata = 1;
+  repeated Plan plans = 2;
+  nexus.common.PaginationResponse pagination = 3;
+}
+
+message UpdatePlanRequest {
+  nexus.common.RequestMetadata metadata = 1;
+  string plan_id = 2;
+  string name = 3;
+  string description = 4;
+  map<string, string> custom_metadata = 5;
+  repeated PlanFeature features = 6;
+}
+
+message UpdatePlanResponse {
+  nexus.common.ResponseMetadata metadata = 1;
+  bool success = 2;
+  Plan plan = 3;
+  nexus.common.Error error = 4;
+}
+
+message ArchivePlanRequest {
+  nexus.common.RequestMetadata metadata = 1;
+  string plan_id = 2;
+}
+
+message ArchivePlanResponse {
+  nexus.common.ResponseMetadata metadata = 1;
+  bool success = 2;
+  nexus.common.Error error = 3;
+}
+
+message ApplyCouponRequest {
+  nexus.common.RequestMetadata metadata = 1;
+  string subscription_id = 2;
+  string coupon_code = 3;
+}
+
+message ApplyCouponResponse {
+  nexus.common.ResponseMetadata metadata = 1;
+  bool success = 2;
+  Subscription subscription = 3;
+  nexus.common.Error error = 4;
+}
+
+// Invoice requests
+message CreateInvoiceRequest {
+  nexus.common.RequestMetadata metadata = 1;
+  string customer_id = 2;
+  string description = 3;
+  string collection_method = 4;
+  int32 days_until_due = 5;
+  map<string, string> custom_metadata = 6;
+  repeated InvoiceLineItem items = 7;
+  string footer = 8;
+  bool auto_advance = 9;
+}
+
+message CreateInvoiceResponse {
+  nexus.common.ResponseMetadata metadata = 1;
+  bool success = 2;
+  Invoice invoice = 3;
+  nexus.common.Error error = 4;
+}
+
+message GetInvoiceRequest {
+  nexus.common.RequestMetadata metadata = 1;
+  string invoice_id = 2;
+}
+
+message GetInvoiceResponse {
+  nexus.common.ResponseMetadata metadata = 1;
+  Invoice invoice = 2;
+  nexus.common.Error error = 3;
+}
+
+message UpdateInvoiceRequest {
+  nexus.common.RequestMetadata metadata = 1;
+  string invoice_id = 2;
+  string description = 3;
+  map<string, string> custom_metadata = 4;
+  string footer = 5;
+}
+
+message UpdateInvoiceResponse {
+  nexus.common.ResponseMetadata metadata = 1;
+  bool success = 2;
+  Invoice invoice = 3;
+  nexus.common.Error error = 4;
+}
+
+message FinalizeInvoiceRequest {
+  nexus.common.RequestMetadata metadata = 1;
+  string invoice_id = 2;
+  bool auto_advance = 3;
+}
+
+message FinalizeInvoiceResponse {
+  nexus.common.ResponseMetadata metadata = 1;
+  bool success = 2;
+  Invoice invoice = 3;
+  nexus.common.Error error = 4;
+}
+
+message PayInvoiceRequest {
+  nexus.common.RequestMetadata metadata = 1;
+  string invoice_id = 2;
+  string payment_method_id = 3;
+}
+
+message PayInvoiceResponse {
+  nexus.common.ResponseMetadata metadata = 1;
+  bool success = 2;
+  Invoice invoice = 3;
+  nexus.common.Error error = 4;
+}
+
+message VoidInvoiceRequest {
+  nexus.common.RequestMetadata metadata = 1;
+  string invoice_id = 2;
+}
+
+message VoidInvoiceResponse {
+  nexus.common.ResponseMetadata metadata = 1;
+  bool success = 2;
+  Invoice invoice = 3;
+  nexus.common.Error error = 4;
+}
+
+message ListInvoicesRequest {
+  nexus.common.RequestMetadata metadata = 1;
+  nexus.common.PaginationRequest pagination = 2;
+  string customer_id = 3;
+  string subscription_id = 4;
+  repeated InvoiceStatus statuses = 5;
+  nexus.common.DateRange created_at = 6;
+}
+
+message ListInvoicesResponse {
+  nexus.common.ResponseMetadata metadata = 1;
+  repeated Invoice invoices = 2;
+  nexus.common.PaginationResponse pagination = 3;
+}
+
+message SendInvoiceRequest {
+  nexus.common.RequestMetadata metadata = 1;
+  string invoice_id = 2;
+}
+
+message SendInvoiceResponse {
+  nexus.common.ResponseMetadata metadata = 1;
+  bool success = 2;
+  nexus.common.Error error = 3;
+}
+
+message AddInvoiceItemRequest {
+  nexus.common.RequestMetadata metadata = 1;
+  string invoice_id = 2;
+  string description = 3;
+  int64 amount = 4;
+  int64 quantity = 5;
+  int64 unit_amount = 6;
+  string currency = 7;
+}
+
+message AddInvoiceItemResponse {
+  nexus.common.ResponseMetadata metadata = 1;
+  bool success = 2;
+  InvoiceLineItem item = 3;
+  nexus.common.Error error = 4;
+}
+
+message RemoveInvoiceItemRequest {
+  nexus.common.RequestMetadata metadata = 1;
+  string invoice_id = 2;
+  string item_id = 3;
+}
+
+message RemoveInvoiceItemResponse {
+  nexus.common.ResponseMetadata metadata = 1;
+  bool success = 2;
+  nexus.common.Error error = 3;
+}
+
+message DownloadInvoiceRequest {
+  nexus.common.RequestMetadata metadata = 1;
+  string invoice_id = 2;
+}
+
+message DownloadInvoiceResponse {
+  nexus.common.ResponseMetadata metadata = 1;
+  bytes pdf_data = 2;
+  string download_url = 3;
+  nexus.common.Error error = 4;
+}
+
+// Payout requests
+message CreatePayoutRequest {
+  nexus.common.RequestMetadata metadata = 1;
+  int64 amount = 2;
+  string currency = 3;
+  string destination = 4;
+  string method = 5;
+  string description = 6;
+  map<string, string> custom_metadata = 7;
+}
+
+message CreatePayoutResponse {
+  nexus.common.ResponseMetadata metadata = 1;
+  bool success = 2;
+  Payout payout = 3;
+  nexus.common.Error error = 4;
+}
+
+message GetPayoutRequest {
+  nexus.common.RequestMetadata metadata = 1;
+  string payout_id = 2;
+}
+
+message GetPayoutResponse {
+  nexus.common.ResponseMetadata metadata = 1;
+  Payout payout = 2;
+  nexus.common.Error error = 3;
+}
+
+message ListPayoutsRequest {
+  nexus.common.RequestMetadata metadata = 1;
+  nexus.common.PaginationRequest pagination = 2;
+  repeated PayoutStatus statuses = 3;
+  nexus.common.DateRange created_at = 4;
+}
+
+message ListPayoutsResponse {
+  nexus.common.ResponseMetadata metadata = 1;
+  repeated Payout payouts = 2;
+  nexus.common.PaginationResponse pagination = 3;
+}
+
+message CancelPayoutRequest {
+  nexus.common.RequestMetadata metadata = 1;
+  string payout_id = 2;
+}
+
+message CancelPayoutResponse {
+  nexus.common.ResponseMetadata metadata = 1;
+  bool success = 2;
+  Payout payout = 3;
+  nexus.common.Error error = 4;
+}
+
+message GetBalanceRequest {
+  nexus.common.RequestMetadata metadata = 1;
+}
+
+message GetBalanceResponse {
+  nexus.common.ResponseMetadata metadata = 1;
+  repeated Balance balances = 2;
+  nexus.common.Error error = 3;
+}
+
+message ListBalanceTransactionsRequest {
+  nexus.common.RequestMetadata metadata = 1;
+  nexus.common.PaginationRequest pagination = 2;
+  string type = 3;
+  string source_id = 4;
+  nexus.common.DateRange created_at = 5;
+}
+
+message ListBalanceTransactionsResponse {
+  nexus.common.ResponseMetadata metadata = 1;
+  repeated BalanceTransaction transactions = 2;
+  nexus.common.PaginationResponse pagination = 3;
+}
