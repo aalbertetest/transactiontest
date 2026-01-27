@@ -1,0 +1,48 @@
+namespace: platform
+imageRegistry: platform
+
+services:
+  - name: api-gateway
+    port: 8080
+    replicas: 3
+  - name: auth
+    port: 8081
+    replicas: 2
+  - name: user
+    port: 8082
+    replicas: 2
+  - name: payment
+    port: 8083
+    replicas: 2
+  - name: workflow
+    port: 8084
+    replicas: 2
+  - name: queue
+    port: 8085
+    replicas: 2
+  - name: stream
+    port: 8086
+    replicas: 2
+  - name: cache
+    port: 8087
+    replicas: 2
+  - name: db
+    port: 8088
+    replicas: 2
+  - name: websocket
+    port: 8089
+    replicas: 2
+  - name: scheduler
+    port: 8090
+    replicas: 1
+  - name: worker
+    port: 8091
+    replicas: 3
+
+env:
+  ENV: "prod"
+  RATE_LIMIT_PER_MIN: "1200"
+  WORKER_CONCURRENCY: "16"
+
+secrets:
+  JWT_SECRET: "dev-secret"
