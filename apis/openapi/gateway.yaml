@@ -1,0 +1,216 @@
+openapi: 3.0.3
+info:
+  title: DSP API Gateway
+  version: 0.1.0
+  description: >
+    Unified REST API surface for the Distributed Software Platform (DSP).
+servers:
+  - url: http://localhost:8080
+security:
+  - bearerAuth: []
+tags:
+  - name: auth
+  - name: users
+  - name: payments
+  - name: workflows
+  - name: queue
+  - name: stream
+  - name: realtime
+paths:
+  /healthz:
+    get:
+      summary: Health check
+      operationId: healthz
+      security: []
+      responses:
+        "200":
+          description: ok
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status: { type: string, example: ok }
+
+  /v1/auth/token:
+    post:
+      tags: [auth]
+      summary: Exchange credentials for tokens (password grant-like for demo)
+      operationId: authToken
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email, password]
+              properties:
+                email: { type: string, format: email }
+                password: { type: string, minLength: 8 }
+                mfa_code: { type: string, description: Optional TOTP code }
+      responses:
+        "200":
+          description: token response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TokenResponse"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  /v1/users/me:
+    get:
+      tags: [users]
+      summary: Get current user profile
+      operationId: usersMe
+      responses:
+        "200":
+          description: ok
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  /v1/payments/intents:
+    post:
+      tags: [payments]
+      summary: Create payment intent
+      operationId: createPaymentIntent
+      parameters:
+        - $ref: "#/components/parameters/IdempotencyKey"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreatePaymentIntentRequest"
+      responses:
+        "200":
+          description: created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PaymentIntent"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "409":
+          $ref: "#/components/responses/Conflict"
+
+  /v1/workflows/start:
+    post:
+      tags: [workflows]
+      summary: Start a workflow
+      operationId: startWorkflow
+      parameters:
+        - $ref: "#/components/parameters/IdempotencyKey"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/StartWorkflowRequest"
+      responses:
+        "200":
+          description: started
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StartWorkflowResponse"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "409":
+          $ref: "#/components/responses/Conflict"
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  parameters:
+    IdempotencyKey:
+      name: Idempotency-Key
+      in: header
+      required: false
+      schema:
+        type: string
+        minLength: 8
+      description: Idempotency key for safe retries.
+  responses:
+    Unauthorized:
+      description: unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+    Conflict:
+      description: conflict (often idempotency in-flight mismatch)
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+  schemas:
+    Error:
+      type: object
+      required: [error, message, request_id]
+      properties:
+        error: { type: string, example: unauthorized }
+        message: { type: string, example: invalid token }
+        request_id: { type: string, example: req_01HZY0P9Y2Q2 }
+    TokenResponse:
+      type: object
+      required: [access_token, token_type, expires_in]
+      properties:
+        access_token: { type: string }
+        token_type: { type: string, example: bearer }
+        expires_in: { type: integer, example: 900 }
+        refresh_token: { type: string }
+    User:
+      type: object
+      required: [id, email]
+      properties:
+        id: { type: string, example: usr_01HZY0M5B8R9W1 }
+        email: { type: string, format: email }
+        tenant_id: { type: string, example: ten_01HZY0M5B8R9W1 }
+        created_at: { type: string, format: date-time }
+    CreatePaymentIntentRequest:
+      type: object
+      required: [amount, currency]
+      properties:
+        amount: { type: integer, minimum: 1, example: 1999 }
+        currency: { type: string, example: USD }
+        customer_id: { type: string, example: cus_123 }
+        description: { type: string, example: Example purchase }
+    PaymentIntent:
+      type: object
+      required: [id, status, amount, currency, created_at]
+      properties:
+        id: { type: string, example: pi_01HZY0M5B8R9W1 }
+        status:
+          type: string
+          enum: [REQUIRES_CONFIRMATION, PROCESSING, SUCCEEDED, FAILED, CANCELED]
+        amount: { type: integer, example: 1999 }
+        currency: { type: string, example: USD }
+        customer_id: { type: string, nullable: true }
+        description: { type: string, nullable: true }
+        created_at: { type: string, format: date-time }
+    StartWorkflowRequest:
+      type: object
+      required: [workflow_type, workflow_id]
+      properties:
+        workflow_type: { type: string, example: payment_capture }
+        workflow_id: { type: string, example: wf_capture_pi_01 }
+        input:
+          type: object
+          additionalProperties: true
+    StartWorkflowResponse:
+      type: object
+      required: [workflow_id, run_id, status]
+      properties:
+        workflow_id: { type: string }
+        run_id: { type: string }
+        status: { type: string, example: RUNNING }
+

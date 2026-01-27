@@ -1,0 +1,100 @@
+syntax = "proto3";
+
+package dsp.platform.v1;
+
+option go_package = "github.com/example/dsp/apis/gen/go/dsp/platform/v1;platformv1";
+
+// NOTE: This protobuf describes the logical platform APIs. Concrete services may
+// expose only their subset, but messages are shared to keep client SDKs aligned.
+
+message Error {
+  string code = 1;
+  string message = 2;
+  string request_id = 3;
+}
+
+// -----------------------------
+// Auth
+// -----------------------------
+
+message TokenRequest {
+  string email = 1;
+  string password = 2;
+  string mfa_code = 3;
+}
+
+message TokenResponse {
+  string access_token = 1;
+  string refresh_token = 2;
+  int64 expires_in_seconds = 3;
+  string token_type = 4;
+}
+
+service AuthService {
+  rpc Token(TokenRequest) returns (TokenResponse);
+}
+
+// -----------------------------
+// Users
+// -----------------------------
+
+message User {
+  string id = 1;
+  string tenant_id = 2;
+  string email = 3;
+  string created_at = 4;
+}
+
+message GetMeRequest {}
+message GetMeResponse { User user = 1; }
+
+service UserService {
+  rpc GetMe(GetMeRequest) returns (GetMeResponse);
+}
+
+// -----------------------------
+// Payments
+// -----------------------------
+
+message CreatePaymentIntentRequest {
+  int64 amount = 1;
+  string currency = 2;
+  string customer_id = 3;
+  string description = 4;
+}
+
+message PaymentIntent {
+  string id = 1;
+  string tenant_id = 2;
+  string status = 3;
+  int64 amount = 4;
+  string currency = 5;
+  string customer_id = 6;
+  string description = 7;
+  string created_at = 8;
+}
+
+service PaymentService {
+  rpc CreatePaymentIntent(CreatePaymentIntentRequest) returns (PaymentIntent);
+}
+
+// -----------------------------
+// Workflows
+// -----------------------------
+
+message StartWorkflowRequest {
+  string workflow_type = 1;
+  string workflow_id = 2;
+  bytes input_json = 3; // canonicalized JSON
+}
+
+message StartWorkflowResponse {
+  string workflow_id = 1;
+  string run_id = 2;
+  string status = 3;
+}
+
+service WorkflowService {
+  rpc Start(StartWorkflowRequest) returns (StartWorkflowResponse);
+}
+
