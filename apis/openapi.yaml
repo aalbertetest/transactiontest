@@ -1,0 +1,860 @@
+openapi: 3.0.3
+info:
+  title: Distributed Platform API
+  version: 1.0.0
+  description: Unified REST API for the distributed platform.
+servers:
+  - url: https://api.example.com
+security:
+  - bearerAuth: []
+paths:
+  /healthz:
+    get:
+      summary: Health check
+      responses:
+        "200":
+          description: OK
+  /readyz:
+    get:
+      summary: Readiness check
+      responses:
+        "200":
+          description: Ready
+  /metrics:
+    get:
+      summary: Metrics
+      responses:
+        "200":
+          description: Prometheus metrics
+  /auth/oauth/authorize:
+    post:
+      summary: OAuth2 authorize
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AuthorizeRequest"
+      responses:
+        "200":
+          description: Authorization code
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthorizeResponse"
+  /auth/oauth/token:
+    post:
+      summary: OAuth2 token
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TokenRequest"
+      responses:
+        "200":
+          description: Token response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TokenResponse"
+  /auth/token/refresh:
+    post:
+      summary: Refresh token
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RefreshRequest"
+      responses:
+        "200":
+          description: Token response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TokenResponse"
+  /auth/mfa/enroll:
+    post:
+      summary: Enroll MFA
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/EnrollMfaRequest"
+      responses:
+        "200":
+          description: MFA enrollment
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EnrollMfaResponse"
+  /auth/mfa/verify:
+    post:
+      summary: Verify MFA
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/VerifyMfaRequest"
+      responses:
+        "200":
+          description: MFA verification
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/VerifyMfaResponse"
+  /users/register:
+    post:
+      summary: Register user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RegisterUserRequest"
+      responses:
+        "201":
+          description: User created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+  /users/{id}:
+    get:
+      summary: Get user
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: User
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+    patch:
+      summary: Update user
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateUserRequest"
+      responses:
+        "200":
+          description: Updated user
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+  /payments/intents:
+    post:
+      summary: Create payment intent
+      parameters:
+        - name: Idempotency-Key
+          in: header
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateIntentRequest"
+      responses:
+        "202":
+          description: Intent created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PaymentIntent"
+  /payments/intents/{id}:
+    get:
+      summary: Get payment intent
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Intent
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PaymentIntent"
+  /payments/intents/{id}/capture:
+    post:
+      summary: Capture payment intent
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Intent
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PaymentIntent"
+  /payments/intents/{id}/refund:
+    post:
+      summary: Refund payment intent
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RefundRequest"
+      responses:
+        "200":
+          description: Intent
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PaymentIntent"
+  /workflows:
+    post:
+      summary: Register workflow
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RegisterWorkflowRequest"
+      responses:
+        "201":
+          description: Workflow registered
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RegisterWorkflowResponse"
+  /workflows/{id}/start:
+    post:
+      summary: Start workflow
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "202":
+          description: Workflow run started
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/WorkflowRun"
+  /workflows/runs/{run_id}:
+    get:
+      summary: Get workflow run
+      parameters:
+        - name: run_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Workflow run
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/WorkflowRun"
+  /queues/{name}/enqueue:
+    post:
+      summary: Enqueue message
+      parameters:
+        - name: name
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/EnqueueRequest"
+      responses:
+        "201":
+          description: Message enqueued
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/QueueMessage"
+  /queues/{name}/dequeue:
+    post:
+      summary: Dequeue message
+      parameters:
+        - name: name
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Messages
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/QueueDequeueResponse"
+  /queues/{name}/ack:
+    post:
+      summary: Ack message
+      parameters:
+        - name: name
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AckRequest"
+      responses:
+        "200":
+          description: Ack status
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Status"
+  /streams/{topic}/publish:
+    post:
+      summary: Publish record
+      parameters:
+        - name: topic
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PublishRequest"
+      responses:
+        "200":
+          description: Record
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StreamRecord"
+  /streams/{topic}/consume:
+    get:
+      summary: Consume records
+      parameters:
+        - name: topic
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Records
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StreamConsumeResponse"
+  /streams/{topic}/commit:
+    post:
+      summary: Commit offsets
+      parameters:
+        - name: topic
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CommitRequest"
+      responses:
+        "200":
+          description: Commit status
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Status"
+  /cache/{key}:
+    get:
+      summary: Get cache entry
+      parameters:
+        - name: key
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Cache entry
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CacheEntry"
+    put:
+      summary: Put cache entry
+      parameters:
+        - name: key
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CachePutRequest"
+      responses:
+        "200":
+          description: Status
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Status"
+    delete:
+      summary: Delete cache entry
+      parameters:
+        - name: key
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Status
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Status"
+  /db/query:
+    post:
+      summary: Query SQL
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/QueryRequest"
+      responses:
+        "200":
+          description: Query response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/QueryResponse"
+  /db/execute:
+    post:
+      summary: Execute SQL
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ExecuteRequest"
+      responses:
+        "200":
+          description: Execute response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Status"
+  /db/document/get:
+    post:
+      summary: Get document
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DocumentGetRequest"
+      responses:
+        "200":
+          description: Document
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DocumentGetResponse"
+  /db/document/put:
+    post:
+      summary: Put document
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DocumentPutRequest"
+      responses:
+        "200":
+          description: Status
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Status"
+  /ws/publish:
+    post:
+      summary: Publish realtime event
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RealtimePublishRequest"
+      responses:
+        "200":
+          description: Status
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Status"
+  /schedules:
+    post:
+      summary: Create schedule
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateScheduleRequest"
+      responses:
+        "201":
+          description: Schedule created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CreateScheduleResponse"
+  /schedules/{id}/enable:
+    post:
+      summary: Enable schedule
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Status
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Status"
+  /schedules/{id}/disable:
+    post:
+      summary: Disable schedule
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Status
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Status"
+  /workers/register:
+    post:
+      summary: Register worker
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RegisterWorkerRequest"
+      responses:
+        "200":
+          description: Status
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Status"
+  /workers/heartbeat:
+    post:
+      summary: Worker heartbeat
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/HeartbeatRequest"
+      responses:
+        "200":
+          description: Status
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Status"
+  /workers/task/result:
+    post:
+      summary: Task result
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TaskResultRequest"
+      responses:
+        "200":
+          description: Status
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Status"
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    Status:
+      type: object
+      properties:
+        code: { type: string }
+        message: { type: string }
+    AuthorizeRequest:
+      type: object
+      required: [client_id, redirect_uri, scope, user_id]
+      properties:
+        client_id: { type: string }
+        redirect_uri: { type: string }
+        scope: { type: string }
+        state: { type: string }
+        user_id: { type: string }
+    AuthorizeResponse:
+      type: object
+      properties:
+        code: { type: string }
+        state: { type: string }
+    TokenRequest:
+      type: object
+      properties:
+        grant_type: { type: string }
+        code: { type: string }
+        client_id: { type: string }
+        client_secret: { type: string }
+    TokenResponse:
+      type: object
+      properties:
+        access_token: { type: string }
+        refresh_token: { type: string }
+        expires_in: { type: integer, format: int64 }
+    RefreshRequest:
+      type: object
+      properties:
+        refresh_token: { type: string }
+    EnrollMfaRequest:
+      type: object
+      properties:
+        user_id: { type: string }
+    EnrollMfaResponse:
+      type: object
+      properties:
+        secret: { type: string }
+        uri: { type: string }
+    VerifyMfaRequest:
+      type: object
+      properties:
+        user_id: { type: string }
+        code: { type: string }
+    VerifyMfaResponse:
+      type: object
+      properties:
+        verified: { type: boolean }
+    RegisterUserRequest:
+      type: object
+      required: [email, display_name]
+      properties:
+        email: { type: string }
+        display_name: { type: string }
+    UpdateUserRequest:
+      type: object
+      properties:
+        display_name: { type: string }
+        status: { type: string }
+    User:
+      type: object
+      properties:
+        id: { type: string }
+        email: { type: string }
+        display_name: { type: string }
+        status: { type: string }
+    CreateIntentRequest:
+      type: object
+      properties:
+        user_id: { type: string }
+        amount: { type: integer, format: int64 }
+        currency: { type: string }
+    RefundRequest:
+      type: object
+      properties:
+        amount: { type: integer, format: int64 }
+    PaymentIntent:
+      type: object
+      properties:
+        id: { type: string }
+        user_id: { type: string }
+        amount: { type: integer, format: int64 }
+        currency: { type: string }
+        status: { type: string }
+        idempotency_key: { type: string }
+    RegisterWorkflowRequest:
+      type: object
+      properties:
+        name: { type: string }
+        definition: { type: string }
+    RegisterWorkflowResponse:
+      type: object
+      properties:
+        workflow_id: { type: string }
+    WorkflowRun:
+      type: object
+      properties:
+        id: { type: string }
+        workflow_id: { type: string }
+        status: { type: string }
+        current_step: { type: string }
+    EnqueueRequest:
+      type: object
+      properties:
+        payload: { type: object }
+    QueueMessage:
+      type: object
+      properties:
+        id: { type: string }
+        queue: { type: string }
+        payload: { type: object }
+        attempt: { type: integer }
+    QueueDequeueResponse:
+      type: object
+      properties:
+        messages:
+          type: array
+          items:
+            $ref: "#/components/schemas/QueueMessage"
+    PublishRequest:
+      type: object
+      properties:
+        key: { type: string }
+        value: { type: string }
+    StreamRecord:
+      type: object
+      properties:
+        topic: { type: string }
+        partition: { type: integer }
+        offset: { type: integer, format: int64 }
+        key: { type: string }
+        value: { type: string }
+    StreamConsumeResponse:
+      type: object
+      properties:
+        records:
+          type: array
+          items:
+            $ref: "#/components/schemas/StreamRecord"
+    CommitRequest:
+      type: object
+      properties:
+        group: { type: string }
+        partition: { type: integer }
+        offset: { type: integer, format: int64 }
+    CacheEntry:
+      type: object
+      properties:
+        key: { type: string }
+        value: { type: string }
+        ttl_seconds: { type: integer, format: int64 }
+    CachePutRequest:
+      type: object
+      properties:
+        value: { type: string }
+        ttl_seconds: { type: integer, format: int64 }
+    QueryRequest:
+      type: object
+      properties:
+        sql: { type: string }
+        params: { type: object }
+    QueryResponse:
+      type: object
+      properties:
+        rows: { type: array, items: { type: object } }
+    ExecuteRequest:
+      type: object
+      properties:
+        sql: { type: string }
+        params: { type: object }
+    DocumentGetRequest:
+      type: object
+      properties:
+        collection: { type: string }
+        key: { type: string }
+    DocumentGetResponse:
+      type: object
+      properties:
+        document: { type: object }
+    DocumentPutRequest:
+      type: object
+      properties:
+        collection: { type: string }
+        key: { type: string }
+        document: { type: object }
+    RealtimePublishRequest:
+      type: object
+      properties:
+        channel: { type: string }
+        payload: { type: object }
+    CreateScheduleRequest:
+      type: object
+      properties:
+        cron: { type: string }
+        payload: { type: object }
+    CreateScheduleResponse:
+      type: object
+      properties:
+        schedule_id: { type: string }
+    RegisterWorkerRequest:
+      type: object
+      properties:
+        worker_id: { type: string }
+        capabilities: { type: object }
+    HeartbeatRequest:
+      type: object
+      properties:
+        worker_id: { type: string }
+    TaskResultRequest:
+      type: object
+      properties:
+        task_id: { type: string }
+        status: { type: string }
+        output: { type: object }
