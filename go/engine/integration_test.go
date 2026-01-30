@@ -19,7 +19,7 @@ func addWorkflow(ctx *WorkflowContext, input map[string]interface{}) (interface{
 
 func addActivity(ctx *ActivityContext, input map[string]interface{}) (interface{}, error) {
 	_ = ctx.Heartbeat(map[string]interface{}{"stage": "adding"})
-	return int(input["a"].(int)) + int(input["b"].(int)), nil
+	return toInt(input["a"]) + toInt(input["b"]), nil
 }
 
 func TestIntegrationWorkflowExecutes(t *testing.T) {
@@ -59,4 +59,17 @@ func TestIntegrationWorkflowExecutes(t *testing.T) {
 		t.Fatalf("workflow did not complete")
 	}
 	_ = os.Remove("integration_test.db")
+}
+
+func toInt(value interface{}) int {
+	switch typed := value.(type) {
+	case int:
+		return typed
+	case int64:
+		return int(typed)
+	case float64:
+		return int(typed)
+	default:
+		return 0
+	}
 }
