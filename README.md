@@ -522,4 +522,3 @@ This engine includes:
 - Scheduler-driven timers and timeouts
 - Heartbeat-based progress tracking
 - Structured logging + metrics
-```
