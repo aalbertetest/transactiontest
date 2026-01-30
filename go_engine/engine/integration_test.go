@@ -31,10 +31,10 @@ func (w TimerWorkflow) Decide(ctx *WorkflowContext, state string, stateData map[
 	}
 	if state == "WAIT_TIMER" {
 		timerID := getString(stateData["timer_id"])
-		if timerID != "" && ctx.TimerFired(timerID) {
-			return DecisionResult{NextState: "TIMER_DONE", StateData: stateData}
+		if timerID != "" && !ctx.TimerFired(timerID) {
+			return DecisionResult{NextState: "WAIT_TIMER", StateData: stateData}
 		}
-		return DecisionResult{NextState: "WAIT_TIMER", StateData: stateData}
+		state = "TIMER_DONE"
 	}
 	if state == "TIMER_DONE" {
 		activityID := ctx.EnsureCommandID("activity", "activity_id")

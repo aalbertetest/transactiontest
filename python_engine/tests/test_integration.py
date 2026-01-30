@@ -30,9 +30,9 @@ class TimerWorkflow(WorkflowDefinition):
             )
         if state == "WAIT_TIMER":
             timer_id = state_data.get("timer_id")
-            if timer_id and ctx.timer_fired(timer_id):
-                return DecisionResult(next_state="TIMER_DONE", state_data=state_data, commands=[])
-            return DecisionResult(next_state="WAIT_TIMER", state_data=state_data, commands=[])
+            if timer_id and not ctx.timer_fired(timer_id):
+                return DecisionResult(next_state="WAIT_TIMER", state_data=state_data, commands=[])
+            state = "TIMER_DONE"
         if state == "TIMER_DONE":
             activity_id = ctx.ensure_command_id("activity", "activity_id")
             if ctx.activity_completed(activity_id):
