@@ -1,0 +1,38 @@
+# Distributed Task Scheduler - Python Dependencies
+# ================================================
+
+# Core dependencies
+asyncpg==0.29.0          # Async PostgreSQL driver
+psycopg2-binary==2.9.9   # Sync PostgreSQL driver (for migrations)
+pydantic==2.5.3          # Data validation and settings management
+pydantic-settings==2.1.0 # Settings management with env vars
+croniter==2.0.1          # Cron expression parsing
+pytz==2024.1             # Timezone handling
+
+# Async support
+asyncio==3.4.3           # Async primitives (if not using Python 3.11+)
+aiohttp==3.9.1           # Async HTTP client/server
+
+# Observability
+prometheus-client==0.19.0  # Metrics export
+structlog==23.2.0        # Structured logging
+
+# Utilities
+python-dotenv==1.0.0     # Environment variable loading
+click==8.1.7             # CLI framework
+pyyaml==6.0.1            # YAML config parsing
+tenacity==8.2.3          # Retry logic
+python-dateutil==2.8.2   # Date utilities
+
+# Testing
+pytest==7.4.3            # Testing framework
+pytest-asyncio==0.23.2   # Async test support
+pytest-cov==4.1.0        # Coverage reporting
+factory-boy==3.3.0       # Test fixtures
+faker==21.0.0            # Fake data generation
+testcontainers==3.7.1    # Container-based testing
+
+# Development
+black==23.12.1           # Code formatting
+isort==5.13.2            # Import sorting
+mypy==1.7.1              # Type checking
