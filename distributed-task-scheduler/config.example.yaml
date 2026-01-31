@@ -1,0 +1,125 @@
+# ============================================================================
+# Distributed Task Scheduler - Example Configuration
+# ============================================================================
+# Copy this file to config.yaml and modify as needed.
+# Environment variables can be used with ${VAR_NAME} syntax.
+# ============================================================================
+
+# Database configuration
+database:
+  host: ${DB_HOST:-localhost}
+  port: ${DB_PORT:-5432}
+  name: ${DB_NAME:-taskscheduler}
+  user: ${DB_USER:-postgres}
+  password: ${DB_PASSWORD:-}
+  max_connections: 20
+  min_connections: 5
+  connection_timeout: 30s
+  command_timeout: 60s
+  ssl_mode: prefer
+
+# Scheduler configuration
+scheduler:
+  # Leader election TTL - how long the leader lock is valid
+  # If the leader doesn't renew before this, another instance takes over
+  leader_election_ttl: 30  # seconds
+  
+  # How often the leader renews its lock
+  # Should be significantly less than TTL for safety margin
+  leader_renewal_interval: 10  # seconds
+  
+  # How often to evaluate cron jobs
+  # 1 second provides good granularity for most use cases
+  cron_tick_interval: 1s
+  
+  # How often to check worker health
+  health_check_interval: 10s
+  
+  # How often to promote pending tasks to queued
+  pending_promotion_interval: 1s
+  
+  # How often to recover timed-out tasks
+  timeout_recovery_interval: 30s
+  
+  # Unique scheduler instance ID (auto-generated if not set)
+  # instance_id: "scheduler-1"
+
+# Worker configuration
+worker:
+  # Queues this worker processes
+  # Workers only claim tasks from their configured queues
+  queues:
+    - default
+    - high-priority
+    - batch
+  
+  # Maximum concurrent tasks per worker
+  # Tune based on task resource requirements
+  concurrency: 10
+  
+  # Number of tasks to claim in each poll
+  # Larger batches reduce database round-trips
+  batch_size: 5
+  
+  # How often to send heartbeats
+  heartbeat_interval: 10s
+  
+  # How long a claimed task remains invisible
+  # Should be longer than typical task duration
+  visibility_timeout: 5m
+  
+  # How often to poll when queue is empty
+  poll_interval: 1s
+  
+  # Maximum poll interval during backoff
+  max_poll_interval: 30s
+  
+  # Time to wait for tasks during graceful shutdown
+  shutdown_timeout: 60s
+  
+  # Unique worker ID (auto-generated if not set)
+  # worker_id: "worker-1"
+
+# Default retry configuration
+retry:
+  # Maximum attempts including first try
+  default_max_attempts: 3
+  
+  # Base delay for exponential backoff (seconds)
+  default_base_delay: 1.0
+  
+  # Maximum delay cap (seconds)
+  default_max_delay: 3600.0
+  
+  # Exponential multiplier (typically 2)
+  exponential_base: 2.0
+  
+  # Add randomization to prevent thundering herd
+  jitter: true
+
+# Metrics configuration (Prometheus-compatible)
+metrics:
+  enabled: true
+  port: 9090
+  path: /metrics
+  namespace: dts
+
+# Logging configuration
+logging:
+  # Log level: DEBUG, INFO, WARN, ERROR
+  level: INFO
+  
+  # Log format: json (production) or console (development)
+  format: json
+  
+  # Output: stdout, stderr, or file path
+  output: stdout
+  
+  # Include timestamps in logs
+  include_timestamp: true
+
+# Environment name
+environment: development
+
+# Enable debug mode
+debug: false
