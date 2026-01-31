@@ -1,0 +1,33 @@
+version: "3.9"
+
+services:
+  api:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      DATABASE_URL: postgresql+asyncpg://game:game@postgres:5432/game
+      REDIS_URL: redis://redis:6379/0
+      SECRET_KEY: change-me
+      MATCHMAKING_SIZE: "2"
+      MAX_INPUT_RATE: "20"
+      MAX_SPEED: "6.0"
+      STATE_TTL_SECONDS: "300"
+    depends_on:
+      - postgres
+      - redis
+
+  postgres:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: game
+      POSTGRES_PASSWORD: game
+      POSTGRES_DB: game
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  redis:
+    image: redis:7
+
+volumes:
+  pgdata: {}
