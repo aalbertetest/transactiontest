@@ -1,0 +1,35 @@
+{
+  "name": "@collab-code/web",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host 0.0.0.0",
+    "build": "tsc -p tsconfig.json && vite build",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@monaco-editor/react": "latest",
+    "@vitejs/plugin-react": "latest",
+    "axios": "latest",
+    "monaco-editor": "latest",
+    "react": "latest",
+    "react-dom": "latest",
+    "vite": "latest",
+    "y-websocket": "latest",
+    "yjs": "latest",
+    "zustand": "latest"
+  },
+  "devDependencies": {
+    "@testing-library/jest-dom": "latest",
+    "@testing-library/react": "latest",
+    "@testing-library/user-event": "latest",
+    "@types/node": "latest",
+    "@types/react": "latest",
+    "@types/react-dom": "latest",
+    "jsdom": "latest",
+    "typescript": "latest",
+    "vitest": "latest"
+  }
+}
