@@ -1,0 +1,25 @@
+{
+  "name": "tasks-backend",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Senior-version task management backend from SIMULATION.md",
+  "type": "module",
+  "scripts": {
+    "start": "node src/index.js",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "bcrypt": "^5.1.1",
+    "better-sqlite3": "^11.3.0",
+    "express": "^4.21.0",
+    "jsonwebtoken": "^9.0.2",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "supertest": "^7.0.0",
+    "vitest": "^2.1.1"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
