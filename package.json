@@ -1,0 +1,23 @@
+{
+  "name": "collaborative-code-editor",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Real-time collaborative code editor with React, Express, Prisma, JWT auth, and Yjs CRDT sync.",
+  "workspaces": [
+    "apps/api",
+    "apps/web"
+  ],
+  "scripts": {
+    "dev": "concurrently \"npm run dev -w @collab-code/api\" \"npm run dev -w @collab-code/web\"",
+    "build": "npm run build -w @collab-code/api && npm run build -w @collab-code/web",
+    "test": "npm run test -w @collab-code/api && npm run test -w @collab-code/web",
+    "typecheck": "npm run typecheck -w @collab-code/api && npm run typecheck -w @collab-code/web",
+    "lint": "npm run lint -w @collab-code/api && npm run typecheck -w @collab-code/web",
+    "prisma:generate": "npm run prisma:generate -w @collab-code/api",
+    "prisma:migrate": "npm run prisma:migrate -w @collab-code/api"
+  },
+  "devDependencies": {
+    "concurrently": "latest",
+    "typescript": "latest"
+  }
+}
