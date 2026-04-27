@@ -1,0 +1,84 @@
+{
+  "generator": "generator_v2",
+  "seed": 44,
+  "prompts": [
+    "Design a in-memory cache with optional disk spillover. It must support implements LRU + TTL eviction and exposes a context-manager API plus async getters. Include unit tests and a short README.",
+    "Implement a diff and patch tool for structured YAML configs. It must support is whitespace-insensitive, preserves comments, and produces a minimal patch script. Include unit tests and a short README.",
+    "Build a rate limiter for a public HTTP API. It must support supports token-bucket and sliding-window strategies, is thread-safe, and exposes Prometheus metrics. Include unit tests and a short README.",
+    "Design a feature-flag service with gradual rollout support. It must support exposes a gRPC API, persists rules in Postgres, and evaluates flags in under 1ms p99. Include unit tests and a short README.",
+    "Build a job scheduler that runs cron-like tasks across a worker pool. It must support guarantees at-least-once delivery, persists state to SQLite, and supports retries with exponential backoff. Include unit tests and a short README."
+  ],
+  "results": [
+    {
+      "index": 1,
+      "prompt": "Design a in-memory cache with optional disk spillover. It must support implements LRU + TTL eviction and exposes a context-manager API plus async getters. Include unit tests and a short README.",
+      "tokens": 36,
+      "scores": {
+        "complexity": 5.2,
+        "creativity": 0.0,
+        "token_usage": 8.2,
+        "real_world_useful": 8.5,
+        "total": 21.9
+      }
+    },
+    {
+      "index": 2,
+      "prompt": "Implement a diff and patch tool for structured YAML configs. It must support is whitespace-insensitive, preserves comments, and produces a minimal patch script. Include unit tests and a short README.",
+      "tokens": 36,
+      "scores": {
+        "complexity": 2.2,
+        "creativity": 0.0,
+        "token_usage": 8.2,
+        "real_world_useful": 8.5,
+        "total": 18.9
+      }
+    },
+    {
+      "index": 3,
+      "prompt": "Build a rate limiter for a public HTTP API. It must support supports token-bucket and sliding-window strategies, is thread-safe, and exposes Prometheus metrics. Include unit tests and a short README.",
+      "tokens": 36,
+      "scores": {
+        "complexity": 5.2,
+        "creativity": 0.0,
+        "token_usage": 8.2,
+        "real_world_useful": 8.5,
+        "total": 21.9
+      }
+    },
+    {
+      "index": 4,
+      "prompt": "Design a feature-flag service with gradual rollout support. It must support exposes a gRPC API, persists rules in Postgres, and evaluates flags in under 1ms p99. Include unit tests and a short README.",
+      "tokens": 39,
+      "scores": {
+        "complexity": 3.7,
+        "creativity": 0.0,
+        "token_usage": 8.3,
+        "real_world_useful": 9.7,
+        "total": 21.7
+      }
+    },
+    {
+      "index": 5,
+      "prompt": "Build a job scheduler that runs cron-like tasks across a worker pool. It must support guarantees at-least-once delivery, persists state to SQLite, and supports retries with exponential backoff. Include unit tests and a short README.",
+      "tokens": 43,
+      "scores": {
+        "complexity": 6.7,
+        "creativity": 0.0,
+        "token_usage": 7.83,
+        "real_world_useful": 7.3,
+        "total": 21.83
+      }
+    }
+  ],
+  "aggregate": {
+    "complexity": 4.6,
+    "creativity": 0.0,
+    "token_usage": 8.146,
+    "real_world_useful": 8.5,
+    "total": 21.246
+  },
+  "diagnosis": [
+    "Prompts skew too simple \u2014 inject systems-level concerns (concurrency, persistence, fault tolerance, scaling).",
+    "Prompts feel templated \u2014 add unusual framings, simulations, or cross-domain inspirations."
+  ]
+}

@@ -1,0 +1,86 @@
+{
+  "generator": "generator_v1",
+  "seed": 43,
+  "prompts": [
+    "Write a number guesser that works.",
+    "Create a number guesser in Python.",
+    "Create a fizzbuzz .",
+    "Write a fizzbuzz .",
+    "Build a fizzbuzz ."
+  ],
+  "results": [
+    {
+      "index": 1,
+      "prompt": "Write a number guesser that works.",
+      "tokens": 7,
+      "scores": {
+        "complexity": 0.4,
+        "creativity": 0.0,
+        "token_usage": 1.4,
+        "real_world_useful": 1.5,
+        "total": 3.3
+      }
+    },
+    {
+      "index": 2,
+      "prompt": "Create a number guesser in Python.",
+      "tokens": 7,
+      "scores": {
+        "complexity": 0.4,
+        "creativity": 0.0,
+        "token_usage": 1.4,
+        "real_world_useful": 1.5,
+        "total": 3.3
+      }
+    },
+    {
+      "index": 3,
+      "prompt": "Create a fizzbuzz .",
+      "tokens": 3,
+      "scores": {
+        "complexity": 0.4,
+        "creativity": 0.0,
+        "token_usage": 0.6,
+        "real_world_useful": 1.5,
+        "total": 2.5
+      }
+    },
+    {
+      "index": 4,
+      "prompt": "Write a fizzbuzz .",
+      "tokens": 3,
+      "scores": {
+        "complexity": 0.4,
+        "creativity": 0.0,
+        "token_usage": 0.6,
+        "real_world_useful": 1.5,
+        "total": 2.5
+      }
+    },
+    {
+      "index": 5,
+      "prompt": "Build a fizzbuzz .",
+      "tokens": 3,
+      "scores": {
+        "complexity": 0.4,
+        "creativity": 0.0,
+        "token_usage": 0.6,
+        "real_world_useful": 1.5,
+        "total": 2.5
+      }
+    }
+  ],
+  "aggregate": {
+    "complexity": 0.4,
+    "creativity": 0.0,
+    "token_usage": 0.92,
+    "real_world_useful": 1.5,
+    "total": 2.82
+  },
+  "diagnosis": [
+    "Prompts skew too simple \u2014 inject systems-level concerns (concurrency, persistence, fault tolerance, scaling).",
+    "Prompts feel templated \u2014 add unusual framings, simulations, or cross-domain inspirations.",
+    "Token usage is suboptimal \u2014 tighten wording, drop fluff ('please', 'robust'), aim for ~60-140 tokens per prompt.",
+    "Prompts feel academic \u2014 anchor in concrete deliverables (API surface, CLI flags, file formats, test expectations)."
+  ]
+}

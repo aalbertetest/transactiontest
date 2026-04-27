@@ -1,0 +1,85 @@
+{
+  "generator": "generator_v3",
+  "seed": 45,
+  "prompts": [
+    "Design and implement a content-addressed storage layer over the local filesystem, where every public function is total and side-effect free. Deliver code, tests, and a 5-line design rationale.",
+    "Write a graph-based task DAG executor with caching of intermediate nodes from scratch \u2014 designed so each subsystem can be hot-swapped at runtime. Deliver code, tests, and a 5-line design rationale.",
+    "Given an existing prototype, refactor a deterministic record-and-replay debugger for asyncio programs so that it now satisfies: but the only allowed dependency is the Python standard library. Deliver code, tests, and a 5-line design rationale.",
+    "Optimize a distributed key-value store with Raft-based replication for production: such that the entire core fits in fewer than 400 lines. Deliver code, tests, and a 5-line design rationale.",
+    "Build a streaming aggregator that ingests JSON events over TCP. Constraint: with a property-based test suite that fuzzes invariants. Deliver code, tests, and a 5-line design rationale."
+  ],
+  "results": [
+    {
+      "index": 1,
+      "prompt": "Design and implement a content-addressed storage layer over the local filesystem, where every public function is total and side-effect free. Deliver code, tests, and a 5-line design rationale.",
+      "tokens": 35,
+      "scores": {
+        "complexity": 0.8,
+        "creativity": 0.0,
+        "token_usage": 7.57,
+        "real_world_useful": 5.1,
+        "total": 13.47
+      }
+    },
+    {
+      "index": 2,
+      "prompt": "Write a graph-based task DAG executor with caching of intermediate nodes from scratch \u2014 designed so each subsystem can be hot-swapped at runtime. Deliver code, tests, and a 5-line design rationale.",
+      "tokens": 38,
+      "scores": {
+        "complexity": 5.3,
+        "creativity": 0.0,
+        "token_usage": 8.27,
+        "real_world_useful": 5.1,
+        "total": 18.67
+      }
+    },
+    {
+      "index": 3,
+      "prompt": "Given an existing prototype, refactor a deterministic record-and-replay debugger for asyncio programs so that it now satisfies: but the only allowed dependency is the Python standard library. Deliver code, tests, and a 5-line design rationale.",
+      "tokens": 44,
+      "scores": {
+        "complexity": 3.3,
+        "creativity": 0.0,
+        "token_usage": 8.47,
+        "real_world_useful": 7.3,
+        "total": 19.07
+      }
+    },
+    {
+      "index": 4,
+      "prompt": "Optimize a distributed key-value store with Raft-based replication for production: such that the entire core fits in fewer than 400 lines. Deliver code, tests, and a 5-line design rationale.",
+      "tokens": 35,
+      "scores": {
+        "complexity": 5.3,
+        "creativity": 0.0,
+        "token_usage": 8.17,
+        "real_world_useful": 5.1,
+        "total": 18.57
+      }
+    },
+    {
+      "index": 5,
+      "prompt": "Build a streaming aggregator that ingests JSON events over TCP. Constraint: with a property-based test suite that fuzzes invariants. Deliver code, tests, and a 5-line design rationale.",
+      "tokens": 32,
+      "scores": {
+        "complexity": 5.2,
+        "creativity": 2.0,
+        "token_usage": 8.07,
+        "real_world_useful": 6.1,
+        "total": 21.37
+      }
+    }
+  ],
+  "aggregate": {
+    "complexity": 3.98,
+    "creativity": 0.4,
+    "token_usage": 8.11,
+    "real_world_useful": 5.74,
+    "total": 18.23
+  },
+  "diagnosis": [
+    "Prompts skew too simple \u2014 inject systems-level concerns (concurrency, persistence, fault tolerance, scaling).",
+    "Prompts feel templated \u2014 add unusual framings, simulations, or cross-domain inspirations.",
+    "Prompts feel academic \u2014 anchor in concrete deliverables (API surface, CLI flags, file formats, test expectations)."
+  ]
+}
