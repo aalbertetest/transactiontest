@@ -1,0 +1,84 @@
+{
+  "generator": "generator_v4",
+  "seed": 99,
+  "prompts": [
+    "Build a distributed key-value store with Raft-based replication with a simulation-mode that replays synthetic workloads; it must be memory bounded \u2014 no growth under steady load. Provide a CLI and unit tests.",
+    "Write a DAG executor that caches intermediate node outputs from scratch \u2014 with a simulation-mode that replays synthetic workloads \u2014 under the rule: crash-only: no graceful shutdown path. Provide a CLI and unit tests.",
+    "Design a distributed key-value store with Raft-based replication, designed to survive arbitrary process crashes mid-write. Constraint: memory bounded \u2014 no growth under steady load. Add a benchmark script.",
+    "Given a transactional in-process queue with crash recovery, optimize it: treating every operation as an idempotent algebraic event, fits in under 400 lines of code. Provide a CLI and unit tests.",
+    "Write a constraint solver for small SAT instances from scratch \u2014 as if the program were a tiny actor system with mailboxes \u2014 under the rule: crash-only: no graceful shutdown path. Provide a CLI and unit tests."
+  ],
+  "results": [
+    {
+      "index": 1,
+      "prompt": "Build a distributed key-value store with Raft-based replication with a simulation-mode that replays synthetic workloads; it must be memory bounded \u2014 no growth under steady load. Provide a CLI and unit tests.",
+      "tokens": 38,
+      "scores": {
+        "complexity": 6.3,
+        "creativity": 2.0,
+        "token_usage": 8.27,
+        "real_world_useful": 9.7,
+        "total": 26.27
+      }
+    },
+    {
+      "index": 2,
+      "prompt": "Write a DAG executor that caches intermediate node outputs from scratch \u2014 with a simulation-mode that replays synthetic workloads \u2014 under the rule: crash-only: no graceful shutdown path. Provide a CLI and unit tests.",
+      "tokens": 39,
+      "scores": {
+        "complexity": 4.8,
+        "creativity": 2.0,
+        "token_usage": 8.3,
+        "real_world_useful": 9.7,
+        "total": 24.8
+      }
+    },
+    {
+      "index": 3,
+      "prompt": "Design a distributed key-value store with Raft-based replication, designed to survive arbitrary process crashes mid-write. Constraint: memory bounded \u2014 no growth under steady load. Add a benchmark script.",
+      "tokens": 34,
+      "scores": {
+        "complexity": 8.2,
+        "creativity": 2.0,
+        "token_usage": 8.13,
+        "real_world_useful": 4.9,
+        "total": 23.23
+      }
+    },
+    {
+      "index": 4,
+      "prompt": "Given a transactional in-process queue with crash recovery, optimize it: treating every operation as an idempotent algebraic event, fits in under 400 lines of code. Provide a CLI and unit tests.",
+      "tokens": 38,
+      "scores": {
+        "complexity": 8.3,
+        "creativity": 0.0,
+        "token_usage": 7.67,
+        "real_world_useful": 6.3,
+        "total": 22.27
+      }
+    },
+    {
+      "index": 5,
+      "prompt": "Write a constraint solver for small SAT instances from scratch \u2014 as if the program were a tiny actor system with mailboxes \u2014 under the rule: crash-only: no graceful shutdown path. Provide a CLI and unit tests.",
+      "tokens": 43,
+      "scores": {
+        "complexity": 1.8,
+        "creativity": 4.0,
+        "token_usage": 8.43,
+        "real_world_useful": 7.3,
+        "total": 21.53
+      }
+    }
+  ],
+  "aggregate": {
+    "complexity": 5.88,
+    "creativity": 2.0,
+    "token_usage": 8.16,
+    "real_world_useful": 7.58,
+    "total": 23.62
+  },
+  "diagnosis": [
+    "Prompts skew too simple \u2014 inject systems-level concerns (concurrency, persistence, fault tolerance, scaling).",
+    "Prompts feel templated \u2014 add unusual framings, simulations, or cross-domain inspirations."
+  ]
+}
