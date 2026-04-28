@@ -1,0 +1,66 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String         @id @default(cuid())
+  email         String         @unique
+  name          String
+  passwordHash  String?
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  oauthAccounts OAuthAccount[]
+  subscriptions Subscription[]
+  invoices      Invoice[]
+}
+
+model OAuthAccount {
+  id             String   @id @default(cuid())
+  provider       String
+  providerUserId String
+  userId         String
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt      DateTime @default(now())
+
+  @@unique([provider, providerUserId])
+}
+
+model Subscription {
+  id                     String    @id @default(cuid())
+  userId                 String
+  planCode               String
+  status                 String
+  providerSubscriptionId String    @unique
+  startedAt              DateTime  @default(now())
+  endedAt                DateTime?
+  user                   User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  invoices               Invoice[]
+}
+
+model Invoice {
+  id                String       @id @default(cuid())
+  userId            String
+  subscriptionId    String
+  amountCents       Int
+  currency          String
+  status            String
+  providerInvoiceId String       @unique
+  issuedAt          DateTime     @default(now())
+  paidAt            DateTime?
+  user              User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  subscription      Subscription @relation(fields: [subscriptionId], references: [id], onDelete: Cascade)
+}
+
+model BillingEvent {
+  id        String   @id @default(cuid())
+  eventType String
+  payload   Json
+  signature String
+  status    String
+  createdAt DateTime @default(now())
+}
