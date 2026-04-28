@@ -81,7 +81,7 @@ export class BillingService {
     const created = await this.prisma.billingEvent.create({
       data: {
         eventType: String(event.type ?? 'unknown'),
-        payload: event,
+        payload: JSON.stringify(event),
         signature,
         status: 'processed',
       },

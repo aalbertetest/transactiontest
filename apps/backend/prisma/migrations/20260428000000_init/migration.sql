@@ -49,7 +49,7 @@ CREATE TABLE "Invoice" (
 CREATE TABLE "BillingEvent" (
     "id" TEXT NOT NULL PRIMARY KEY,
     "eventType" TEXT NOT NULL,
-    "payload" JSON NOT NULL,
+    "payload" TEXT NOT NULL,
     "signature" TEXT NOT NULL,
     "status" TEXT NOT NULL,
     "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP

@@ -59,7 +59,7 @@ model Invoice {
 model BillingEvent {
   id        String   @id @default(cuid())
   eventType String
-  payload   Json
+  payload   String
   signature String
   status    String
   createdAt DateTime @default(now())

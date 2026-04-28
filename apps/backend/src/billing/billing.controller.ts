@@ -32,6 +32,10 @@ export class BillingController {
   @Post('webhooks/mock')
   processMockWebhook(@Body() body: MockWebhookDto, @Headers('x-mock-signature') signature?: string) {
     const rawPayload = JSON.stringify(body);
-    return this.billingService.handleWebhook(rawPayload, signature, body);
+    return this.billingService.handleWebhook(
+      rawPayload,
+      signature,
+      body as unknown as Record<string, unknown>,
+    );
   }
 }
