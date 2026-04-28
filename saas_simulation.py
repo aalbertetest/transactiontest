@@ -223,7 +223,8 @@ def ltv_modeling(df: pd.DataFrame, monthly_discount: float = 0.01) -> dict:
       `LTV_undisc = margin_m / π_i`.
     - *Discounted LTV* with monthly discount rate d (cost of capital / time value):
       Sum_{t=1..∞} margin_m * (1-π_i)^(t-1) / (1+d)^t
-      = margin_m / (π_i + d + π_i*d)  (standard closed form for constant margin).
+      = margin_m / (π_i + d). Proof: let r=1/(1+d), q=1-π_i; sum_{t>=1} r^t q^{t-1}
+      = r/(1-qr) = 1/(π_i + d) after algebra.
       We use the closed form with small floor on π to avoid division blowups:
       π' = max(π_i, 0.005).
 
@@ -238,7 +239,7 @@ def ltv_modeling(df: pd.DataFrame, monthly_discount: float = 0.01) -> dict:
     margin_m = 0.78 * revenue_m
     pi = np.clip(df["churn_risk"].to_numpy(), 0.005, 0.95)
     d = monthly_discount
-    ltv_disc = margin_m / (pi + d + pi * d)
+    ltv_disc = margin_m / (pi + d)
     ltv_undisc = margin_m / pi
 
     summary = {
