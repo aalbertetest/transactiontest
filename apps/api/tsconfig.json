@@ -3,12 +3,13 @@
   "compilerOptions": {
     "module": "CommonJS",
     "moduleResolution": "Node",
+    "ignoreDeprecations": "6.0",
     "outDir": "dist",
-    "rootDir": ".",
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "types": ["node", "jest"],
     "noEmit": false
   },
-  "include": ["src/**/*.ts", "test/**/*.ts"]
+  "include": ["src/**/*.ts", "test/**/*.ts"],
+  "references": [{ "path": "../../packages/shared" }]
 }

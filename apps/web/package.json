@@ -5,11 +5,11 @@
   "type": "module",
   "scripts": {
     "dev": "vite --host 0.0.0.0",
-    "build": "tsc -b && vite build",
+    "build": "npm run build --workspace @saas/shared && tsc -b && vite build",
     "preview": "vite preview --host 0.0.0.0",
     "lint": "eslint src --ext .ts,.tsx",
     "test": "vitest run",
-    "typecheck": "tsc -b --noEmit"
+    "typecheck": "npm run build --workspace @saas/shared && tsc -b --noEmit"
   },
   "dependencies": {
     "@saas/shared": "^0.1.0",

@@ -18,7 +18,8 @@ async function run() {
   const client = new Client({ connectionString: process.env.DATABASE_URL });
   await client.connect();
   await ensureTable(client);
-  const applied = new Set((await client.query('select id from schema_migrations')).rows.map((row) => row.id));
+  const result = await client.query<{ id: string }>('select id from schema_migrations');
+  const applied = new Set(result.rows.map((row) => row.id));
   const files = readdirSync(migrationsDir).filter((file) => file.endsWith('.sql')).sort();
 
   for (const file of files) {

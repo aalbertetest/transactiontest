@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { hashPassword } from '../auth/auth.service';
+import { hashPassword } from '../auth/password';
 
 export interface UserRecord {
   id: string;
