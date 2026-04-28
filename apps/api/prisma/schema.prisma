@@ -1,0 +1,85 @@
+// SaaS database schema. SQLite is used by default for local/dev/CI simplicity;
+// the same schema works against PostgreSQL by changing `provider` and DATABASE_URL.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String          @id @default(cuid())
+  email         String          @unique
+  name          String?
+  passwordHash  String?
+  role          String          @default("USER")
+  provider      String?
+  providerId    String?
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+
+  refreshTokens RefreshToken[]
+  subscriptions Subscription[]
+  invoices      Invoice[]
+
+  @@unique([provider, providerId])
+}
+
+model RefreshToken {
+  id         String   @id @default(cuid())
+  userId     String
+  tokenHash  String   @unique
+  expiresAt  DateTime
+  revokedAt  DateTime?
+  createdAt  DateTime @default(now())
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model Plan {
+  id         String         @id
+  name       String
+  priceCents Int
+  currency   String         @default("usd")
+  interval   String         @default("month")
+  features   String
+  active     Boolean        @default(true)
+
+  subscriptions Subscription[]
+}
+
+model Subscription {
+  id                String   @id @default(cuid())
+  userId            String
+  planId            String
+  status            String
+  currentPeriodEnd  DateTime
+  cancelAtPeriodEnd Boolean  @default(false)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  user     User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  plan     Plan      @relation(fields: [planId], references: [id])
+  invoices Invoice[]
+
+  @@index([userId])
+}
+
+model Invoice {
+  id             String   @id @default(cuid())
+  userId         String
+  subscriptionId String
+  amountCents    Int
+  currency       String   @default("usd")
+  status         String
+  createdAt      DateTime @default(now())
+
+  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  subscription Subscription @relation(fields: [subscriptionId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}

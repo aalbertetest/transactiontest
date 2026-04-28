@@ -1,0 +1,27 @@
+version: "3.9"
+
+services:
+  api:
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+    image: saas/api
+    environment:
+      NODE_ENV: production
+      PORT: 3001
+      DATABASE_URL: file:./prisma/dev.db
+      JWT_ACCESS_SECRET: dev-access
+      JWT_REFRESH_SECRET: dev-refresh
+      CORS_ORIGIN: http://localhost:8080
+    ports:
+      - "3001:3001"
+
+  web:
+    build:
+      context: .
+      dockerfile: apps/web/Dockerfile
+    image: saas/web
+    depends_on:
+      - api
+    ports:
+      - "8080:80"

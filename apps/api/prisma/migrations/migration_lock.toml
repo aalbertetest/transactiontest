@@ -1,0 +1,2 @@
+# Locks the Prisma datasource provider for this migrations history.
+provider = "sqlite"

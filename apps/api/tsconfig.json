@@ -1,0 +1,15 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "outDir": "dist",
+    "baseUrl": ".",
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "target": "ES2022",
+    "module": "commonjs",
+    "paths": {
+      "@saas/shared": ["../../packages/shared/src"]
+    }
+  },
+  "include": ["src", "prisma"]
+}
