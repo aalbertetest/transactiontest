@@ -1,0 +1,815 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Arena — Multiplayer Prototype</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: #0d0d0f;
+    color: #e0e0e0;
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 100vh;
+    padding: 16px;
+    gap: 12px;
+  }
+
+  h1 {
+    font-size: 1.4rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: #7effc5;
+  }
+
+  #hud {
+    display: flex;
+    gap: 24px;
+    font-size: 0.85rem;
+    color: #aaa;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  #hud span { color: #fff; font-weight: 600; }
+
+  #canvas-wrap {
+    position: relative;
+    border: 2px solid #333;
+    border-radius: 4px;
+    overflow: hidden;
+  }
+
+  canvas {
+    display: block;
+    background: #111318;
+  }
+
+  #overlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0,0,0,0.7);
+    gap: 12px;
+    font-size: 1.1rem;
+  }
+
+  #overlay.hidden { display: none; }
+
+  #controls {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+    justify-content: center;
+    font-size: 0.8rem;
+    color: #888;
+  }
+
+  label { display: flex; align-items: center; gap: 6px; cursor: pointer; }
+
+  input[type=checkbox] { accent-color: #7effc5; width: 16px; height: 16px; }
+
+  input[type=range] { accent-color: #7effc5; }
+
+  #debug-panel {
+    font-family: monospace;
+    font-size: 0.75rem;
+    color: #555;
+    max-width: 800px;
+    width: 100%;
+  }
+
+  button.connect-btn {
+    background: #7effc5;
+    color: #000;
+    border: none;
+    padding: 10px 28px;
+    border-radius: 4px;
+    font-size: 1rem;
+    font-weight: 700;
+    cursor: pointer;
+    letter-spacing: 0.06em;
+  }
+
+  button.connect-btn:hover { background: #5ee8aa; }
+
+  #health-bar-wrap {
+    width: 200px;
+    height: 10px;
+    background: #333;
+    border-radius: 5px;
+    overflow: hidden;
+    display: inline-block;
+    vertical-align: middle;
+    margin-left: 6px;
+  }
+  #health-bar {
+    height: 100%;
+    background: #7effc5;
+    transition: width 0.15s;
+    border-radius: 5px;
+  }
+</style>
+</head>
+<body>
+
+<h1>Arena ⚔ Multiplayer</h1>
+
+<div id="hud">
+  <div>Health: <span id="hud-health">100</span>
+    <div id="health-bar-wrap"><div id="health-bar" style="width:100%"></div></div>
+  </div>
+  <div>Score: <span id="hud-score">0</span></div>
+  <div>Players: <span id="hud-players">0</span></div>
+  <div>Ping: <span id="hud-ping">—</span> ms</div>
+  <div>Server tick: <span id="hud-tick">0</span></div>
+</div>
+
+<div id="canvas-wrap">
+  <canvas id="arena" width="1200" height="800"></canvas>
+  <div id="overlay">
+    <div id="overlay-msg">Enter server address and connect</div>
+    <div style="display:flex;gap:8px;align-items:center;">
+      <input id="server-url" type="text" value="ws://localhost:8080"
+        style="padding:8px 12px;border-radius:4px;border:1px solid #444;background:#1a1a1a;color:#fff;font-size:0.9rem;width:240px;" />
+      <button class="connect-btn" id="connect-btn">Connect</button>
+    </div>
+  </div>
+</div>
+
+<div id="controls">
+  <label>
+    <input type="checkbox" id="toggle-lag" />
+    Simulate lag
+  </label>
+  <label>
+    Lag: <input type="range" id="lag-slider" min="0" max="500" value="100" style="width:100px;" />
+    <span id="lag-value">100</span> ms
+  </label>
+  <label>
+    <input type="checkbox" id="toggle-predict" checked />
+    Client prediction
+  </label>
+  <label>
+    <input type="checkbox" id="toggle-reconcile" checked />
+    Server reconciliation
+  </label>
+  <label>
+    <input type="checkbox" id="toggle-interp" checked />
+    Interpolation
+  </label>
+  <label>
+    <input type="checkbox" id="toggle-debug" />
+    Debug overlay
+  </label>
+</div>
+
+<div id="debug-panel"></div>
+
+<div id="controls" style="margin-top:4px;color:#666;">
+  WASD / Arrow keys — move &nbsp;|&nbsp; Mouse — aim &nbsp;|&nbsp; Left click / Space — fire
+</div>
+
+<script>
+// ─────────────────────────────────────────────────────────────────────────────
+// Configuration (filled in from server init message)
+// ─────────────────────────────────────────────────────────────────────────────
+let CFG = {
+  arenaW: 1200,
+  arenaH: 800,
+  playerSpeed: 200,
+  playerRadius: 16,
+  projectileSpeed: 450,
+  projectileRadius: 5,
+  projectileTtl: 2000,
+  fireRateMs: 250,
+  maxHealth: 100,
+  tickRateHz: 20,
+};
+
+// ─────────────────────────────────────────────────────────────────────────────
+// State
+// ─────────────────────────────────────────────────────────────────────────────
+let myId       = null;
+let serverTick = 0;
+let ws         = null;
+
+// Authoritative server snapshot (latest received)
+let serverPlayers     = new Map(); // id → player data
+let serverProjectiles = new Map(); // id → proj data
+
+// Local prediction state for own player
+let localPlayer = null;
+
+// Prediction buffer: array of { seq, input, x, y }
+const predictionBuffer = [];
+let   inputSeq         = 0;
+
+// Interpolation: store two snapshots for remote players
+const interpBuffer = new Map(); // playerId → [{ tick, ts, x, y, angle }, ...]
+
+// Input state
+const keys = { up: false, down: false, left: false, right: false, w: false, a: false, s: false, d: false };
+let   mouseAngle = 0;
+let   firing     = false;
+
+// Ping
+let pingTs        = 0;
+let latencyMs     = 0;
+let pingInterval  = null;
+
+// Local fire-rate limiter (mirrors server)
+let lastLocalFire = 0;
+
+// Lag simulation queue: [{ deliverAt, data }]
+const lagQueue = [];
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Canvas
+// ─────────────────────────────────────────────────────────────────────────────
+const canvas  = document.getElementById('arena');
+const ctx     = canvas.getContext('2d');
+const overlay = document.getElementById('overlay');
+
+// ─────────────────────────────────────────────────────────────────────────────
+// UI bindings
+// ─────────────────────────────────────────────────────────────────────────────
+const lagSlider    = document.getElementById('lag-slider');
+const lagValueEl   = document.getElementById('lag-value');
+const toggleLag    = document.getElementById('toggle-lag');
+const togglePredict  = document.getElementById('toggle-predict');
+const toggleReconcile= document.getElementById('toggle-reconcile');
+const toggleInterp   = document.getElementById('toggle-interp');
+const toggleDebug    = document.getElementById('toggle-debug');
+const debugPanel   = document.getElementById('debug-panel');
+
+lagSlider.addEventListener('input', () => { lagValueEl.textContent = lagSlider.value; });
+
+document.getElementById('connect-btn').addEventListener('click', () => {
+  const url = document.getElementById('server-url').value.trim();
+  connectToServer(url);
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+// WebSocket
+// ─────────────────────────────────────────────────────────────────────────────
+function connectToServer(url) {
+  if (ws) { ws.close(); }
+
+  document.getElementById('overlay-msg').textContent = 'Connecting…';
+
+  ws = new WebSocket(url);
+  ws.binaryType = 'arraybuffer';
+
+  ws.onopen = () => {
+    document.getElementById('overlay-msg').textContent = 'Connected — waiting for game state…';
+    startPing();
+  };
+
+  ws.onmessage = (evt) => {
+    if (toggleLag.checked) {
+      const delay = parseInt(lagSlider.value, 10);
+      lagQueue.push({ deliverAt: performance.now() + delay, data: evt.data });
+    } else {
+      processMessage(evt.data);
+    }
+  };
+
+  ws.onclose = () => {
+    overlay.classList.remove('hidden');
+    document.getElementById('overlay-msg').textContent = 'Disconnected. Reconnect?';
+    stopPing();
+  };
+
+  ws.onerror = () => {
+    document.getElementById('overlay-msg').textContent = 'Connection error.';
+  };
+}
+
+function processMessage(data) {
+  let msg;
+  try { msg = JSON.parse(data); } catch { return; }
+
+  switch (msg.type) {
+    case 'init':      handleInit(msg);       break;
+    case 'state':     handleState(msg);      break;
+    case 'hit':       handleHit(msg);        break;
+    case 'killed':    handleKilled(msg);     break;
+    case 'respawn':   handleRespawn(msg);    break;
+    case 'playerJoined': handlePlayerJoined(msg); break;
+    case 'playerLeft':   handlePlayerLeft(msg);   break;
+    case 'pong':      handlePong(msg);       break;
+    case 'anticheat': console.warn('[AC]', msg.reason, msg.details); break;
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Message handlers
+// ─────────────────────────────────────────────────────────────────────────────
+function handleInit(msg) {
+  myId = msg.playerId;
+  CFG  = { ...CFG, ...msg.config };
+  serverTick = msg.tick;
+
+  overlay.classList.add('hidden');
+  document.getElementById('overlay-msg').textContent = '';
+
+  console.log('[init] player id:', myId, 'config:', CFG);
+}
+
+function handleState(msg) {
+  serverTick = msg.tick;
+  document.getElementById('hud-tick').textContent = serverTick;
+
+  // Update server player snapshots
+  const freshIds = new Set();
+  for (const p of msg.players) {
+    freshIds.add(p.id);
+    serverPlayers.set(p.id, p);
+
+    // Feed interpolation buffer for remote players
+    if (p.id !== myId) {
+      if (!interpBuffer.has(p.id)) interpBuffer.set(p.id, []);
+      const buf = interpBuffer.get(p.id);
+      buf.push({ tick: msg.tick, ts: msg.ts, x: p.x, y: p.y, angle: p.angle, health: p.health, alive: p.alive });
+      // Keep only last 10 snapshots
+      if (buf.length > 10) buf.shift();
+    }
+  }
+  // Remove disconnected players
+  for (const id of serverPlayers.keys()) {
+    if (!freshIds.has(id)) { serverPlayers.delete(id); interpBuffer.delete(id); }
+  }
+
+  // Update projectiles
+  serverProjectiles.clear();
+  for (const proj of msg.projectiles) {
+    serverProjectiles.set(proj.id, proj);
+  }
+
+  // ── Server reconciliation for own player ─────────────────────────────────
+  const me = serverPlayers.get(myId);
+  if (!me) return;
+
+  if (!localPlayer) {
+    localPlayer = { ...me };
+    return;
+  }
+
+  if (toggleReconcile.checked) {
+    // Discard acknowledged inputs
+    const acked = me.lastInputSeq;
+    let i = 0;
+    while (i < predictionBuffer.length && predictionBuffer[i].seq <= acked) i++;
+    predictionBuffer.splice(0, i);
+
+    // Rewind to server position
+    let rx = me.x;
+    let ry = me.y;
+
+    // Re-apply unacknowledged inputs
+    for (const entry of predictionBuffer) {
+      const { input } = entry;
+      const dt = CFG.tickRateHz > 0 ? (1 / CFG.tickRateHz) : 0.05;
+      const result = clientApplyInput(rx, ry, input, dt);
+      rx = result.x;
+      ry = result.y;
+    }
+
+    // Smooth correction (avoid snap)
+    const snapThreshold = 10; // px — snap hard if too far off
+    const errorX = rx - localPlayer.x;
+    const errorY = ry - localPlayer.y;
+    const errorDist = Math.hypot(errorX, errorY);
+
+    if (errorDist > snapThreshold) {
+      localPlayer.x = rx;
+      localPlayer.y = ry;
+    } else {
+      localPlayer.x += errorX * 0.3;
+      localPlayer.y += errorY * 0.3;
+    }
+  } else {
+    // No reconciliation — just snap to server
+    localPlayer.x = me.x;
+    localPlayer.y = me.y;
+  }
+
+  localPlayer.health = me.health;
+  localPlayer.score  = me.score;
+  localPlayer.alive  = me.alive;
+
+  updateHUD();
+}
+
+function handleHit(msg) {
+  if (msg.targetId === myId && localPlayer) {
+    localPlayer.health = msg.health;
+    updateHUD();
+  }
+  flashEffect(msg.targetId);
+}
+
+function handleKilled(msg) {
+  if (msg.targetId === myId && localPlayer) {
+    localPlayer.alive = false;
+    localPlayer.health = 0;
+    updateHUD();
+  }
+  flashEffect(msg.targetId);
+}
+
+function handleRespawn(msg) {
+  if (msg.playerId === myId && localPlayer) {
+    localPlayer.alive  = true;
+    localPlayer.health = msg.health;
+    localPlayer.x      = msg.x;
+    localPlayer.y      = msg.y;
+    predictionBuffer.length = 0;
+    updateHUD();
+  }
+}
+
+function handlePlayerJoined(msg) {
+  serverPlayers.set(msg.player.id, msg.player);
+  document.getElementById('hud-players').textContent = serverPlayers.size;
+}
+
+function handlePlayerLeft(msg) {
+  serverPlayers.delete(msg.playerId);
+  interpBuffer.delete(msg.playerId);
+  document.getElementById('hud-players').textContent = serverPlayers.size;
+}
+
+function handlePong(msg) {
+  latencyMs = Date.now() - msg.clientTs;
+  document.getElementById('hud-ping').textContent = latencyMs;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Client-side prediction helpers
+// ─────────────────────────────────────────────────────────────────────────────
+function clientApplyInput(x, y, input, dt) {
+  const { keys: k = {}, angle = 0 } = input;
+  let dx = 0, dy = 0;
+  if (k.up    || k.w) dy -= 1;
+  if (k.down  || k.s) dy += 1;
+  if (k.left  || k.a) dx -= 1;
+  if (k.right || k.d) dx += 1;
+
+  const mag = Math.sqrt(dx * dx + dy * dy);
+  if (mag > 0) { dx = (dx / mag) * CFG.playerSpeed; dy = (dy / mag) * CFG.playerSpeed; }
+
+  const r = CFG.playerRadius;
+  return {
+    x: Math.max(r, Math.min(CFG.arenaW - r, x + dx * dt)),
+    y: Math.max(r, Math.min(CFG.arenaH - r, y + dy * dt)),
+    angle,
+  };
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Hit flash tracking
+// ─────────────────────────────────────────────────────────────────────────────
+const flashTimers = new Map(); // playerId → expiry timestamp
+
+function flashEffect(playerId) {
+  flashTimers.set(playerId, performance.now() + 200);
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Input capture
+// ─────────────────────────────────────────────────────────────────────────────
+document.addEventListener('keydown', (e) => {
+  const k = e.key.toLowerCase();
+  if (k === 'arrowup'    || k === 'w') keys.up    = keys.w    = true;
+  if (k === 'arrowdown'  || k === 's') keys.down  = keys.s    = true;
+  if (k === 'arrowleft'  || k === 'a') keys.left  = keys.a    = true;
+  if (k === 'arrowright' || k === 'd') keys.right = keys.d    = true;
+  if (k === ' ') { firing = true; e.preventDefault(); }
+});
+
+document.addEventListener('keyup', (e) => {
+  const k = e.key.toLowerCase();
+  if (k === 'arrowup'    || k === 'w') keys.up    = keys.w    = false;
+  if (k === 'arrowdown'  || k === 's') keys.down  = keys.s    = false;
+  if (k === 'arrowleft'  || k === 'a') keys.left  = keys.a    = false;
+  if (k === 'arrowright' || k === 'd') keys.right = keys.d    = false;
+  if (k === ' ') { firing = false; }
+});
+
+canvas.addEventListener('mousemove', (e) => {
+  if (!localPlayer) return;
+  const rect = canvas.getBoundingClientRect();
+  const mx = e.clientX - rect.left;
+  const my = e.clientY - rect.top;
+  mouseAngle = Math.atan2(my - localPlayer.y, mx - localPlayer.x);
+});
+
+canvas.addEventListener('mousedown', (e) => { if (e.button === 0) firing = true; });
+canvas.addEventListener('mouseup',   (e) => { if (e.button === 0) firing = false; });
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Client-predicted projectiles (visual only)
+// ─────────────────────────────────────────────────────────────────────────────
+const localProjectiles = []; // { x, y, vx, vy, createdAt }
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Game loop
+// ─────────────────────────────────────────────────────────────────────────────
+let lastFrame = performance.now();
+
+function gameLoop(now) {
+  requestAnimationFrame(gameLoop);
+
+  const dt = Math.min((now - lastFrame) / 1000, 0.05); // cap at 50ms
+  lastFrame = now;
+
+  // Drain lag queue
+  if (toggleLag.checked) {
+    let i = 0;
+    while (i < lagQueue.length && lagQueue[i].deliverAt <= now) {
+      processMessage(lagQueue[i].data);
+      i++;
+    }
+    if (i > 0) lagQueue.splice(0, i);
+  }
+
+  if (!myId || !localPlayer) {
+    renderWaiting();
+    return;
+  }
+
+  // ── Client prediction ─────────────────────────────────────────────────────
+  if (togglePredict.checked && localPlayer.alive) {
+    const shouldFire = firing && (now - lastLocalFire >= CFG.fireRateMs);
+    const input = {
+      keys: { ...keys },
+      fire:  shouldFire,
+      angle: mouseAngle,
+      seq:   ++inputSeq,
+    };
+
+    // Local fire
+    if (shouldFire) {
+      lastLocalFire = now;
+      localProjectiles.push({
+        x: localPlayer.x,
+        y: localPlayer.y,
+        vx: Math.cos(mouseAngle) * CFG.projectileSpeed,
+        vy: Math.sin(mouseAngle) * CFG.projectileSpeed,
+        createdAt: now,
+      });
+    }
+
+    const result = clientApplyInput(localPlayer.x, localPlayer.y, input, dt);
+    localPlayer.x     = result.x;
+    localPlayer.y     = result.y;
+    localPlayer.angle = mouseAngle;
+
+    // Store prediction entry for later reconciliation
+    predictionBuffer.push({ seq: inputSeq, input, x: localPlayer.x, y: localPlayer.y });
+    if (predictionBuffer.length > 120) predictionBuffer.shift(); // safety cap
+
+    // Send to server
+    if (ws && ws.readyState === WebSocket.OPEN) {
+      ws.send(JSON.stringify({
+        type:  'input',
+        seq:   inputSeq,
+        tick:  serverTick,
+        keys:  { ...keys },
+        fire:  shouldFire,
+        angle: mouseAngle,
+      }));
+    }
+  } else {
+    // No prediction — just use server state
+    const me = serverPlayers.get(myId);
+    if (me) { localPlayer.x = me.x; localPlayer.y = me.y; localPlayer.angle = me.angle; }
+  }
+
+  // ── Advance local projectiles ─────────────────────────────────────────────
+  for (let i = localProjectiles.length - 1; i >= 0; i--) {
+    const p = localProjectiles[i];
+    p.x += p.vx * dt;
+    p.y += p.vy * dt;
+    const age = now - p.createdAt;
+    const oob = p.x < 0 || p.x > CFG.arenaW || p.y < 0 || p.y > CFG.arenaH;
+    if (age > CFG.projectileTtl || oob) localProjectiles.splice(i, 1);
+  }
+
+  render(now, dt);
+}
+
+requestAnimationFrame(gameLoop);
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Render
+// ─────────────────────────────────────────────────────────────────────────────
+const PLAYER_COLORS = ['#7effc5','#ff7e7e','#7eb8ff','#ffd97e','#d07eff','#ff9e5e'];
+
+function playerColor(id) {
+  let hash = 0;
+  for (let i = 0; i < id.length; i++) hash = (hash * 31 + id.charCodeAt(i)) | 0;
+  return PLAYER_COLORS[Math.abs(hash) % PLAYER_COLORS.length];
+}
+
+function renderWaiting() {
+  ctx.clearRect(0, 0, CFG.arenaW, CFG.arenaH);
+  ctx.fillStyle = '#1a1a2e';
+  ctx.fillRect(0, 0, CFG.arenaW, CFG.arenaH);
+}
+
+function render(now, dt) {
+  // Background
+  ctx.fillStyle = '#111318';
+  ctx.fillRect(0, 0, CFG.arenaW, CFG.arenaH);
+
+  // Grid lines
+  ctx.strokeStyle = '#1c1e24';
+  ctx.lineWidth = 1;
+  const gs = 80;
+  for (let x = 0; x <= CFG.arenaW; x += gs) {
+    ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, CFG.arenaH); ctx.stroke();
+  }
+  for (let y = 0; y <= CFG.arenaH; y += gs) {
+    ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(CFG.arenaW, y); ctx.stroke();
+  }
+
+  // Arena border
+  ctx.strokeStyle = '#333';
+  ctx.lineWidth = 2;
+  ctx.strokeRect(1, 1, CFG.arenaW - 2, CFG.arenaH - 2);
+
+  const interpDelay = 100; // ms behind current server time for smooth interp
+
+  // ── Remote players (interpolated) ────────────────────────────────────────
+  for (const [id, p] of serverPlayers) {
+    if (id === myId) continue;
+    if (!p.alive) continue;
+
+    let rx = p.x, ry = p.y, ra = p.angle;
+
+    if (toggleInterp.checked) {
+      const buf = interpBuffer.get(id);
+      if (buf && buf.length >= 2) {
+        const renderTs = Date.now() - interpDelay;
+        // Find straddling snapshots
+        let lo = buf[0], hi = buf[buf.length - 1];
+        for (let i = 0; i < buf.length - 1; i++) {
+          if (buf[i].ts <= renderTs && buf[i + 1].ts >= renderTs) {
+            lo = buf[i]; hi = buf[i + 1]; break;
+          }
+        }
+        const span = hi.ts - lo.ts;
+        const t    = span > 0 ? Math.max(0, Math.min(1, (renderTs - lo.ts) / span)) : 1;
+        rx = lo.x + (hi.x - lo.x) * t;
+        ry = lo.y + (hi.y - lo.y) * t;
+        ra = lo.angle + angleLerp(lo.angle, hi.angle) * t;
+      }
+    }
+
+    drawPlayer(id, rx, ry, ra, p.health, p.score, now);
+  }
+
+  // ── Server-authoritative projectiles ─────────────────────────────────────
+  ctx.fillStyle = '#ffe97e';
+  for (const proj of serverProjectiles.values()) {
+    ctx.beginPath();
+    ctx.arc(proj.x, proj.y, CFG.projectileRadius, 0, Math.PI * 2);
+    ctx.fill();
+  }
+
+  // ── Local (predicted) projectiles ─────────────────────────────────────────
+  if (togglePredict.checked) {
+    ctx.fillStyle = '#ffff99';
+    for (const proj of localProjectiles) {
+      ctx.beginPath();
+      ctx.arc(proj.x, proj.y, CFG.projectileRadius, 0, Math.PI * 2);
+      ctx.fill();
+    }
+  }
+
+  // ── Own player ────────────────────────────────────────────────────────────
+  if (localPlayer && localPlayer.alive) {
+    drawPlayer(myId, localPlayer.x, localPlayer.y, localPlayer.angle, localPlayer.health, localPlayer.score, now, true);
+  } else if (localPlayer && !localPlayer.alive) {
+    ctx.save();
+    ctx.fillStyle = 'rgba(255,0,0,0.15)';
+    ctx.fillRect(0, 0, CFG.arenaW, CFG.arenaH);
+    ctx.fillStyle = '#ff5555';
+    ctx.font = 'bold 48px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('YOU DIED', CFG.arenaW / 2, CFG.arenaH / 2 - 20);
+    ctx.font = '20px sans-serif';
+    ctx.fillStyle = '#aaa';
+    ctx.fillText('Respawning…', CFG.arenaW / 2, CFG.arenaH / 2 + 20);
+    ctx.restore();
+  }
+
+  // ── Debug overlay ─────────────────────────────────────────────────────────
+  if (toggleDebug.checked) {
+    renderDebug(now);
+  }
+}
+
+function angleLerp(a, b) {
+  let d = ((b - a) % (Math.PI * 2) + Math.PI * 3) % (Math.PI * 2) - Math.PI;
+  return d;
+}
+
+function drawPlayer(id, x, y, angle, health, score, now, isLocal = false) {
+  const r     = CFG.playerRadius;
+  const color = playerColor(id);
+  const flash = flashTimers.has(id) && flashTimers.get(id) > now;
+
+  ctx.save();
+  ctx.translate(x, y);
+
+  // Body
+  ctx.beginPath();
+  ctx.arc(0, 0, r, 0, Math.PI * 2);
+  ctx.fillStyle = flash ? '#ffffff' : (isLocal ? color : color + 'bb');
+  ctx.fill();
+
+  // Outline
+  ctx.strokeStyle = isLocal ? '#fff' : color;
+  ctx.lineWidth   = isLocal ? 2.5 : 1.5;
+  ctx.stroke();
+
+  // Direction indicator (barrel)
+  ctx.rotate(angle);
+  ctx.fillStyle = isLocal ? '#fff' : '#ddd';
+  ctx.fillRect(r * 0.4, -3, r * 0.9, 6);
+
+  ctx.restore();
+
+  // Health bar
+  const barW = r * 2.5;
+  const barH = 4;
+  const bx   = x - barW / 2;
+  const by   = y - r - 10;
+  ctx.fillStyle = '#333';
+  ctx.fillRect(bx, by, barW, barH);
+  const pct = Math.max(0, health / CFG.maxHealth);
+  ctx.fillStyle = pct > 0.5 ? '#7effc5' : pct > 0.25 ? '#ffd97e' : '#ff5e5e';
+  ctx.fillRect(bx, by, barW * pct, barH);
+
+  // Score label
+  ctx.fillStyle = '#aaa';
+  ctx.font = '11px monospace';
+  ctx.textAlign = 'center';
+  ctx.fillText(isLocal ? `YOU  [${score}]` : `[${score}]`, x, y - r - 14);
+}
+
+function renderDebug(now) {
+  const me = serverPlayers.get(myId);
+  const lines = [
+    `myId: ${myId}`,
+    `serverTick: ${serverTick}  ping: ${latencyMs}ms`,
+    `prediction buf: ${predictionBuffer.length}  localProj: ${localProjectiles.length}`,
+    `serverPlayers: ${serverPlayers.size}  serverProj: ${serverProjectiles.size}`,
+    me ? `server pos: (${me.x.toFixed(1)}, ${me.y.toFixed(1)})  seq: ${me.lastInputSeq}` : 'no server me',
+    localPlayer ? `local pos:  (${localPlayer.x.toFixed(1)}, ${localPlayer.y.toFixed(1)})  health: ${localPlayer.health}` : '',
+    `lag sim: ${toggleLag.checked ? lagSlider.value + 'ms' : 'off'}  queue: ${lagQueue.length}`,
+  ];
+  debugPanel.textContent = lines.join('\n');
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// HUD
+// ─────────────────────────────────────────────────────────────────────────────
+function updateHUD() {
+  if (!localPlayer) return;
+  document.getElementById('hud-health').textContent = Math.max(0, localPlayer.health);
+  document.getElementById('hud-score').textContent  = localPlayer.score;
+  document.getElementById('hud-players').textContent = serverPlayers.size;
+  const pct = Math.max(0, localPlayer.health / CFG.maxHealth) * 100;
+  document.getElementById('health-bar').style.width = pct + '%';
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Ping
+// ─────────────────────────────────────────────────────────────────────────────
+function startPing() {
+  stopPing();
+  pingInterval = setInterval(() => {
+    if (ws && ws.readyState === WebSocket.OPEN) {
+      ws.send(JSON.stringify({ type: 'ping', clientTs: Date.now() }));
+    }
+  }, 2000);
+}
+
+function stopPing() {
+  if (pingInterval) { clearInterval(pingInterval); pingInterval = null; }
+}
+</script>
+</body>
+</html>
