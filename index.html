@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Wedding Weekend Details</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="page-shell">
+      <header class="hero" id="top">
+        <div class="hero__overlay"></div>
+        <nav class="nav">
+          <a class="nav__brand" href="#top">Wedding Weekend</a>
+          <div class="nav__links">
+            <a href="#overview">Overview</a>
+            <a href="#schedule">Schedule</a>
+            <a href="#travel">Travel</a>
+            <a href="#faq">FAQ</a>
+          </div>
+        </nav>
+
+        <div class="hero__content">
+          <p class="eyebrow">All the details in one place</p>
+          <h1 id="couple-names">A Wedding Weekend</h1>
+          <p class="hero__summary" id="wedding-summary">
+            A complete example wedding site with generated details.
+          </p>
+
+          <div class="hero__meta">
+            <div>
+              <span class="hero__label">Date</span>
+              <strong id="wedding-date"></strong>
+            </div>
+            <div>
+              <span class="hero__label">Location</span>
+              <strong id="wedding-location"></strong>
+            </div>
+            <div>
+              <span class="hero__label">Countdown</span>
+              <strong id="countdown"></strong>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <main>
+        <section class="section section--intro" id="overview">
+          <div class="section__heading">
+            <p class="eyebrow">Weekend overview</p>
+            <h2>Everything guests need to know</h2>
+          </div>
+          <div class="intro-grid">
+            <article class="card">
+              <h3>At a glance</h3>
+              <div id="overview-cards" class="stack"></div>
+            </article>
+            <article class="card">
+              <h3>Quick notes</h3>
+              <ul id="quick-notes" class="detail-list"></ul>
+            </article>
+          </div>
+        </section>
+
+        <section class="section">
+          <div class="section__heading">
+            <p class="eyebrow">Story</p>
+            <h2>The couple</h2>
+          </div>
+          <article class="card">
+            <div class="two-column">
+              <div>
+                <h3>About the couple</h3>
+                <p id="couple-story" class="lead"></p>
+              </div>
+              <div>
+                <h3>Proposal details</h3>
+                <ul id="proposal-details" class="detail-list"></ul>
+              </div>
+            </div>
+          </article>
+        </section>
+
+        <section class="section" id="schedule">
+          <div class="section__heading">
+            <p class="eyebrow">Timeline</p>
+            <h2>Event schedule</h2>
+          </div>
+          <div id="schedule-grid" class="grid grid--cards"></div>
+        </section>
+
+        <section class="section">
+          <div class="section__heading">
+            <p class="eyebrow">Ceremony & reception</p>
+            <h2>Venue details</h2>
+          </div>
+          <div class="grid grid--two">
+            <article class="card">
+              <h3>Ceremony</h3>
+              <ul id="ceremony-details" class="detail-list"></ul>
+            </article>
+            <article class="card">
+              <h3>Reception</h3>
+              <ul id="reception-details" class="detail-list"></ul>
+            </article>
+          </div>
+        </section>
+
+        <section class="section">
+          <div class="section__heading">
+            <p class="eyebrow">People</p>
+            <h2>Wedding party & family</h2>
+          </div>
+          <div class="grid grid--two">
+            <article class="card">
+              <h3>Wedding party</h3>
+              <div id="wedding-party" class="party-grid"></div>
+            </article>
+            <article class="card">
+              <h3>Key family & hosts</h3>
+              <ul id="family-details" class="detail-list"></ul>
+            </article>
+          </div>
+        </section>
+
+        <section class="section" id="travel">
+          <div class="section__heading">
+            <p class="eyebrow">Travel</p>
+            <h2>Hotels, transportation & arrival info</h2>
+          </div>
+          <div class="grid grid--three">
+            <article class="card">
+              <h3>Stay</h3>
+              <ul id="lodging-details" class="detail-list"></ul>
+            </article>
+            <article class="card">
+              <h3>Transportation</h3>
+              <ul id="transport-details" class="detail-list"></ul>
+            </article>
+            <article class="card">
+              <h3>Arrival planning</h3>
+              <ul id="arrival-details" class="detail-list"></ul>
+            </article>
+          </div>
+        </section>
+
+        <section class="section">
+          <div class="section__heading">
+            <p class="eyebrow">Attire & dining</p>
+            <h2>Dress code, menu & guest experience</h2>
+          </div>
+          <div class="grid grid--three">
+            <article class="card">
+              <h3>Dress code</h3>
+              <ul id="attire-details" class="detail-list"></ul>
+            </article>
+            <article class="card">
+              <h3>Menu</h3>
+              <ul id="menu-details" class="detail-list"></ul>
+            </article>
+            <article class="card">
+              <h3>Guest logistics</h3>
+              <ul id="guest-details" class="detail-list"></ul>
+            </article>
+          </div>
+        </section>
+
+        <section class="section">
+          <div class="section__heading">
+            <p class="eyebrow">Activities</p>
+            <h2>Weekend extras</h2>
+          </div>
+          <div class="grid grid--two">
+            <article class="card">
+              <h3>Pre-wedding events</h3>
+              <div id="pre-events" class="stack"></div>
+            </article>
+            <article class="card">
+              <h3>Post-wedding plans</h3>
+              <div id="post-events" class="stack"></div>
+            </article>
+          </div>
+        </section>
+
+        <section class="section" id="faq">
+          <div class="section__heading">
+            <p class="eyebrow">Helpful answers</p>
+            <h2>Frequently asked questions</h2>
+          </div>
+          <div id="faq-list" class="faq-list"></div>
+        </section>
+
+        <section class="section">
+          <div class="section__heading">
+            <p class="eyebrow">Registry & contact</p>
+            <h2>Final details</h2>
+          </div>
+          <div class="grid grid--two">
+            <article class="card">
+              <h3>Registry & gifting</h3>
+              <ul id="registry-details" class="detail-list"></ul>
+            </article>
+            <article class="card">
+              <h3>Contacts & backup plans</h3>
+              <ul id="contact-details" class="detail-list"></ul>
+            </article>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <script src="script.js"></script>
+  </body>
+</html>
