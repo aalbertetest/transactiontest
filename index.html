@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Harper & Julian Wedding Weekend</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <header class="hero" id="top">
+      <nav class="site-nav">
+        <a class="brand" href="#top">H + J</a>
+        <div class="nav-links">
+          <a href="#overview">Overview</a>
+          <a href="#schedule">Schedule</a>
+          <a href="#travel">Travel</a>
+          <a href="#faq">FAQ</a>
+          <a href="#rsvp">RSVP</a>
+        </div>
+      </nav>
+
+      <div class="hero-card">
+        <p class="eyebrow">Wedding weekend</p>
+        <h1 id="couple-names">Harper &amp; Julian</h1>
+        <p class="hero-date" id="hero-date"></p>
+        <p class="hero-location" id="hero-location"></p>
+        <p class="hero-summary" id="hero-summary"></p>
+
+        <div class="hero-actions">
+          <a class="button primary" href="#schedule">See the full itinerary</a>
+          <a class="button secondary" href="#travel">Plan your stay</a>
+        </div>
+
+        <div class="countdown" aria-label="Countdown to wedding">
+          <div>
+            <span id="days">0</span>
+            <small>Days</small>
+          </div>
+          <div>
+            <span id="hours">0</span>
+            <small>Hours</small>
+          </div>
+          <div>
+            <span id="minutes">0</span>
+            <small>Minutes</small>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <main class="page-shell">
+      <section class="panel intro-panel" id="overview">
+        <div>
+          <p class="section-tag">At a glance</p>
+          <h2>Every detail in one place</h2>
+          <p id="intro-text"></p>
+        </div>
+        <div class="facts-grid" id="quick-facts"></div>
+      </section>
+
+      <section class="panel two-column">
+        <article>
+          <p class="section-tag">Our story</p>
+          <h2>How it all started</h2>
+          <div id="story-content" class="stacked-list prose"></div>
+        </article>
+        <article>
+          <p class="section-tag">Wedding party</p>
+          <h2>Meet the people standing with us</h2>
+          <div id="wedding-party" class="stacked-list"></div>
+        </article>
+      </section>
+
+      <section class="panel" id="schedule">
+        <p class="section-tag">Full weekend schedule</p>
+        <div class="section-heading">
+          <h2>From welcome cocktails to farewell brunch</h2>
+          <p>
+            Everything below is included so guests can plan each part of the
+            weekend with confidence.
+          </p>
+        </div>
+        <div id="timeline" class="timeline"></div>
+      </section>
+
+      <section class="panel two-column">
+        <article id="ceremony" class="detail-card"></article>
+        <article id="reception" class="detail-card"></article>
+      </section>
+
+      <section class="panel two-column" id="travel">
+        <article>
+          <p class="section-tag">Travel</p>
+          <h2>Getting there</h2>
+          <div id="travel-content" class="stacked-list"></div>
+        </article>
+        <article>
+          <p class="section-tag">Stay</p>
+          <h2>Hotel blocks and nearby options</h2>
+          <div id="stay-content" class="stacked-list"></div>
+        </article>
+      </section>
+
+      <section class="panel three-column">
+        <article class="info-card">
+          <p class="section-tag">Food & drinks</p>
+          <h2>Menu</h2>
+          <div id="menu-content" class="stacked-list"></div>
+        </article>
+        <article class="info-card">
+          <p class="section-tag">Dress code</p>
+          <h2>What to wear</h2>
+          <div id="attire-content" class="stacked-list"></div>
+        </article>
+        <article class="info-card">
+          <p class="section-tag">Registry</p>
+          <h2>Gift details</h2>
+          <div id="registry-content" class="stacked-list"></div>
+        </article>
+      </section>
+
+      <section class="panel two-column">
+        <article>
+          <p class="section-tag">Accessibility</p>
+          <h2>On-site accommodations</h2>
+          <div id="accessibility-content" class="stacked-list"></div>
+        </article>
+        <article>
+          <p class="section-tag">Weather plan</p>
+          <h2>Backup details</h2>
+          <div id="weather-content" class="stacked-list"></div>
+        </article>
+      </section>
+
+      <section class="panel two-column">
+        <article id="rsvp">
+          <p class="section-tag">RSVP</p>
+          <h2>How to respond</h2>
+          <div id="rsvp-content" class="stacked-list"></div>
+        </article>
+        <article>
+          <p class="section-tag">Contact</p>
+          <h2>Need help?</h2>
+          <div id="contact-content" class="stacked-list"></div>
+        </article>
+      </section>
+
+      <section class="panel" id="faq">
+        <p class="section-tag">FAQ</p>
+        <div class="section-heading">
+          <h2>Common guest questions</h2>
+          <p>
+            These answers cover the logistics guests usually ask about right
+            before the weekend begins.
+          </p>
+        </div>
+        <div id="faq-list" class="faq-list"></div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <p id="footer-note"></p>
+    </footer>
+
+    <script src="script.js"></script>
+  </body>
+</html>
