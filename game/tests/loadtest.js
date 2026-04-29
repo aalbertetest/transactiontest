@@ -134,36 +134,11 @@ function createBot(index) {
   const ws = new WebSocket(SERVER_URL);
   totalConns++;
 
+  let inMatch = false;
+
   ws.on('open', () => {
     stats.connected   = true;
     stats.connectTime = Date.now();
-
-    // Send inputs at INPUT_HZ
-    inputInterval = setInterval(() => {
-      if (!stats.initialized || ws.readyState !== WebSocket.OPEN) return;
-
-      // Change direction every 1-3 seconds
-      dirChangeTimer++;
-      if (dirChangeTimer > INPUT_HZ * (1 + Math.random() * 2)) {
-        directionIdx  = (directionIdx + 1) % DIRECTIONS.length;
-        dirChangeTimer = 0;
-      }
-
-      const fire  = Math.random() < 0.15; // fire 15% of ticks
-      const angle = Math.random() * Math.PI * 2;
-      const msg   = JSON.stringify({
-        type:  'input',
-        seq:   ++inputSeq,
-        tick:  0,
-        keys:  DIRECTIONS[directionIdx],
-        fire,
-        angle,
-      });
-
-      ws.send(msg);
-      stats.inputsSent++;
-      stats.bytesSent += msg.length;
-    }, INPUT_INTERVAL_MS);
 
     // Ping every 5s
     pingInterval = setInterval(() => {
@@ -182,13 +157,58 @@ function createBot(index) {
     let msg;
     try { msg = JSON.parse(raw); } catch { return; }
 
-    if (msg.type === 'init') {
-      stats.initialized = true;
-    } else if (msg.type === 'pong') {
-      const rtt = Date.now() - msg.clientTs;
-      if (rtt >= 0 && rtt < 10000) {
-        stats.latencySamples.push(rtt);
-        if (stats.latencySamples.length > 50) stats.latencySamples.shift();
+    switch (msg.type) {
+      case 'welcome': {
+        // Announce name and join matchmaking queue
+        const nameMsg  = JSON.stringify({ type: 'setName', name: `bot_${index}` });
+        const queueMsg = JSON.stringify({ type: 'joinQueue' });
+        ws.send(nameMsg);  stats.bytesSent += nameMsg.length;
+        ws.send(queueMsg); stats.bytesSent += queueMsg.length;
+        stats.initialized = true;
+        break;
+      }
+      case 'matchmakingPlaced':
+      case 'joinedLobby': {
+        // Mark ready immediately
+        const readyMsg = JSON.stringify({ type: 'setReady', ready: true });
+        ws.send(readyMsg); stats.bytesSent += readyMsg.length;
+        break;
+      }
+      case 'matchStart': {
+        inMatch = true;
+        // Start sending inputs
+        inputInterval = setInterval(() => {
+          if (!inMatch || ws.readyState !== WebSocket.OPEN) return;
+          dirChangeTimer++;
+          if (dirChangeTimer > INPUT_HZ * (1 + Math.random() * 2)) {
+            directionIdx  = (directionIdx + 1) % DIRECTIONS.length;
+            dirChangeTimer = 0;
+          }
+          const fire  = Math.random() < 0.15;
+          const angle = Math.random() * Math.PI * 2;
+          const m = JSON.stringify({
+            type: 'input', seq: ++inputSeq, tick: 0,
+            keys: DIRECTIONS[directionIdx], fire, angle,
+          });
+          ws.send(m);
+          stats.inputsSent++;
+          stats.bytesSent += m.length;
+        }, INPUT_INTERVAL_MS);
+        break;
+      }
+      case 'matchOver': {
+        inMatch = false;
+        clearInterval(inputInterval);
+        inputInterval = null;
+        break;
+      }
+      case 'pong': {
+        const rtt = Date.now() - msg.clientTs;
+        if (rtt >= 0 && rtt < 10000) {
+          stats.latencySamples.push(rtt);
+          if (stats.latencySamples.length > 50) stats.latencySamples.shift();
+        }
+        break;
       }
     }
   });

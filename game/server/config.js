@@ -28,6 +28,19 @@ const CONFIG = {
   SPEED_TOLERANCE: 1.20,   // allow 20% over nominal to absorb network jitter
   TELEPORT_THRESHOLD: 400, // px — any jump larger than this is suspicious
   MAX_VIOLATIONS: 5,       // disconnect after this many
+
+  // Lobby / matchmaking
+  LOBBY_MAX_PLAYERS: 8,    // max players per lobby (excluding spectators)
+  LOBBY_MAX_SPECTATORS: 20,
+  LOBBY_MIN_TO_START: 2,   // auto-start countdown once this many players ready
+  LOBBY_COUNTDOWN_S: 5,    // seconds of countdown before match starts
+  LOBBY_IDLE_TIMEOUT_MS: 60_000, // destroy empty lobby after this long
+  MATCH_SCORE_LIMIT: 10,   // first player to N kills wins
+  MATCH_TIME_LIMIT_S: 300, // 5-minute hard cap
+
+  // Matchmaking
+  MM_INTERVAL_MS: 2000,    // how often the matchmaker runs
+  MM_MIN_QUEUE_TO_FILL: 2, // minimum players in queue before creating a lobby
 };
 
 module.exports = CONFIG;
