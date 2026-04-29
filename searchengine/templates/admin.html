@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% block title %}Admin — LocalSearch{% endblock %}
+
+{% block content %}
+<div class="admin-page">
+  <h1>Admin Panel</h1>
+
+  <section class="admin-card">
+    <h2>Index Statistics</h2>
+    <table class="stats-table">
+      <tr><th>Documents</th><td>{{ stats.num_docs }}</td></tr>
+      <tr><th>Unique terms</th><td>{{ stats.num_terms }}</td></tr>
+      <tr><th>Avg document length</th><td>{{ stats.avg_doc_length }} tokens</td></tr>
+    </table>
+  </section>
+
+  <section class="admin-card">
+    <h2>Index a Local Folder</h2>
+    <form method="post">
+      <input type="hidden" name="action" value="index_folder" />
+      <label for="folder">Folder path (absolute or relative to CWD):</label>
+      <div class="input-row">
+        <input type="text" name="folder" id="folder" placeholder="/path/to/docs" required />
+        <button type="submit">Index Folder</button>
+      </div>
+      <p class="form-hint">Indexes .html, .htm, .md, .markdown, and .txt files recursively.</p>
+    </form>
+  </section>
+
+  <section class="admin-card">
+    <h2>Crawl URLs</h2>
+    <form method="post">
+      <input type="hidden" name="action" value="crawl_urls" />
+      <label for="urls">Seed URLs (one per line):</label>
+      <textarea name="urls" id="urls" rows="4" placeholder="https://example.com&#10;https://other.com"></textarea>
+      <div class="input-row">
+        <label for="max_pages">Max pages:</label>
+        <input type="number" name="max_pages" id="max_pages" value="20" min="1" max="500" style="width:80px" />
+        <button type="submit">Start Crawl</button>
+      </div>
+      <p class="form-hint">Crawls within the same domain(s) by default.</p>
+    </form>
+  </section>
+
+  <section class="admin-card">
+    <h2>Save Index</h2>
+    <form method="post">
+      <input type="hidden" name="action" value="save" />
+      <button type="submit">Save Index to Disk</button>
+    </form>
+    <p class="form-hint">The index is also saved automatically after each indexing operation.</p>
+  </section>
+</div>
+{% endblock %}
