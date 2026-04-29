@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+{% block title %}{% if query %}{{ query }} — {% endif %}LocalSearch{% endblock %}
+
+{% block content %}
+<div class="search-page">
+  <div class="search-hero {% if results or error %}search-hero--compact{% endif %}">
+    {% if not results and not error and not query %}
+      <h1 class="hero-title">LocalSearch</h1>
+      <p class="hero-sub">Full-text search over your documents</p>
+    {% endif %}
+
+    <form class="search-form" action="{{ url_for('index') }}" method="get">
+      <div class="search-box">
+        <input
+          type="search"
+          name="q"
+          id="q"
+          value="{{ query | e }}"
+          placeholder='Search… e.g. python "web framework" OR java NOT ruby'
+          autocomplete="off"
+          autofocus
+        />
+        <button type="submit">Search</button>
+      </div>
+      <p class="search-hint">
+        Supports <code>"phrase search"</code>, <code>AND</code>, <code>OR</code>, <code>NOT</code>, and parentheses.
+      </p>
+    </form>
+
+    <div class="index-stats">
+      <span>&#128196; {{ stats.num_docs }} documents</span>
+      <span>&#128220; {{ stats.num_terms }} terms</span>
+    </div>
+  </div>
+
+  {% if error %}
+    <div class="error-box">{{ error }}</div>
+  {% endif %}
+
+  {% if results %}
+    <section class="results-section">
+      <p class="results-count">{{ results | length }} result(s) for <strong>{{ query | e }}</strong></p>
+      <ol class="results-list">
+        {% for r in results %}
+        <li class="result-card">
+          <div class="result-header">
+            <a class="result-title" href="{{ r.url }}" target="_blank" rel="noopener">{{ r.title | e }}</a>
+            <span class="result-score">score: {{ r.score }}</span>
+          </div>
+          <a class="result-url" href="{{ r.url }}" target="_blank" rel="noopener">{{ r.url }}</a>
+          <p class="result-snippet">{{ r.snippet | safe }}</p>
+
+          <details class="why-box">
+            <summary>Why this result?</summary>
+            <ul class="why-list">
+              {% for line in r.explanation %}
+                <li>{{ line }}</li>
+              {% endfor %}
+            </ul>
+          </details>
+        </li>
+        {% endfor %}
+      </ol>
+    </section>
+  {% elif query and not error %}
+    <div class="no-results">
+      <p>No results found for <strong>{{ query | e }}</strong>.</p>
+      <p>Try different keywords or check the <a href="{{ url_for('admin') }}">Admin</a> panel to add documents.</p>
+    </div>
+  {% endif %}
+</div>
+{% endblock %}
