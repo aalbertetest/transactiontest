@@ -1,0 +1,7 @@
+account,debit,credit,category
+Cash,50000,,current_asset
+Accounts payable,,20000,current_liability
+Common stock,,20000,equity
+Beginning retained earnings,,3000,beginning_retained_earnings
+Sales revenue,,10000,revenue
+Rent expense,3000,,operating_expense

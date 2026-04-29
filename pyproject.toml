@@ -1,0 +1,22 @@
+[project]
+name = "trial-balance-gaap"
+version = "0.1.0"
+description = "Convert a trial balance CSV into GAAP-style financial statements"
+requires-python = ">=3.10"
+dependencies = []
+
+[project.scripts]
+tb-gaap = "trial_balance_gaap.cli:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project.optional-dependencies]
+dev = ["pytest>=7.0"]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/trial_balance_gaap"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
