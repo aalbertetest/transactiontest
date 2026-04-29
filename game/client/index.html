@@ -1,0 +1,1126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Arena — Multiplayer</title>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:      #0d0d0f;
+  --surface: #16181e;
+  --border:  #2a2d38;
+  --accent:  #7effc5;
+  --accent2: #7eb8ff;
+  --danger:  #ff5e5e;
+  --warn:    #ffd97e;
+  --text:    #d8d8e0;
+  --muted:   #666;
+  --radius:  6px;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Segoe UI', system-ui, sans-serif;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 16px;
+  gap: 14px;
+}
+
+h1 { font-size: 1.5rem; letter-spacing: .12em; text-transform: uppercase; color: var(--accent); }
+h2 { font-size: 1rem; letter-spacing: .08em; text-transform: uppercase; color: var(--accent); margin-bottom: 10px; }
+h3 { font-size: .9rem; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; margin-bottom: 6px; }
+
+/* ── Screen management ─────────────────────────────────────────────────── */
+.screen { display: none; flex-direction: column; align-items: center; gap: 14px; width: 100%; max-width: 900px; }
+.screen.active { display: flex; }
+
+/* ── Cards & panels ────────────────────────────────────────────────────── */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px 20px;
+  width: 100%;
+}
+
+/* ── Inputs ────────────────────────────────────────────────────────────── */
+input[type=text] {
+  background: #1a1c24;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  color: #fff;
+  padding: 8px 12px;
+  font-size: .9rem;
+  outline: none;
+}
+input[type=text]:focus { border-color: var(--accent); }
+
+/* ── Buttons ───────────────────────────────────────────────────────────── */
+button {
+  background: var(--accent);
+  color: #000;
+  border: none;
+  border-radius: var(--radius);
+  padding: 8px 20px;
+  font-size: .9rem;
+  font-weight: 700;
+  cursor: pointer;
+  letter-spacing: .04em;
+  transition: background .15s;
+}
+button:hover { background: #5ee8aa; }
+button.secondary {
+  background: var(--surface);
+  color: var(--text);
+  border: 1px solid var(--border);
+}
+button.secondary:hover { border-color: var(--accent); color: var(--accent); background: var(--surface); }
+button.danger { background: var(--danger); color: #fff; }
+button.danger:hover { background: #e04444; }
+button:disabled { opacity: .4; cursor: not-allowed; }
+
+/* ── Notification banner ───────────────────────────────────────────────── */
+#notif {
+  position: fixed;
+  top: 12px; right: 12px;
+  background: var(--surface);
+  border: 1px solid var(--accent);
+  border-radius: var(--radius);
+  padding: 10px 16px;
+  font-size: .85rem;
+  max-width: 300px;
+  opacity: 0;
+  transition: opacity .3s;
+  pointer-events: none;
+  z-index: 999;
+}
+#notif.show { opacity: 1; }
+
+/* ── Connect screen ────────────────────────────────────────────────────── */
+#connect-card {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-width: 400px;
+  width: 100%;
+}
+#connect-card label { font-size: .85rem; color: var(--muted); margin-bottom: 2px; display: block; }
+.row { display: flex; gap: 8px; align-items: center; }
+
+/* ── Lobby hall ────────────────────────────────────────────────────────── */
+.lobby-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 10px;
+  width: 100%;
+}
+
+.lobby-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.lobby-card h4 { font-size: .95rem; font-weight: 700; }
+.lobby-card .meta { font-size: .78rem; color: var(--muted); }
+.lobby-card .btns { display: flex; gap: 6px; margin-top: 4px; }
+.lobby-card button { padding: 6px 12px; font-size: .8rem; }
+
+.badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 20px;
+  font-size: .72rem;
+  font-weight: 700;
+  letter-spacing: .04em;
+}
+.badge.waiting    { background: #1e3a2f; color: var(--accent); }
+.badge.countdown  { background: #3a2f1e; color: var(--warn); }
+.badge.in_progress{ background: #2a1e3a; color: var(--accent2); }
+
+/* ── Queue status ──────────────────────────────────────────────────────── */
+#queue-status { text-align: center; color: var(--muted); font-size: .85rem; }
+
+/* ── Lobby room ────────────────────────────────────────────────────────── */
+#lobby-room-card { display: grid; grid-template-columns: 1fr 220px; gap: 16px; }
+@media (max-width: 600px) { #lobby-room-card { grid-template-columns: 1fr; } }
+
+.player-list { list-style: none; display: flex; flex-direction: column; gap: 6px; }
+.player-list li {
+  display: flex; align-items: center; gap: 8px;
+  background: #1a1c24; border-radius: var(--radius); padding: 8px 12px;
+}
+.player-list li .pname { flex: 1; }
+.ready-dot {
+  width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0;
+  background: var(--danger);
+}
+.ready-dot.ready { background: var(--accent); }
+
+/* ── Countdown overlay ─────────────────────────────────────────────────── */
+#countdown-overlay {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,.7);
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 12px; z-index: 100;
+  pointer-events: none;
+}
+#countdown-overlay.hidden { display: none; }
+#countdown-number {
+  font-size: 7rem; font-weight: 900; color: var(--accent);
+  text-shadow: 0 0 40px var(--accent);
+  animation: pulse .5s ease-in-out infinite alternate;
+}
+@keyframes pulse { from { transform: scale(1); } to { transform: scale(1.1); } }
+
+/* ── Game screen ───────────────────────────────────────────────────────── */
+#hud {
+  display: flex; gap: 24px; font-size: .85rem; color: var(--muted); flex-wrap: wrap; justify-content: center;
+}
+#hud span { color: #fff; font-weight: 600; }
+#health-bar-wrap { width: 160px; height: 8px; background: #333; border-radius: 4px; overflow: hidden; display: inline-block; vertical-align: middle; margin-left: 6px; }
+#health-bar { height: 100%; background: var(--accent); transition: width .15s; border-radius: 4px; }
+
+#canvas-wrap { position: relative; border: 2px solid var(--border); border-radius: var(--radius); overflow: hidden; }
+canvas { display: block; background: #111318; }
+
+/* Spectator banner */
+#spec-banner {
+  position: absolute; top: 8px; left: 50%; transform: translateX(-50%);
+  background: rgba(126,178,255,.15); border: 1px solid var(--accent2);
+  color: var(--accent2); font-size: .8rem; font-weight: 700;
+  padding: 4px 16px; border-radius: 20px; letter-spacing: .08em;
+  pointer-events: none;
+}
+#spec-banner.hidden { display: none; }
+
+#game-controls { font-size: .75rem; color: var(--muted); text-align: center; }
+
+/* ── Options row ───────────────────────────────────────────────────────── */
+.opts { display: flex; gap: 14px; flex-wrap: wrap; justify-content: center; font-size: .8rem; color: var(--muted); }
+.opts label { display: flex; align-items: center; gap: 5px; cursor: pointer; }
+.opts input[type=checkbox] { accent-color: var(--accent); }
+.opts input[type=range] { accent-color: var(--accent); width: 80px; }
+
+/* ── Debug panel ───────────────────────────────────────────────────────── */
+#debug-panel { font-family: monospace; font-size: .72rem; color: #555; max-width: 900px; width: 100%; white-space: pre; }
+
+/* ── In-game scoreboard sidebar ────────────────────────────────────────── */
+#scoreboard {
+  position: absolute; top: 8px; right: 8px;
+  background: rgba(14,16,20,.85); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 8px 12px;
+  font-size: .75rem; min-width: 130px;
+}
+#scoreboard h4 { color: var(--accent); font-size: .72rem; text-transform: uppercase; letter-spacing: .06em; margin-bottom: 6px; }
+#scoreboard .sb-row { display: flex; justify-content: space-between; gap: 8px; margin-bottom: 3px; }
+#scoreboard .sb-row.me { color: var(--accent); font-weight: 700; }
+
+/* ── Match over screen ─────────────────────────────────────────────────── */
+#match-over-card {
+  max-width: 500px; width: 100%;
+  display: flex; flex-direction: column; align-items: center; gap: 14px; text-align: center;
+}
+#match-over-card .winner-label { font-size: 1.6rem; font-weight: 900; color: var(--accent); }
+#match-over-card .reason-label { font-size: .85rem; color: var(--muted); }
+.leaderboard-table { width: 100%; border-collapse: collapse; font-size: .85rem; }
+.leaderboard-table th { text-align: left; padding: 6px 10px; color: var(--muted); font-weight: 600; border-bottom: 1px solid var(--border); }
+.leaderboard-table td { padding: 7px 10px; border-bottom: 1px solid #1e2028; }
+.leaderboard-table tr.winner td { color: var(--accent); font-weight: 700; }
+</style>
+</head>
+<body>
+
+<h1>Arena ⚔</h1>
+<div id="notif"></div>
+<div id="countdown-overlay" class="hidden">
+  <div style="color:#aaa;font-size:1.1rem;letter-spacing:.1em;">MATCH STARTING IN</div>
+  <div id="countdown-number">5</div>
+</div>
+
+<!-- ══ SCREEN: connect ══════════════════════════════════════════════════════ -->
+<div id="screen-connect" class="screen active">
+  <div id="connect-card" class="card">
+    <h2>Connect to Server</h2>
+    <div>
+      <label>Server URL</label>
+      <input id="srv-url" type="text" value="ws://localhost:8080" style="width:100%" />
+    </div>
+    <div>
+      <label>Your name</label>
+      <input id="player-name" type="text" placeholder="Player" maxlength="24" style="width:100%" />
+    </div>
+    <button id="btn-connect">Connect</button>
+    <div id="connect-status" style="font-size:.8rem;color:var(--muted)"></div>
+  </div>
+</div>
+
+<!-- ══ SCREEN: lobby hall ═══════════════════════════════════════════════════ -->
+<div id="screen-hall" class="screen">
+  <div class="card" style="display:flex;gap:12px;flex-wrap:wrap;align-items:center;justify-content:space-between;">
+    <div style="font-size:.85rem;">
+      Playing as <strong id="hall-name" style="color:var(--accent)">—</strong>
+    </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;">
+      <input id="new-lobby-name" type="text" placeholder="Lobby name (optional)" style="width:180px" />
+      <button id="btn-create-lobby">Create Lobby</button>
+      <button id="btn-join-queue" class="secondary">Quick Match</button>
+      <button id="btn-leave-queue" class="secondary" style="display:none">Leave Queue</button>
+    </div>
+  </div>
+  <div id="queue-status"></div>
+  <div class="card">
+    <h2>Open Lobbies</h2>
+    <div id="lobby-grid" class="lobby-grid">
+      <span style="color:var(--muted);font-size:.85rem;">No open lobbies. Create one!</span>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SCREEN: lobby room ═══════════════════════════════════════════════════ -->
+<div id="screen-lobby" class="screen">
+  <div class="card" style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;">
+    <div>
+      <span id="lobby-name-label" style="font-weight:700;font-size:1rem;"></span>
+      <span id="lobby-state-badge" class="badge waiting" style="margin-left:8px;"></span>
+    </div>
+    <div style="display:flex;gap:8px;">
+      <button id="btn-ready" class="secondary">Ready</button>
+      <button id="btn-start-now" class="secondary">Force Start</button>
+      <button id="btn-leave-lobby" class="danger">Leave</button>
+    </div>
+  </div>
+  <div id="lobby-room-card" class="card">
+    <div>
+      <h3>Players</h3>
+      <ul id="lobby-player-list" class="player-list"></ul>
+    </div>
+    <div>
+      <h3>Info</h3>
+      <div id="lobby-info" style="font-size:.82rem;color:var(--muted);line-height:1.7;"></div>
+    </div>
+  </div>
+  <div style="font-size:.8rem;color:var(--muted);text-align:center;">
+    All players mark Ready to begin countdown, or use Force Start (min 2 players).
+  </div>
+</div>
+
+<!-- ══ SCREEN: game ══════════════════════════════════════════════════════════ -->
+<div id="screen-game" class="screen">
+  <div id="hud">
+    <div>Health: <span id="hud-health">100</span>
+      <div id="health-bar-wrap"><div id="health-bar" style="width:100%"></div></div>
+    </div>
+    <div>Score: <span id="hud-score">0</span></div>
+    <div>Players: <span id="hud-players">0</span></div>
+    <div>Ping: <span id="hud-ping">—</span> ms</div>
+    <div>Tick: <span id="hud-tick">0</span></div>
+    <div>Time: <span id="hud-time">—</span></div>
+  </div>
+
+  <div id="canvas-wrap">
+    <canvas id="arena" width="1200" height="800"></canvas>
+    <div id="spec-banner" class="hidden">👁 SPECTATING</div>
+    <div id="scoreboard">
+      <h4>Scores</h4>
+      <div id="sb-rows"></div>
+    </div>
+  </div>
+
+  <div id="game-controls">
+    WASD / Arrows — move &nbsp;|&nbsp; Mouse — aim &nbsp;|&nbsp; Click / Space — fire
+  </div>
+
+  <div class="opts">
+    <label><input type="checkbox" id="toggle-lag" /> Lag sim</label>
+    <label>Lag: <input type="range" id="lag-slider" min="0" max="500" value="100" />
+      <span id="lag-value">100</span> ms</label>
+    <label><input type="checkbox" id="toggle-predict" checked /> Prediction</label>
+    <label><input type="checkbox" id="toggle-reconcile" checked /> Reconciliation</label>
+    <label><input type="checkbox" id="toggle-interp" checked /> Interpolation</label>
+    <label><input type="checkbox" id="toggle-debug" /> Debug</label>
+  </div>
+  <div id="debug-panel"></div>
+</div>
+
+<!-- ══ SCREEN: match over ════════════════════════════════════════════════════ -->
+<div id="screen-over" class="screen">
+  <div id="match-over-card" class="card">
+    <div class="winner-label" id="over-winner"></div>
+    <div class="reason-label" id="over-reason"></div>
+    <table class="leaderboard-table" id="over-table">
+      <thead><tr><th>#</th><th>Player</th><th>Kills</th></tr></thead>
+      <tbody id="over-tbody"></tbody>
+    </table>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center;">
+      <button id="btn-play-again">Play Again</button>
+      <button id="btn-back-hall" class="secondary">Back to Hall</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════════════════ -->
+<script>
+'use strict';
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Global state
+// ─────────────────────────────────────────────────────────────────────────────
+let CFG = {
+  arenaW: 1200, arenaH: 800, playerSpeed: 200, playerRadius: 16,
+  projectileSpeed: 450, projectileRadius: 5, projectileTtl: 2000,
+  fireRateMs: 250, maxHealth: 100, tickRateHz: 20,
+  lobbyMaxPlayers: 8, lobbyMinToStart: 2, scoreLimit: 10, timeLimitS: 300,
+};
+
+let ws           = null;
+let mySessionId  = null;
+let myName       = 'Player';
+let myRole       = 'none';    // 'player' | 'spectator' | 'none'
+let currentLobby = null;
+let isSpectator  = false;
+let isInQueue    = false;
+let matchStart   = null;
+let serverTick   = 0;
+
+// Game state
+let myId             = null;   // same as mySessionId when playing
+let localPlayer      = null;
+let serverPlayers    = new Map();
+let serverProjectiles= new Map();
+const predictionBuffer = [];
+let inputSeq         = 0;
+const interpBuffer   = new Map();
+const flashTimers    = new Map();
+const localProjectiles = [];
+let lastLocalFire    = 0;
+let mouseAngle       = 0;
+let firing           = false;
+const keys = { up:false,down:false,left:false,right:false,w:false,a:false,s:false,d:false };
+
+// Ping
+let latencyMs = 0;
+let pingInterval = null;
+
+// Lag queue
+const lagQueue = [];
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Screens
+// ─────────────────────────────────────────────────────────────────────────────
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Notification
+// ─────────────────────────────────────────────────────────────────────────────
+let notifTimer = null;
+function notify(msg, ms = 3000) {
+  const el = document.getElementById('notif');
+  el.textContent = msg;
+  el.classList.add('show');
+  clearTimeout(notifTimer);
+  notifTimer = setTimeout(() => el.classList.remove('show'), ms);
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// WebSocket
+// ─────────────────────────────────────────────────────────────────────────────
+document.getElementById('btn-connect').addEventListener('click', () => {
+  const url  = document.getElementById('srv-url').value.trim();
+  const name = document.getElementById('player-name').value.trim() || 'Player';
+  myName = name;
+  connectToServer(url, name);
+});
+
+function connectToServer(url, name) {
+  if (ws) { ws.close(); ws = null; }
+  document.getElementById('connect-status').textContent = 'Connecting…';
+  ws = new WebSocket(url);
+  ws.onopen  = () => {
+    document.getElementById('connect-status').textContent = '';
+    // Server will send welcome; after that we send our name
+    startPing();
+  };
+  ws.onmessage = (e) => {
+    const toggle = document.getElementById('toggle-lag');
+    const delay  = parseInt(document.getElementById('lag-slider').value, 10);
+    if (toggle.checked) {
+      lagQueue.push({ deliverAt: performance.now() + delay, data: e.data });
+    } else {
+      processMessage(e.data);
+    }
+  };
+  ws.onclose = () => {
+    stopPing();
+    showScreen('screen-connect');
+    document.getElementById('connect-status').textContent = 'Disconnected.';
+  };
+  ws.onerror = () => {
+    document.getElementById('connect-status').textContent = 'Connection error.';
+  };
+}
+
+function processMessage(raw) {
+  let msg;
+  try { msg = JSON.parse(raw); } catch { return; }
+
+  switch (msg.type) {
+    case 'welcome':      handleWelcome(msg);      break;
+    case 'nameSet':      handleNameSet(msg);       break;
+    case 'lobbyList':    handleLobbyList(msg);     break;
+    case 'joinedLobby':  handleJoinedLobby(msg);   break;
+    case 'lobbyState':   handleLobbyState(msg);    break;
+    case 'queueJoined':  handleQueueJoined(msg);   break;
+    case 'queueLeft':    handleQueueLeft();         break;
+    case 'matchmakingPlaced': handleMMPlaced(msg); break;
+    case 'countdown':    handleCountdown(msg);      break;
+    case 'countdownCancelled': handleCountdownCancel(msg); break;
+    case 'matchStart':   handleMatchStart(msg);    break;
+    case 'state':        handleState(msg);          break;
+    case 'hit':          handleHit(msg);            break;
+    case 'killed':       handleKilled(msg);         break;
+    case 'respawn':      handleRespawn(msg);        break;
+    case 'playerLeft':   handlePlayerLeft(msg);     break;
+    case 'matchOver':    handleMatchOver(msg);      break;
+    case 'anticheat':    console.warn('[AC]', msg); break;
+    case 'pong':         handlePong(msg);            break;
+    case 'error':        notify('Server: ' + msg.message); break;
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Message handlers — lobby hall
+// ─────────────────────────────────────────────────────────────────────────────
+function handleWelcome(msg) {
+  mySessionId = msg.sessionId;
+  myId        = msg.sessionId;
+  CFG         = { ...CFG, ...msg.config };
+  // Tell server our chosen name
+  wsSend({ type: 'setName', name: myName });
+  handleLobbyList(msg);
+  showScreen('screen-hall');
+}
+
+function handleNameSet(msg) {
+  myName = msg.name;
+  document.getElementById('hall-name').textContent = myName;
+}
+
+function handleLobbyList(msg) {
+  document.getElementById('hall-name').textContent = myName;
+  renderLobbyGrid(msg.lobbies || []);
+}
+
+function renderLobbyGrid(lobbies) {
+  const grid = document.getElementById('lobby-grid');
+  if (!lobbies.length) {
+    grid.innerHTML = '<span style="color:var(--muted);font-size:.85rem;">No open lobbies. Create one!</span>';
+    return;
+  }
+  grid.innerHTML = lobbies.map(l => `
+    <div class="lobby-card">
+      <h4>${esc(l.name)}</h4>
+      <div class="meta">
+        <span class="badge ${l.state}">${l.state.replace('_', ' ')}</span>
+        &nbsp; ${l.playerCount}/${l.maxPlayers} players &nbsp; ${l.spectatorCount} watching
+      </div>
+      <div class="btns">
+        ${l.state === 'waiting'
+          ? `<button onclick="joinLobby('${l.id}')">Join</button>`
+          : ''}
+        <button class="secondary" onclick="spectateLobby('${l.id}')">Watch</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function handleQueueJoined(msg) {
+  isInQueue = true;
+  document.getElementById('btn-join-queue').style.display  = 'none';
+  document.getElementById('btn-leave-queue').style.display = '';
+  document.getElementById('queue-status').textContent = `In queue… ${msg.queueSize} waiting. Matchmaking runs every 2 s.`;
+}
+
+function handleQueueLeft() {
+  isInQueue = false;
+  document.getElementById('btn-join-queue').style.display  = '';
+  document.getElementById('btn-leave-queue').style.display = 'none';
+  document.getElementById('queue-status').textContent = '';
+}
+
+function handleMMPlaced(msg) {
+  notify('Matchmaking found a match!');
+  currentLobby = msg.lobby;
+  showLobbyRoom(msg.lobby);
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Message handlers — lobby room
+// ─────────────────────────────────────────────────────────────────────────────
+function handleJoinedLobby(msg) {
+  myRole      = msg.role;
+  isSpectator = (msg.role === 'spectator');
+  currentLobby = msg.lobby;
+  showLobbyRoom(msg.lobby);
+}
+
+function handleLobbyState(msg) {
+  currentLobby = msg.lobby;
+  if (document.getElementById('screen-lobby').classList.contains('active')) {
+    renderLobbyRoom(msg.lobby);
+  }
+}
+
+function showLobbyRoom(lobby) {
+  renderLobbyRoom(lobby);
+  showScreen('screen-lobby');
+  // Reset ready button
+  const btn = document.getElementById('btn-ready');
+  btn.textContent = 'Ready';
+  btn.classList.remove('danger');
+  if (isSpectator) {
+    btn.disabled = true;
+    document.getElementById('btn-start-now').disabled = true;
+  }
+}
+
+function renderLobbyRoom(lobby) {
+  document.getElementById('lobby-name-label').textContent = lobby.name;
+  const badge = document.getElementById('lobby-state-badge');
+  badge.textContent = lobby.state.replace('_', ' ');
+  badge.className   = 'badge ' + lobby.state;
+
+  const list = document.getElementById('lobby-player-list');
+  list.innerHTML = (lobby.players || []).map(p => `
+    <li>
+      <span class="ready-dot ${p.ready ? 'ready' : ''}"></span>
+      <span class="pname">${esc(p.name)} ${p.id === mySessionId ? '<em style="color:var(--accent)">(you)</em>' : ''}</span>
+      <span style="font-size:.75rem;color:var(--muted)">${p.ready ? 'Ready' : 'Not ready'}</span>
+    </li>
+  `).join('');
+
+  document.getElementById('lobby-info').innerHTML = `
+    Players: ${lobby.playerCount} / ${lobby.maxPlayers}<br>
+    Spectators: ${lobby.spectatorCount}<br>
+    State: ${lobby.state}<br>
+    Score limit: ${CFG.scoreLimit}<br>
+    Time limit: ${Math.floor(CFG.timeLimitS / 60)} min
+  `;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Countdown
+// ─────────────────────────────────────────────────────────────────────────────
+let countdownOverlayTimer = null;
+
+function handleCountdown(msg) {
+  const overlay = document.getElementById('countdown-overlay');
+  const numEl   = document.getElementById('countdown-number');
+  overlay.classList.remove('hidden');
+  numEl.textContent = msg.remaining;
+  clearTimeout(countdownOverlayTimer);
+}
+
+function handleCountdownCancel(msg) {
+  document.getElementById('countdown-overlay').classList.add('hidden');
+  notify(msg.reason || 'Countdown cancelled.');
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Match start
+// ─────────────────────────────────────────────────────────────────────────────
+function handleMatchStart(msg) {
+  document.getElementById('countdown-overlay').classList.add('hidden');
+  serverTick  = 0;
+  matchStart  = Date.now();
+  localPlayer = null;
+  serverPlayers.clear();
+  serverProjectiles.clear();
+  predictionBuffer.length = 0;
+  inputSeq    = 0;
+  lagQueue.length = 0;
+
+  // Show spectator banner
+  document.getElementById('spec-banner').classList.toggle('hidden', !isSpectator);
+
+  showScreen('screen-game');
+  notify(isSpectator ? 'Spectating match…' : 'Match started!');
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// In-game message handlers (identical to prior version, adapted for lobbies)
+// ─────────────────────────────────────────────────────────────────────────────
+function handleState(msg) {
+  serverTick = msg.tick;
+  document.getElementById('hud-tick').textContent = serverTick;
+  if (matchStart) {
+    const elapsed = Math.floor((Date.now() - matchStart) / 1000);
+    const rem = Math.max(0, CFG.timeLimitS - elapsed);
+    const m = Math.floor(rem / 60), s = rem % 60;
+    document.getElementById('hud-time').textContent = `${m}:${s.toString().padStart(2,'0')}`;
+  }
+
+  const freshIds = new Set();
+  for (const p of msg.players) {
+    freshIds.add(p.id);
+    serverPlayers.set(p.id, p);
+    if (p.id !== myId) {
+      if (!interpBuffer.has(p.id)) interpBuffer.set(p.id, []);
+      const buf = interpBuffer.get(p.id);
+      buf.push({ tick: msg.tick, ts: msg.ts, x: p.x, y: p.y, angle: p.angle, health: p.health, alive: p.alive });
+      if (buf.length > 10) buf.shift();
+    }
+  }
+  for (const id of serverPlayers.keys()) {
+    if (!freshIds.has(id)) { serverPlayers.delete(id); interpBuffer.delete(id); }
+  }
+  serverProjectiles.clear();
+  for (const proj of msg.projectiles) serverProjectiles.set(proj.id, proj);
+
+  // Spectators: no local player needed
+  if (isSpectator) {
+    updateScoreboard(msg.players);
+    return;
+  }
+
+  const me = serverPlayers.get(myId);
+  if (!me) return;
+
+  if (!localPlayer) { localPlayer = { ...me }; return; }
+
+  if (document.getElementById('toggle-reconcile').checked) {
+    const acked = me.lastInputSeq;
+    let i = 0;
+    while (i < predictionBuffer.length && predictionBuffer[i].seq <= acked) i++;
+    predictionBuffer.splice(0, i);
+    let rx = me.x, ry = me.y;
+    const dt = 1 / CFG.tickRateHz;
+    for (const entry of predictionBuffer) {
+      const r = clientApplyInput(rx, ry, entry.input, dt);
+      rx = r.x; ry = r.y;
+    }
+    const ed = Math.hypot(rx - localPlayer.x, ry - localPlayer.y);
+    if (ed > 10) { localPlayer.x = rx; localPlayer.y = ry; }
+    else { localPlayer.x += (rx - localPlayer.x) * 0.3; localPlayer.y += (ry - localPlayer.y) * 0.3; }
+  } else {
+    localPlayer.x = me.x; localPlayer.y = me.y;
+  }
+  localPlayer.health = me.health;
+  localPlayer.score  = me.score;
+  localPlayer.alive  = me.alive;
+  updateHUD();
+  updateScoreboard(msg.players);
+}
+
+function handleHit(msg) {
+  if (msg.targetId === myId && localPlayer) { localPlayer.health = msg.health; updateHUD(); }
+  flashTimers.set(msg.targetId, performance.now() + 200);
+}
+
+function handleKilled(msg) {
+  if (msg.targetId === myId && localPlayer) { localPlayer.alive = false; localPlayer.health = 0; updateHUD(); }
+  flashTimers.set(msg.targetId, performance.now() + 200);
+}
+
+function handleRespawn(msg) {
+  if (msg.playerId === myId && localPlayer) {
+    localPlayer.alive = true; localPlayer.health = msg.health;
+    localPlayer.x = msg.x; localPlayer.y = msg.y;
+    predictionBuffer.length = 0;
+    updateHUD();
+  }
+}
+
+function handlePlayerLeft(msg) {
+  serverPlayers.delete(msg.playerId);
+  interpBuffer.delete(msg.playerId);
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Match over
+// ─────────────────────────────────────────────────────────────────────────────
+function handleMatchOver(msg) {
+  showScreen('screen-over');
+
+  const winnerEntry = (msg.leaderboard || []).find(e => e.id === msg.winnerId);
+  const winnerName  = winnerEntry ? winnerEntry.name : (msg.winnerId || 'Nobody');
+
+  document.getElementById('over-winner').textContent =
+    msg.reason === 'abandon' ? 'Match Abandoned' : `🏆 ${winnerName} wins!`;
+  document.getElementById('over-reason').textContent =
+    { score: `Reached ${CFG.scoreLimit} kills`, time: 'Time limit reached', abandon: 'All players left' }[msg.reason] || msg.reason;
+
+  const tbody = document.getElementById('over-tbody');
+  tbody.innerHTML = (msg.leaderboard || []).map((e, i) => `
+    <tr class="${e.id === msg.winnerId ? 'winner' : ''}">
+      <td>${i + 1}</td>
+      <td>${esc(e.name)} ${e.id === myId ? '<em style="color:var(--accent)">(you)</em>' : ''}</td>
+      <td>${e.score}</td>
+    </tr>
+  `).join('');
+
+  myRole = 'none'; isSpectator = false; currentLobby = null;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Ping
+// ─────────────────────────────────────────────────────────────────────────────
+function handlePong(msg) {
+  latencyMs = Date.now() - msg.clientTs;
+  document.getElementById('hud-ping').textContent = latencyMs;
+}
+function startPing() {
+  stopPing();
+  pingInterval = setInterval(() => {
+    if (ws && ws.readyState === WebSocket.OPEN)
+      wsSend({ type: 'ping', clientTs: Date.now() });
+  }, 2000);
+}
+function stopPing() { if (pingInterval) { clearInterval(pingInterval); pingInterval = null; } }
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Lobby hall button handlers
+// ─────────────────────────────────────────────────────────────────────────────
+document.getElementById('btn-create-lobby').addEventListener('click', () => {
+  wsSend({ type: 'createLobby', name: document.getElementById('new-lobby-name').value.trim() });
+});
+document.getElementById('btn-join-queue').addEventListener('click', () => {
+  wsSend({ type: 'joinQueue' });
+});
+document.getElementById('btn-leave-queue').addEventListener('click', () => {
+  wsSend({ type: 'leaveQueue' });
+});
+
+window.joinLobby = function(lobbyId) {
+  wsSend({ type: 'joinLobby', lobbyId });
+};
+window.spectateLobby = function(lobbyId) {
+  wsSend({ type: 'spectate', lobbyId });
+};
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Lobby room button handlers
+// ─────────────────────────────────────────────────────────────────────────────
+let amReady = false;
+document.getElementById('btn-ready').addEventListener('click', () => {
+  if (isSpectator) return;
+  amReady = !amReady;
+  wsSend({ type: 'setReady', ready: amReady });
+  const btn = document.getElementById('btn-ready');
+  btn.textContent = amReady ? 'Unready' : 'Ready';
+  if (amReady) btn.classList.add('danger'); else btn.classList.remove('danger');
+});
+document.getElementById('btn-start-now').addEventListener('click', () => {
+  wsSend({ type: 'startNow' });
+});
+document.getElementById('btn-leave-lobby').addEventListener('click', () => {
+  wsSend({ type: 'leaveLobby' });
+  myRole = 'none'; isSpectator = false; currentLobby = null; amReady = false;
+  showScreen('screen-hall');
+  wsSend({ type: 'listLobbies' });
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Match-over buttons
+// ─────────────────────────────────────────────────────────────────────────────
+document.getElementById('btn-play-again').addEventListener('click', () => {
+  showScreen('screen-hall');
+  wsSend({ type: 'listLobbies' });
+});
+document.getElementById('btn-back-hall').addEventListener('click', () => {
+  showScreen('screen-hall');
+  wsSend({ type: 'listLobbies' });
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Input capture
+// ─────────────────────────────────────────────────────────────────────────────
+document.addEventListener('keydown', (e) => {
+  const k = e.key.toLowerCase();
+  if (k === 'arrowup'    || k === 'w') keys.up    = keys.w    = true;
+  if (k === 'arrowdown'  || k === 's') keys.down  = keys.s    = true;
+  if (k === 'arrowleft'  || k === 'a') keys.left  = keys.a    = true;
+  if (k === 'arrowright' || k === 'd') keys.right = keys.d    = true;
+  if (k === ' ') { firing = true; e.preventDefault(); }
+});
+document.addEventListener('keyup', (e) => {
+  const k = e.key.toLowerCase();
+  if (k === 'arrowup'    || k === 'w') keys.up    = keys.w    = false;
+  if (k === 'arrowdown'  || k === 's') keys.down  = keys.s    = false;
+  if (k === 'arrowleft'  || k === 'a') keys.left  = keys.a    = false;
+  if (k === 'arrowright' || k === 'd') keys.right = keys.d    = false;
+  if (k === ' ') firing = false;
+});
+const canvas = document.getElementById('arena');
+canvas.addEventListener('mousemove', (e) => {
+  if (!localPlayer) return;
+  const r = canvas.getBoundingClientRect();
+  mouseAngle = Math.atan2(e.clientY - r.top - localPlayer.y, e.clientX - r.left - localPlayer.x);
+});
+canvas.addEventListener('mousedown', (e) => { if (e.button === 0) firing = true; });
+canvas.addEventListener('mouseup',   (e) => { if (e.button === 0) firing = false; });
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Client prediction helpers
+// ─────────────────────────────────────────────────────────────────────────────
+function clientApplyInput(x, y, input, dt) {
+  const { keys: k = {}, angle = 0 } = input;
+  let dx = 0, dy = 0;
+  if (k.up    || k.w) dy -= 1;
+  if (k.down  || k.s) dy += 1;
+  if (k.left  || k.a) dx -= 1;
+  if (k.right || k.d) dx += 1;
+  const mag = Math.sqrt(dx*dx + dy*dy);
+  if (mag > 0) { dx = (dx/mag)*CFG.playerSpeed; dy = (dy/mag)*CFG.playerSpeed; }
+  const r = CFG.playerRadius;
+  return {
+    x: Math.max(r, Math.min(CFG.arenaW - r, x + dx*dt)),
+    y: Math.max(r, Math.min(CFG.arenaH - r, y + dy*dt)),
+    angle,
+  };
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// HUD & scoreboard
+// ─────────────────────────────────────────────────────────────────────────────
+function updateHUD() {
+  if (!localPlayer) return;
+  document.getElementById('hud-health').textContent = Math.max(0, localPlayer.health);
+  document.getElementById('hud-score').textContent  = localPlayer.score || 0;
+  document.getElementById('hud-players').textContent = serverPlayers.size;
+  const pct = Math.max(0, (localPlayer.health || 0) / CFG.maxHealth) * 100;
+  document.getElementById('health-bar').style.width = pct + '%';
+}
+
+function updateScoreboard(players) {
+  const sorted = [...(players || [])].sort((a,b) => b.score - a.score);
+  document.getElementById('sb-rows').innerHTML = sorted.map(p => {
+    const isMe = p.id === myId;
+    return `<div class="sb-row${isMe ? ' me' : ''}">`
+      + `<span>${esc(p.id.slice(0,6))}${isMe ? '*' : ''}</span>`
+      + `<span>${p.score}</span></div>`;
+  }).join('');
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Main game loop
+// ─────────────────────────────────────────────────────────────────────────────
+const ctx = canvas.getContext('2d');
+document.getElementById('lag-slider').addEventListener('input', e => {
+  document.getElementById('lag-value').textContent = e.target.value;
+});
+
+let lastFrame = performance.now();
+
+function gameLoop(now) {
+  requestAnimationFrame(gameLoop);
+
+  // Drain lag queue
+  if (document.getElementById('toggle-lag').checked) {
+    let i = 0;
+    while (i < lagQueue.length && lagQueue[i].deliverAt <= now) { processMessage(lagQueue[i++].data); }
+    if (i) lagQueue.splice(0, i);
+  }
+
+  const dt = Math.min((now - lastFrame) / 1000, 0.05);
+  lastFrame = now;
+
+  // Only run prediction + render when game screen is active
+  if (!document.getElementById('screen-game').classList.contains('active')) return;
+  if (isSpectator) { render(now, dt); return; }
+  if (!myId || !localPlayer) { renderWaiting(); return; }
+
+  // Client prediction
+  if (document.getElementById('toggle-predict').checked && localPlayer.alive) {
+    const shouldFire = firing && (now - lastLocalFire >= CFG.fireRateMs);
+    const input = { keys: { ...keys }, fire: shouldFire, angle: mouseAngle, seq: ++inputSeq };
+    if (shouldFire) {
+      lastLocalFire = now;
+      localProjectiles.push({
+        x: localPlayer.x, y: localPlayer.y,
+        vx: Math.cos(mouseAngle) * CFG.projectileSpeed,
+        vy: Math.sin(mouseAngle) * CFG.projectileSpeed,
+        createdAt: now,
+      });
+    }
+    const result = clientApplyInput(localPlayer.x, localPlayer.y, input, dt);
+    localPlayer.x = result.x; localPlayer.y = result.y; localPlayer.angle = mouseAngle;
+    predictionBuffer.push({ seq: inputSeq, input, x: localPlayer.x, y: localPlayer.y });
+    if (predictionBuffer.length > 120) predictionBuffer.shift();
+
+    if (ws && ws.readyState === WebSocket.OPEN)
+      ws.send(JSON.stringify({ type: 'input', seq: inputSeq, tick: serverTick, keys: { ...keys }, fire: shouldFire, angle: mouseAngle }));
+  } else {
+    const me = serverPlayers.get(myId);
+    if (me) { localPlayer.x = me.x; localPlayer.y = me.y; localPlayer.angle = me.angle; }
+  }
+
+  // Advance local projectiles
+  for (let i = localProjectiles.length - 1; i >= 0; i--) {
+    const p = localProjectiles[i];
+    p.x += p.vx * dt; p.y += p.vy * dt;
+    const oob = p.x < 0 || p.x > CFG.arenaW || p.y < 0 || p.y > CFG.arenaH;
+    if (now - p.createdAt > CFG.projectileTtl || oob) localProjectiles.splice(i, 1);
+  }
+
+  render(now, dt);
+}
+
+requestAnimationFrame(gameLoop);
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Rendering
+// ─────────────────────────────────────────────────────────────────────────────
+const PLAYER_COLORS = ['#7effc5','#ff7e7e','#7eb8ff','#ffd97e','#d07eff','#ff9e5e'];
+
+function playerColor(id) {
+  let h = 0;
+  for (let i = 0; i < id.length; i++) h = (h * 31 + id.charCodeAt(i)) | 0;
+  return PLAYER_COLORS[Math.abs(h) % PLAYER_COLORS.length];
+}
+
+function renderWaiting() {
+  ctx.fillStyle = '#111318';
+  ctx.fillRect(0, 0, CFG.arenaW, CFG.arenaH);
+}
+
+function render(now) {
+  ctx.fillStyle = '#111318';
+  ctx.fillRect(0, 0, CFG.arenaW, CFG.arenaH);
+
+  // Grid
+  ctx.strokeStyle = '#1c1e24'; ctx.lineWidth = 1;
+  const gs = 80;
+  for (let x = 0; x <= CFG.arenaW; x += gs) { ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,CFG.arenaH); ctx.stroke(); }
+  for (let y = 0; y <= CFG.arenaH; y += gs) { ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(CFG.arenaW,y); ctx.stroke(); }
+  ctx.strokeStyle = '#2a2d38'; ctx.lineWidth = 2;
+  ctx.strokeRect(1, 1, CFG.arenaW - 2, CFG.arenaH - 2);
+
+  const interpDelay = 100;
+
+  // Remote players
+  for (const [id, p] of serverPlayers) {
+    if (id === myId) continue;
+    if (!p.alive) continue;
+    let rx = p.x, ry = p.y, ra = p.angle;
+    if (document.getElementById('toggle-interp').checked) {
+      const buf = interpBuffer.get(id);
+      if (buf && buf.length >= 2) {
+        const renderTs = Date.now() - interpDelay;
+        let lo = buf[0], hi = buf[buf.length - 1];
+        for (let i = 0; i < buf.length - 1; i++) {
+          if (buf[i].ts <= renderTs && buf[i+1].ts >= renderTs) { lo = buf[i]; hi = buf[i+1]; break; }
+        }
+        const span = hi.ts - lo.ts;
+        const t = span > 0 ? Math.max(0, Math.min(1, (renderTs - lo.ts) / span)) : 1;
+        rx = lo.x + (hi.x - lo.x) * t;
+        ry = lo.y + (hi.y - lo.y) * t;
+        let ad = ((hi.angle - lo.angle) % (Math.PI*2) + Math.PI*3) % (Math.PI*2) - Math.PI;
+        ra = lo.angle + ad * t;
+      }
+    }
+    drawPlayer(id, rx, ry, ra, p.health, p.score, now, false);
+  }
+
+  // Server projectiles
+  ctx.fillStyle = '#ffe97e';
+  for (const proj of serverProjectiles.values()) {
+    ctx.beginPath(); ctx.arc(proj.x, proj.y, CFG.projectileRadius, 0, Math.PI*2); ctx.fill();
+  }
+
+  // Local predicted projectiles
+  if (!isSpectator && document.getElementById('toggle-predict').checked) {
+    ctx.fillStyle = '#ffff99';
+    for (const p of localProjectiles) {
+      ctx.beginPath(); ctx.arc(p.x, p.y, CFG.projectileRadius, 0, Math.PI*2); ctx.fill();
+    }
+  }
+
+  // Own player
+  if (!isSpectator) {
+    if (localPlayer && localPlayer.alive) {
+      drawPlayer(myId, localPlayer.x, localPlayer.y, localPlayer.angle, localPlayer.health, localPlayer.score || 0, now, true);
+    } else if (localPlayer && !localPlayer.alive) {
+      ctx.save();
+      ctx.fillStyle = 'rgba(255,0,0,.15)'; ctx.fillRect(0,0,CFG.arenaW,CFG.arenaH);
+      ctx.fillStyle = '#ff5555'; ctx.font = 'bold 48px sans-serif'; ctx.textAlign = 'center';
+      ctx.fillText('YOU DIED', CFG.arenaW/2, CFG.arenaH/2 - 20);
+      ctx.font = '20px sans-serif'; ctx.fillStyle = '#aaa';
+      ctx.fillText('Respawning…', CFG.arenaW/2, CFG.arenaH/2 + 20);
+      ctx.restore();
+    }
+  }
+
+  // Debug
+  if (document.getElementById('toggle-debug').checked) renderDebug(now);
+}
+
+function drawPlayer(id, x, y, angle, health, score, now, isLocal) {
+  const r     = CFG.playerRadius;
+  const color = playerColor(id);
+  const flash = flashTimers.has(id) && flashTimers.get(id) > now;
+  ctx.save(); ctx.translate(x, y);
+  ctx.beginPath(); ctx.arc(0, 0, r, 0, Math.PI*2);
+  ctx.fillStyle = flash ? '#fff' : (isLocal ? color : color + 'bb');
+  ctx.fill();
+  ctx.strokeStyle = isLocal ? '#fff' : color;
+  ctx.lineWidth   = isLocal ? 2.5 : 1.5;
+  ctx.stroke();
+  ctx.rotate(angle);
+  ctx.fillStyle = isLocal ? '#fff' : '#ddd';
+  ctx.fillRect(r * 0.4, -3, r * 0.9, 6);
+  ctx.restore();
+
+  const bw = r * 2.5, bh = 4;
+  ctx.fillStyle = '#333';
+  ctx.fillRect(x - bw/2, y - r - 10, bw, bh);
+  const pct = Math.max(0, health / CFG.maxHealth);
+  ctx.fillStyle = pct > .5 ? '#7effc5' : pct > .25 ? '#ffd97e' : '#ff5e5e';
+  ctx.fillRect(x - bw/2, y - r - 10, bw * pct, bh);
+
+  // Name tag (spectator mode shows id prefix)
+  ctx.fillStyle = '#aaa'; ctx.font = '11px monospace'; ctx.textAlign = 'center';
+  ctx.fillText(isLocal ? `YOU [${score}]` : `[${score}]`, x, y - r - 14);
+}
+
+function renderDebug(now) {
+  const me = serverPlayers.get(myId);
+  document.getElementById('debug-panel').textContent = [
+    `sessionId: ${mySessionId}  role: ${myRole}`,
+    `serverTick: ${serverTick}  ping: ${latencyMs}ms`,
+    `predBuf: ${predictionBuffer.length}  localProj: ${localProjectiles.length}`,
+    `serverPlayers: ${serverPlayers.size}  serverProj: ${serverProjectiles.size}`,
+    me ? `srv pos: (${me.x.toFixed(1)}, ${me.y.toFixed(1)}) seq: ${me.lastInputSeq}` : 'no server me',
+    localPlayer ? `lcl pos: (${localPlayer.x.toFixed(1)}, ${localPlayer.y.toFixed(1)}) hp: ${localPlayer.health}` : '',
+    `lag: ${document.getElementById('toggle-lag').checked ? document.getElementById('lag-slider').value + 'ms' : 'off'}  queue: ${lagQueue.length}`,
+  ].join('\n');
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// WebSocket send helper
+// ─────────────────────────────────────────────────────────────────────────────
+function wsSend(msg) {
+  if (ws && ws.readyState === WebSocket.OPEN) ws.send(JSON.stringify(msg));
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Utility
+// ─────────────────────────────────────────────────────────────────────────────
+function esc(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+</script>
+</body>
+</html>
