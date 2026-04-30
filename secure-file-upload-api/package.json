@@ -1,0 +1,20 @@
+{
+  "name": "secure-file-upload-api",
+  "version": "1.0.0",
+  "description": "Educational project demonstrating secure vs vulnerable file upload APIs in Node.js",
+  "main": "secure-server.js",
+  "scripts": {
+    "start": "node secure-server.js",
+    "start:vulnerable": "node vulnerable-server.js",
+    "test": "node test.js"
+  },
+  "keywords": ["security", "file-upload", "owasp", "express"],
+  "license": "MIT",
+  "dependencies": {
+    "cors": "^2.8.6",
+    "express": "^5.2.1",
+    "express-rate-limit": "^8.4.1",
+    "helmet": "^8.1.0",
+    "multer": "^2.1.1"
+  }
+}
