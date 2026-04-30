@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pathfinding Visualizer</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<!-- ─── Header ──────────────────────────────────────────────── -->
+<header>
+  <h1><span>&lt;/&gt;</span> Pathfinding Visualizer</h1>
+</header>
+
+<!-- ─── Toolbar ─────────────────────────────────────────────── -->
+<nav class="toolbar">
+  <div class="toolbar-group">
+    <button id="btn-bfs" class="primary">BFS</button>
+    <button id="btn-dfs" class="primary">DFS</button>
+    <button id="btn-dijkstra" class="primary">Dijkstra</button>
+    <button id="btn-astar" class="primary">A*</button>
+  </div>
+
+  <div class="toolbar-divider"></div>
+
+  <div class="toolbar-group">
+    <button id="btn-maze-random">Random Maze</button>
+    <button id="btn-maze-recursive">Recursive Division</button>
+  </div>
+
+  <div class="toolbar-divider"></div>
+
+  <div class="toolbar-group">
+    <button id="btn-clear-path">Clear Path</button>
+    <button id="btn-clear-board">Clear Board</button>
+  </div>
+
+  <div class="toolbar-divider"></div>
+
+  <div class="toolbar-group">
+    <label for="speed-select" style="font-size:.8125rem;color:var(--text-muted)">Speed:</label>
+    <select id="speed-select">
+      <option value="fast">Fast</option>
+      <option value="medium" selected>Medium</option>
+      <option value="slow">Slow</option>
+    </select>
+  </div>
+
+  <div class="toolbar-group">
+    <label for="grid-size" style="font-size:.8125rem;color:var(--text-muted)">Grid:</label>
+    <select id="grid-size">
+      <option value="15x30">Small (15×30)</option>
+      <option value="25x50" selected>Medium (25×50)</option>
+      <option value="35x70">Large (35×70)</option>
+      <option value="50x100">XL (50×100)</option>
+    </select>
+  </div>
+</nav>
+
+<!-- ─── Main content ────────────────────────────────────────── -->
+<main>
+  <!-- Stats -->
+  <div id="stats">
+    <div class="stat"><span class="stat-label">Algorithm</span><span class="stat-value">—</span></div>
+    <div class="stat"><span class="stat-label">Nodes Visited</span><span class="stat-value">—</span></div>
+    <div class="stat"><span class="stat-label">Path Length</span><span class="stat-value">—</span></div>
+    <div class="stat"><span class="stat-label">Compute Time</span><span class="stat-value">—</span></div>
+  </div>
+
+  <!-- Grid -->
+  <div id="grid"></div>
+
+  <!-- Legend -->
+  <div class="legend">
+    <div class="legend-item"><div class="legend-swatch" style="background:var(--start);border-radius:50%"></div> Start</div>
+    <div class="legend-item"><div class="legend-swatch" style="background:var(--end);border-radius:50%"></div> End</div>
+    <div class="legend-item"><div class="legend-swatch" style="background:var(--wall)"></div> Wall</div>
+    <div class="legend-item"><div class="legend-swatch" style="background:var(--visited)"></div> Visited</div>
+    <div class="legend-item"><div class="legend-swatch" style="background:var(--path)"></div> Shortest Path</div>
+  </div>
+
+  <p style="font-size:.75rem;color:var(--text-muted);text-align:center">
+    Click &amp; drag to draw walls. Drag the green/red nodes to move start/end.
+  </p>
+
+  <!-- Info toggle -->
+  <button id="info-toggle">Show Algorithm Details</button>
+
+  <!-- ─── Algorithm explanations ────────────────────────────── -->
+  <div id="info-panel" class="collapsed">
+
+    <!-- BFS -->
+    <div class="algo-section">
+      <h3>Breadth-First Search (BFS)</h3>
+      <p>
+        BFS explores all neighbors at the current depth before moving to the
+        next level. Think of dropping a stone into still water — the ripple
+        expands uniformly outward.  Because it visits nodes in order of
+        increasing distance, BFS <strong>guarantees the shortest path</strong>
+        on unweighted grids.
+      </p>
+
+      <h4>Pseudocode</h4>
+<pre>function BFS(start, end):
+    queue ← [start]
+    visited ← {start}
+    parent ← {}
+
+    while queue is not empty:
+        node ← queue.dequeue()
+        if node == end:
+            return reconstructPath(parent, end)
+        for neighbor in getNeighbors(node):
+            if neighbor not in visited and not a wall:
+                visited.add(neighbor)
+                parent[neighbor] = node
+                queue.enqueue(neighbor)
+    return null   // no path found</pre>
+
+      <h4>Complexity</h4>
+      <ul>
+        <li><strong>Time:</strong>  O(V + E) — every vertex and edge processed at most once.</li>
+        <li><strong>Space:</strong> O(V) — the queue and visited set can hold all vertices in the worst case.</li>
+      </ul>
+
+      <h4>Tradeoffs</h4>
+      <p>
+        BFS is simple, optimal for unweighted grids, and easy to implement.
+        However, it explores in all directions equally, which wastes work
+        when the goal is far away in a known direction. It also cannot handle
+        weighted edges without modification.
+      </p>
+    </div>
+
+    <!-- DFS -->
+    <div class="algo-section">
+      <h3>Depth-First Search (DFS)</h3>
+      <p>
+        DFS picks a direction and goes as deep as possible before backtracking.
+        It is <strong>not guaranteed to find the shortest path</strong> — it
+        finds <em>a</em> path, which may be long and winding.
+      </p>
+
+      <h4>Pseudocode</h4>
+<pre>function DFS(start, end):
+    stack ← [start]
+    visited ← {start}
+    parent ← {}
+
+    while stack is not empty:
+        node ← stack.pop()
+        if node == end:
+            return reconstructPath(parent, end)
+        for neighbor in getNeighbors(node):
+            if neighbor not in visited and not a wall:
+                visited.add(neighbor)
+                parent[neighbor] = node
+                stack.push(neighbor)
+    return null</pre>
+
+      <h4>Complexity</h4>
+      <ul>
+        <li><strong>Time:</strong>  O(V + E)</li>
+        <li><strong>Space:</strong> O(V) — the stack depth can reach V in the worst case.</li>
+      </ul>
+
+      <h4>Tradeoffs</h4>
+      <p>
+        DFS uses less memory than BFS on wide, shallow graphs because it
+        only needs the current branch in memory. It is useful for maze
+        generation and cycle detection, but a poor choice when shortest-path
+        guarantees matter.
+      </p>
+    </div>
+
+    <!-- Dijkstra -->
+    <div class="algo-section">
+      <h3>Dijkstra's Algorithm</h3>
+      <p>
+        Dijkstra expands the node closest to the start at every step,
+        gradually building the shortest-path tree outward. It handles
+        <strong>weighted edges</strong> (cells with different movement costs)
+        and guarantees the shortest path for non-negative weights.
+      </p>
+
+      <h4>Pseudocode</h4>
+<pre>function Dijkstra(start, end):
+    dist[start] = 0            // all others = ∞
+    pq ← MinHeap { start }
+
+    while pq is not empty:
+        node ← pq.extractMin()
+        if node == end:
+            return reconstructPath(parent, end)
+
+        for neighbor in getNeighbors(node):
+            alt = dist[node] + weight(node, neighbor)
+            if alt &lt; dist[neighbor]:
+                dist[neighbor] = alt
+                parent[neighbor] = node
+                pq.decreaseKey(neighbor, alt)
+    return null</pre>
+
+      <h4>Complexity</h4>
+      <ul>
+        <li><strong>Time:</strong>  O(V log V) with a binary heap, O(V²) with a naive array.</li>
+        <li><strong>Space:</strong> O(V) for the distance table and priority queue.</li>
+      </ul>
+
+      <h4>Tradeoffs</h4>
+      <p>
+        On an unweighted grid Dijkstra degenerates to BFS with extra overhead.
+        Its real strength is weighted terrain. Like BFS, it is "uninformed"
+        — it has no notion of where the goal is, so it explores uniformly.
+      </p>
+    </div>
+
+    <!-- A* -->
+    <div class="algo-section">
+      <h3>A* (A-Star) Algorithm</h3>
+      <p>
+        A* is an <em>informed</em> search that combines Dijkstra's actual cost
+        <strong>g(n)</strong> with a heuristic estimate of remaining cost
+        <strong>h(n)</strong>. The total priority is <code>f(n) = g(n) + h(n)</code>.
+        With an admissible heuristic (one that never overestimates), A*
+        guarantees the shortest path while typically visiting <strong>far
+        fewer</strong> nodes than BFS or Dijkstra.
+      </p>
+
+      <h4>Pseudocode</h4>
+<pre>function AStar(start, end):
+    g[start] = 0
+    f[start] = h(start, end)      // heuristic
+    openSet ← MinHeap { start }   // keyed on f
+
+    while openSet is not empty:
+        node ← openSet.extractMin()
+        if node == end:
+            return reconstructPath(parent, end)
+
+        for neighbor in getNeighbors(node):
+            tentG = g[node] + weight(node, neighbor)
+            if tentG &lt; g[neighbor]:
+                g[neighbor] = tentG
+                f[neighbor] = tentG + h(neighbor, end)
+                parent[neighbor] = node
+                openSet.insertOrUpdate(neighbor)
+    return null</pre>
+
+      <h4>Heuristic: Manhattan Distance</h4>
+      <p>
+        <code>h(a, b) = |a.row − b.row| + |a.col − b.col|</code><br>
+        Admissible for 4-directional movement (never overestimates). For
+        8-directional grids, use the Chebyshev or Octile distance instead.
+      </p>
+
+      <h4>Complexity</h4>
+      <ul>
+        <li><strong>Time:</strong>  O(V log V) worst-case, but typically much better because the heuristic prunes most of the search space.</li>
+        <li><strong>Space:</strong> O(V)</li>
+      </ul>
+
+      <h4>Tradeoffs</h4>
+      <p>
+        A* is usually the best choice for grid pathfinding. The quality of
+        the heuristic determines how much work it saves. A perfect heuristic
+        makes it visit only the optimal path; a zero heuristic degrades it
+        to Dijkstra. Choosing or computing the heuristic adds implementation
+        complexity.
+      </p>
+    </div>
+
+    <!-- Comparison table -->
+    <div class="algo-section">
+      <h3>Algorithm Comparison</h3>
+      <table class="comparison-table">
+        <thead>
+          <tr>
+            <th>Property</th>
+            <th>BFS</th>
+            <th>DFS</th>
+            <th>Dijkstra</th>
+            <th>A*</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Shortest path?</td>
+            <td>Yes (unweighted)</td>
+            <td>No</td>
+            <td>Yes (non-neg weights)</td>
+            <td>Yes (admissible h)</td>
+          </tr>
+          <tr>
+            <td>Weighted edges?</td>
+            <td>No</td>
+            <td>No</td>
+            <td>Yes</td>
+            <td>Yes</td>
+          </tr>
+          <tr>
+            <td>Informed?</td>
+            <td>No</td>
+            <td>No</td>
+            <td>No</td>
+            <td>Yes</td>
+          </tr>
+          <tr>
+            <td>Time</td>
+            <td>O(V+E)</td>
+            <td>O(V+E)</td>
+            <td>O(V log V)</td>
+            <td>O(V log V)*</td>
+          </tr>
+          <tr>
+            <td>Space</td>
+            <td>O(V)</td>
+            <td>O(V)</td>
+            <td>O(V)</td>
+            <td>O(V)</td>
+          </tr>
+          <tr>
+            <td>Best for</td>
+            <td>Unweighted grids</td>
+            <td>Maze generation, existence checks</td>
+            <td>Weighted terrain</td>
+            <td>General pathfinding</td>
+          </tr>
+        </tbody>
+      </table>
+      <p style="font-size:.75rem;margin-top:4px">
+        * A* worst-case matches Dijkstra, but in practice it visits far fewer nodes.
+      </p>
+    </div>
+
+    <!-- Scaling / Game Engine section -->
+    <div class="algo-section scaling-section">
+      <h3>Scaling to a Real-Time Game Engine</h3>
+
+      <h4>1. Hierarchical Pathfinding (HPA*)</h4>
+      <p>
+        Divide the map into clusters/sectors. Pre-compute shortest paths
+        within each cluster and between cluster borders. At query time, do a
+        high-level search over clusters and refine locally. This reduces the
+        effective graph size by orders of magnitude on large maps.
+      </p>
+
+      <h4>2. Navigation Meshes (NavMeshes)</h4>
+      <p>
+        Instead of a dense grid, represent walkable space as convex polygons.
+        Pathfinding runs on the polygon graph (far fewer nodes), then a
+        funnel algorithm smooths the path into straight-line segments.
+        Standard in engines like Unity and Unreal.
+      </p>
+
+      <h4>3. Jump Point Search (JPS)</h4>
+      <p>
+        An optimization of A* for uniform-cost grids. JPS prunes symmetric
+        paths by "jumping" over intermediate nodes, achieving 10–100×
+        speedups while still guaranteeing optimality.
+      </p>
+
+      <h4>4. Incremental / Anytime Algorithms</h4>
+      <p>
+        <strong>D* Lite:</strong> re-plans efficiently when the map changes
+        (dynamic obstacles). <strong>ARA*:</strong> returns a suboptimal
+        path quickly, then refines it over successive iterations — useful
+        when frame budgets are tight.
+      </p>
+
+      <h4>5. Multithreading &amp; SIMD</h4>
+      <p>
+        Split independent pathfinding queries across worker threads. On the
+        GPU, BFS-like algorithms map well to CUDA/compute shaders for
+        thousands of simultaneous agents. Flow-field pathfinding computes a
+        single field that all agents can share.
+      </p>
+
+      <h4>6. Caching &amp; Amortisation</h4>
+      <p>
+        Cache recently computed paths and invalidate them only when the local
+        map changes. Spread expensive re-plans over multiple frames to avoid
+        frame-rate spikes.
+      </p>
+    </div>
+
+  </div><!-- /info-panel -->
+</main>
+
+<script type="module" src="js/app.js"></script>
+</body>
+</html>
