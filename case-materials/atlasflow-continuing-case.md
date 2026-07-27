@@ -209,9 +209,9 @@ India uses INR.
 
 ### 1.6 The Kestrel Labs acquisition (August 4, 2025)
 
-Purchase price: $19,400 total consideration — $16,900 cash at closing, plus $2,500 fair value of contingent
-consideration (an earn-out payable in Q1 2027 if a retention-and-revenue milestone is met, maximum payout
-$4,000). Preliminary purchase price allocation:
+**Management's preliminary allocation schedule, as first provided to the auditor (this schedule does not
+foot — see the note below; the non-footing is deliberate and is used as a teaching point in Chapters 2, 9,
+and 19).**
 
 | Component | Amount |
 | --- | --- |
@@ -220,7 +220,32 @@ $4,000). Preliminary purchase price allocation:
 | Net working capital acquired | 200 |
 | Deferred tax liability | (1,300) |
 | **Goodwill** | **14,500** |
-| **Total** | **19,400** |
+| **Sum of components** | **21,400** |
+| Total consideration per management's schedule | 19,400 |
+| **Unexplained difference** | **2,000** |
+
+**Note — the resolved facts.** The identifiable components above are correct, and goodwill of $14,500 is
+independently corroborated by the movement in account 1700 ($26,900 at December 31, 2025 less $12,400 at
+December 31, 2024). Management's consideration figure was wrong. Total consideration is **$21,400**,
+comprising **$18,900 of cash paid at closing** and **$2,500 of contingent consideration** (an earn-out
+payable in Q1 2027 if a retention-and-revenue milestone is met, maximum payout $4,000). The $2,000 error
+arose because management's schedule captured the $16,900 base cash purchase price from the merger agreement
+and omitted the $2,000 closing working-capital adjustment paid at the same time. The corrected allocation
+therefore is:
+
+| Component | Amount |
+| --- | --- |
+| Developed technology intangible (5-year life) | 6,900 |
+| Customer relationships intangible (7-year life) | 1,100 |
+| Net working capital acquired | 200 |
+| Deferred tax liability | (1,300) |
+| **Goodwill** | **14,500** |
+| **Total consideration** | **21,400** |
+| Of which: cash paid at closing | 18,900 |
+| Of which: contingent consideration at fair value (account 2600) | 2,500 |
+
+Chapters may use either the uncorrected schedule (to illustrate the audit issue) or the corrected schedule
+(to illustrate the answer), but must be explicit about which one they are using.
 
 Kestrel had 22 employees, an unaudited historical financial statement set prepared on a modified cash basis,
 no formal revenue recognition policy, and a homegrown billing spreadsheet. Kestrel's customer contracts
