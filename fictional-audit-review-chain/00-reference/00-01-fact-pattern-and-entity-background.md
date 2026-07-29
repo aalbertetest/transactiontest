@@ -415,7 +415,7 @@ the ARG file was being completed.
 |---|---|---:|---:|---:|---|
 | 2 — Manager | Sasha Lindqvist | 118.0 | 1,842 of 4,127 workpapers (44.6%) | 49 | All closed by 11 Mar 20X5 |
 | 3 — Partner | Ronan Belliveau | 11.5 (review) | 312 of 4,127 workpapers (7.6%) | 19 (13 acknowledgement-only) | Authorised signature 12 Mar 20X5 |
-| 4 — Internal inspection | Nathaniel Ferreira-Osei | 141.0 | Targeted | 14 findings (draft) → 10 (final) | Draft grade 3 → **final grade 2** |
+| 4 — Internal inspection | Nathaniel Ferreira-Osei | 141.0 | Targeted | 6 findings + 8 improvement points (draft) → 2 findings + 12 improvement points (final) | Draft grade 3 → **final grade 2** |
 | 5 — Regulator | Ingrid Halvorsen-Duffy | 402.0 | File + firm systems | 14 findings, 14 required actions | **Grade D**; enforcement referral |
 
 ---

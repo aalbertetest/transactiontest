@@ -41,8 +41,9 @@ rationale approved by the Head of Quality."*
 
 | | **Draft — 20X5-08-12** | **Final — 20X5-09-30** |
 |---|---|---|
-| Findings | **6** | **2** |
-| Improvement points | 8 | 8 |
+| Findings in the register | **6** | **2** |
+| Improvement points | 8 | **12** |
+| Standalone conclusion on engagement-level quality management (`INSP-F03`) | Finding | Finding, softened |
 | **Grade** | **3 — Significant improvements required** | **2 — Compliant with limited improvements required** |
 | Consequence for the engagement partner | Mandatory second partner review on all listed engagements for two cycles; quality metric impact; reported individually to the Risk and Quality Committee | **None of the above** |
 | Consequence for the firm's public reporting | Engagement counted in the "significant improvements required" category in the firm's transparency report | **Counted in the "limited improvements" category** |
@@ -62,12 +63,12 @@ rationale approved by the Head of Quality."*
 
 ### 2.2 The final determination, as recorded 30 September 20X5
 
-> *"Two findings are identified: `INSP-F01` and `INSP-F02`. Both concern procedural and methodological
+> *"Two register findings are identified: `INSP-F01` and `INSP-F02`. Both concern procedural and methodological
 > compliance rather than the substantive adequacy of the audit conclusions reached. Four matters raised in
 > draft have been reclassified as improvement points following consideration of the engagement team response
 > and of further information, on the individual rationales at §4.*
 >
-> *Eight improvement points are identified, several of which reflect firm-wide methodology and tooling gaps
+> *Twelve improvement points are identified, several of which reflect firm-wide methodology and tooling gaps
 > addressed by the firm-wide actions at `I-700` rather than shortcomings specific to this engagement.*
 >
 > *The engagement team engaged fully and constructively with the inspection, including the preparation by the
@@ -323,7 +324,8 @@ nowhere.
 | | |
 |---|---|
 | **Grade** | **2 — Compliant with limited improvements required** |
-| Findings | `INSP-F01`, `INSP-F02` |
+| Register findings | `INSP-F01`, `INSP-F02` |
+| Standalone conclusion on engagement-level quality management | `INSP-F03` (retained, softened) |
 | Improvement points | `INSP-IP01` to `INSP-IP12` |
 | Remedial actions | 7 engagement-specific, 6 firm-wide — see `I-700` |
 | Reported to the Risk and Quality Committee | 20X5-10-14, within the cycle 20X5 summary |

@@ -8,8 +8,9 @@ From:  R. Belliveau, Engagement Partner
 To:    N. Ferreira-Osei, Director, NQMG
        M. Ivanovic-Hale, Partner, Head of Quality
 Date:  20X5-08-29
-Re:    Draft inspection report dated 12 August 20X5 — 6 findings, 8 improvement
-       points, proposed grade 3
+Re:    Draft inspection report dated 12 August 20X5 — 6 register findings,
+       8 improvement points, the standalone conclusion on engagement-level
+       quality management at `INSP-F03`, and a proposed grade of 3
 ```
 
 ---
@@ -18,10 +19,13 @@ Re:    Draft inspection report dated 12 August 20X5 — 6 findings, 8 improvemen
 
 I accept the substance of this report.
 
-Of the six findings, **I accept four without qualification**: `INSP-F01`, `INSP-F02`, `INSP-F03` and
+Of the six register findings, **I accept three without qualification**: `INSP-F01`, `INSP-F02` and
 `INSP-F06`. I accept the eight improvement points. I contest two findings, `INSP-F05` and `INSP-F07`, on
 points of fact set out at §5 and §6. I ask that one finding, `INSP-F04`, be reallocated rather than
 withdrawn, for the reasons at §3.
+
+**I accept the standalone conclusion on my own direction, supervision and review at `INSP-F03` in full, and
+I ask that it not be softened.** See §7.
 
 **I do not ask for the grade to be changed.** I have read `AV-QM-06` and I can see that `INSP-F02` alone
 engages it. If the outcome of this inspection is grade 3, that is the correct outcome and I would not want
@@ -278,7 +282,8 @@ enhanced sign-off. I have given my view at §7 on why I think that will not work
 
 ## 10. Conclusion
 
-I accept four of six findings without qualification, contest one element of `INSP-F05` on the facts *(see the
+I accept three of six register findings without qualification, accept `INSP-F03` in full, contest one
+element of `INSP-F05` on the facts *(see the
 addendum at §5 — I was wrong and I withdraw it)*, contest the characterisation of `INSP-F07`, and ask that
 `INSP-F04` be reallocated to me.
 

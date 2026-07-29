@@ -131,7 +131,7 @@ factors known to it.
 
 | Factor |
 |---|
-| **Mr Belliveau accepted four of the six findings in the firm's draft report without qualification, including the finding against his own review, and expressly asked that it not be softened**: *"I do not contest this finding and I do not want it softened."* |
+| **Mr Belliveau accepted three of the six register findings in the firm's draft report without qualification, and accepted the separate conclusion on his own direction, supervision and review in full, expressly asking that it not be softened**: *"I do not contest this finding and I do not want it softened."* |
 | **He did not request the reduction of the grade** and recorded: *"If the outcome of this inspection is grade 3, that is the correct outcome and I would not want it recorded that I argued otherwise."* |
 | **He prepared, unprompted, `P-200` and `P-500` Part B** — a note-by-note assessment of the manager's 49 clearances and a line-by-line assessment of which of his own twelve signed confirmations were accurate. Neither was required. Both are more critical of him than the firm's final report is. |
 | **He asked the firm to refer the £7.47m projected misstatement to the Risk and Quality Committee for consideration of the FY20X4 opinion.** The request was refused by the Head of Quality. |

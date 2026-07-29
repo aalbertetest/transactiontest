@@ -275,7 +275,7 @@ rationale approved by the Head of Quality."*
 | **20X5-08-12** | **Draft report issued — 6 findings, 8 improvement points, GRADE 3** |
 | 20X5-08-29 | Engagement team response received (14 pages) — `I-600` |
 | **20X5-09-09** | **Meeting: lead inspector, Head of Quality, engagement partner. No minutes taken.** |
-| **20X5-09-30** | **Final report issued — 2 findings, 8 improvement points, GRADE 2** |
+| **20X5-09-30** | **Final report issued — 2 findings, 12 improvement points, GRADE 2** |
 | 20X5-10-14 | Reported to the Risk and Quality Committee as part of the cycle 20X5 summary |
 | 20X6-03-24 | §3.3 and §3.4 added following FRAOA inquiry |
 

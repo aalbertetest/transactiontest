@@ -109,14 +109,14 @@ Of the £183.4m Software & Subscriptions revenue, **£38.2m** is reseller-channe
 | Deferred tax liabilities | 8 | (38.2) | (24.9) | |
 | | | **(582.2)** | **(453.9)** | |
 | **Current liabilities** | | | | |
-| Trade and other payables | | (298.4) | (271.3) | |
+| Trade and other payables | | (298.4) | (251.3) | |
 | Contract liabilities | 17 | (156.3) | (141.8) | `C-100` |
 | Lease liabilities | 15 | (15.6) | (13.4) | |
 | Provisions | 21 | (18.7) | (16.6) | |
 | Current tax | | (8.8) | (10.3) | |
-| | | **(497.8)** | **(453.4)** | |
-| **Total liabilities** | | **(1,080.0)** | **(907.3)** | |
-| **Net assets** | | **662.5** | **612.9** | |
+| | | **(497.8)** | **(433.4)** | |
+| **Total liabilities** | | **(1,080.0)** | **(887.3)** | |
+| **Net assets** | | **662.5** | **632.9** | |
 
 ### Equity
 
@@ -125,10 +125,10 @@ Of the £183.4m Software & Subscriptions revenue, **£38.2m** is reseller-channe
 | Share capital (43.5m ordinary shares of £1.00) | 43.5 | 43.3 |
 | Share premium | 187.0 | 180.7 |
 | Other reserves | 31.6 | 37.2 |
-| Retained earnings | 400.4 | 351.7 |
-| **Total equity** | **662.5** | **612.9** |
+| Retained earnings | 400.4 | 371.7 |
+| **Total equity** | **662.5** | **632.9** |
 
-Movement: 612.9 + 47.4 (profit) − 18.7 (dividends) + 6.5 (shares issued for Kestrel) − 5.6 (OCI,
+Movement: 632.9 + 47.4 (profit) − 18.7 (dividends) + 6.5 (shares issued for Kestrel) − 5.6 (OCI,
 principally FX translation) = **662.5**.
 
 > ### ⚠ Note the classification of the RCF

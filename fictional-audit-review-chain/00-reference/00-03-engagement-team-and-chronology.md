@@ -125,8 +125,9 @@ programme, cycle 20X5.
 | Meeting with the engagement partner | 9 September 20X5 (no minutes on file) |
 | Final report issued | 30 September 20X5 |
 | **Final grade** | **2 — Compliant with limited improvements** |
-| Findings in draft | 6 significant deficiencies, 8 improvement points |
-| Findings in final | **2 significant deficiencies, 8 improvement points** |
+| Findings in draft | 6 register findings, 8 improvement points |
+| Findings in final | **2 register findings, 12 improvement points** |
+| Standalone conclusion on engagement-level quality management (`INSP-F03`) | Retained as a finding in both versions; **five sentences removed and a mitigation paragraph added** |
 
 ---
 

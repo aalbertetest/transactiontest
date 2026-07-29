@@ -70,8 +70,9 @@ allocation. HPV's report is dated 28 January 20X5 and is filed at `C-500/5`.
 | Trade and other payables | (5.1) | — | (5.1) |
 | Deferred revenue | (4.2) | +0.6 | (3.6) |
 | Deferred tax liability on intangibles | — | **(9.4)** | **(9.4)** |
+| **Deferred tax asset on acquired tax losses** | — | **+3.2** | **3.2** |
 | Other net liabilities | (1.4) | — | (1.4) |
-| **Net identifiable assets** | **3.8** | **+27.8** | **34.8** |
+| **Net identifiable assets** | **3.8** | **+31.0** | **34.8** |
 | Total consideration | | | 86.0 |
 | **Goodwill** | | | **51.2** |
 

@@ -43,13 +43,29 @@ a reasonable margin.
 
 ## 4. Scoping of detailed testing
 
-| Basis | Contracts | Revenue £m | % of segment |
-|---|---:|---:|---:|
-| Contracts with revenue above £30m in FY20X4 | 5 | 428.3 | 57.7% |
-| Contracts with a forecast margin movement above 2pp | 3 (2 already in the above) | 41.2 | 5.5% |
-| Contracts in a loss position | 2 | 18.6 | 2.5% |
-| Contracts selected at random from the remainder | 4 | 22.1 | 3.0% |
-| **Total selected** | **12** | **496.2** | **66.8%** |
+| Basis | Contracts | Contract value £m |
+|---|---:|---:|
+| The five largest contracts by value | 5 | 380.2 |
+| Contracts with a forecast margin movement above 2pp | 3 (2 already in the above) | 24.1 |
+| Contracts in a loss position | 2 | 38.4 |
+| Contracts selected at random from the remainder | 4 | 53.5 |
+| **Total selected** | **12** | **496.2** |
+
+Coverage achieved:
+
+| | £m | % of segment revenue |
+|---|---:|---:|
+| Combined contract value of the 12 contracts selected | 496.2 | — |
+| **FY20X4 revenue recognised on the 12 contracts** | **227.8** | **30.7%** |
+| FY20X4 revenue on the five largest alone | 148.1 | 19.9% |
+| Equipment & Systems segment revenue | 742.8 | 100% |
+
+*Note on coverage. 30.7% of segment revenue is below the level the firm's methodology describes as
+typical for a significant risk of this kind (50–60%). The scoping is risk-based rather than
+value-based: it captures every contract above £50m of value, every contract whose forecast margin
+moved by more than 2 percentage points, both loss-making contracts, and four selected at random. The
+concentration of the segment's 61 open contracts is such that no further contract exceeds £52.1m of
+value or £18.6m of FY20X4 revenue.*
 
 ### 4.1 The five largest contracts
 

@@ -27,8 +27,8 @@
 
 ## What this is
 
-This is a single audit engagement documented five times over, from five different vantage points,
-each one looking down at the layer beneath it:
+**59 documents, one engagement, five levels of review.** A single audit documented five times over,
+from five different vantage points, each one looking down at the layer beneath it:
 
 | Level | Who is reviewing | What they are reviewing | Folder |
 |---|---|---|---|
@@ -58,11 +58,14 @@ progression:
   come from people she works with every day and the deadline is fixed.
 - **The partner** reviews the manager's *conclusions* rather than the manager's *review*, and so
   inherits every error the manager cleared. He spends 11.5 hours reviewing a 3,140-hour engagement.
-- **The inspection team** catches most of the substantive audit failures — and then downgrades four
-  of them between draft and final report after the partner objects.
+- **The inspection team** catches almost everything — twelve of the regulator's fifteen findings are
+  in its draft — and then, in the seven weeks before it publishes, reduces six findings to two. Not
+  one underlying fact changes. The inspector who objects files a note nobody reads.
 - **The regulator** finds that the audit was deficient, but concludes that the *more serious*
   problem is that the firm's own inspection function found the deficiencies and then neutralised
-  them. The regulator's harshest findings are about the reviewers, not the auditors.
+  them. Its harshest findings are about the reviewers, not the auditors. It also finds that the
+  engagement partner asked for the grade to *stay* at the harsher level and asked that the finding
+  against himself *not* be softened — and that both happened anyway.
 
 By Level 5 the subject matter has shifted entirely. The regulator is barely interested in Auburn
 Ridge Group plc. It is interested in whether a firm that can detect its own failures and then

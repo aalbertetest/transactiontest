@@ -107,13 +107,13 @@ compliant with limited improvements required.**
 | | Draft, 12 Aug 20X5 | Final, 30 Sep 20X5 |
 |---|---:|---:|
 | Findings | **6** | **2** |
-| Improvement points | 8 | 8 |
+| Improvement points | 8 | 12 |
 | **Grade** | **3** | **2** |
 
 Four findings were reclassified as improvement points. **No underlying fact changed. Every figure in the final
 report appears in the draft.**
 
-In the twenty-one days between the firm's internal recommendation to retain the higher grade and the revised
+In the nine days between the firm's own internal recommendation to retain the higher grade and the revised
 draft reclassifying the findings, the only recorded event is a meeting attended by the lead inspector, the Head
 of Quality and the engagement partner. **No minute of that meeting exists**, contrary to the firm's own policy.
 

@@ -25,9 +25,9 @@ evaluation of component auditors' work, in accordance with ISA 600 (Revised).
 | ARG Polska sp. z o.o. | Poland | 100% | 244.1 | 13.1 | 218.7 | Manufacturing and assembly |
 | ARG Systems GmbH | Germany | 100% | 154.2 | 8.7 | 131.4 | Equipment & Systems, DACH |
 | ARG Aftermarket Inc | Delrado | 100% | 192.7 | 10.0 | 148.9 | Aftermarket, Americas |
-| ARG Software Ltd | Meridia | 100% | 96.4 | 12.4 | 94.6 | Telemetry Suite |
+| ARG Software Ltd | Meridia | 100% | 71.8 | 12.4 | 94.6 | Telemetry Suite |
 | Kestrel Dynamics Ltd | Meridia | 100% (from 1 May 20X4) | 32.4 | 4.9 | 88.1 | Predictive analytics |
-| 11 dormant / immaterial entities | Various | 100% | — | (0.1) | 3.6 | — |
+| 11 dormant / immaterial entities | Various | 100% | 24.6 | (0.1) | 3.6 | Includes two small distribution entities selling the Telemetry Suite in secondary territories |
 | Eliminations and consolidation adjustments | | | — | 0.2 | (321.4) | |
 | **Group** | | | **1,284.6** | **62.4** | **1,742.5** | |
 

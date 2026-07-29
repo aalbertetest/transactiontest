@@ -31,7 +31,7 @@ evaluate the adequacy of the related disclosures, in accordance with ISA 570 (Re
 | Undrawn uncommitted overdraft | 25.0 | 25.0 |
 | **Total liquidity** | **199.3** | 270.9 |
 | Net current assets | 226.6 | 161.4 |
-| Net assets | 662.5 | 612.9 |
+| Net assets | 662.5 | 632.9 |
 
 ### 2.1 Facilities and maturities
 

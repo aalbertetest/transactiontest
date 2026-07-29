@@ -49,9 +49,9 @@ monitoring and remediation process as **not effective**.
 > mischaracterised, and on 12 August 20X5 they issued a draft report identifying six findings and proposing a
 > grade of 3.
 >
-> **Twenty-one days later, following an unminuted meeting attended by the lead inspector, the Head of Quality
-> and the engagement partner, four of those six findings were reclassified as improvement points and the grade
-> was reduced to 2. Not one underlying fact changed. Every figure in the final report appears in the draft.**
+> **Seven weeks later, and within two days of an unminuted meeting attended by the lead inspector, the Head of
+> Quality and the engagement partner, four of those six findings had been reclassified as improvement points and
+> the grade reduced to 2. Not one underlying fact changed. Every figure in the final report appears in the draft.**
 >
 > The senior manager who had performed a third of the fieldwork recorded her dissent in writing. Her note was
 > filed in the working papers, was not referred to in the final report, was not reported to the Risk and

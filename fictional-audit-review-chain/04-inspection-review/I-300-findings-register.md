@@ -5,8 +5,8 @@ ENGAGEMENT: Auburn Ridge Group plc, FY20X4
 FINDINGS REGISTER
 ────────────────────────────────────────────────────────────────────────────────
 LEVEL 4 OF 5
-Draft issued:  20X5-08-12  — 6 findings, 8 improvement points, GRADE 3
-Final issued:  20X5-09-30  — 2 findings, 8 improvement points, GRADE 2
+Draft issued:  20X5-08-12  —  6 findings,  8 improvement points, GRADE 3
+Final issued:  20X5-09-30  —  2 findings, 12 improvement points, GRADE 2
 ```
 
 ---
@@ -17,7 +17,6 @@ Final issued:  20X5-09-30  — 2 findings, 8 improvement points, GRADE 2
 |---|---|---|---|---|
 | `INSP-F01` | EQR completed after the report date | `ISS-09` | **FINDING** | **FINDING** |
 | `INSP-F02` | Cut-off sample error not projected | `ISS-02` | **FINDING** | **FINDING** |
-| `INSP-F03` | Partner review — extent and quality | — | **FINDING** | **→ FINDING (softened, see `I-200` §6)** |
 | `INSP-F04` | Manager review — clearances and coverage | — | **FINDING** | **→ Improvement point `INSP-IP09`** |
 | `INSP-F05` | CN-4471 contract estimate | `ISS-01` | **FINDING** | **→ Improvement point `INSP-IP10`** |
 | `INSP-F06` | Going concern — period of assessment | `ISS-07` | **FINDING** | **→ Improvement point `INSP-IP11`** |
@@ -33,6 +32,20 @@ Final issued:  20X5-09-30  — 2 findings, 8 improvement points, GRADE 2
 
 **Draft: 6 findings. Final: 2 findings. Four findings were reclassified as improvement points. No finding
 was withdrawn on the basis that it was factually wrong.**
+
+> **A note on `INSP-F03`, which is not in the table above.** NQMG methodology records the assessment of
+> engagement-level quality management — the engagement partner's direction, supervision and review — as a
+> standalone conclusion in the body of the report rather than as an entry in the findings register. It carries
+> the reference `INSP-F03` and it contributes to the grading, but it is not counted among the six and two
+> numbered findings.
+>
+> `INSP-F03` was **retained as a finding in the final report**. Five sentences were removed from it and a
+> mitigation paragraph added. Every underlying figure is unchanged in both versions. The two texts are set out
+> side by side at [`I-200`](I-200-assessment-of-the-partner-review.md) §6.3, and the rationale for the change
+> is at [`I-500`](I-500-grading-determination-and-draft-to-final-changes.md) §4.1.
+>
+> The engagement partner accepted `INSP-F03` in full and expressly asked that it not be softened
+> (`I-600` §7).
 
 ---
 ---

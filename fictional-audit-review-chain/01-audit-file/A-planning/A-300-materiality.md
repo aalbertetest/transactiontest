@@ -55,7 +55,12 @@ and consistency assists comparability of the misstatement evaluation year on yea
 |---|---:|---:|
 | Profit before tax | £61.0m (forecast) | **£62.4m (actual)** |
 | Percentage applied | 5.0% | **5.0%** |
-| **Group materiality** | **£3.05m** | **£3.10m** |
+| Calculated amount | £3.05m | £3.12m |
+| **Group materiality applied (rounded down to the nearest £0.05m)** | **£3.05m** | **£3.10m** |
+
+Firm methodology requires materiality to be expressed to the nearest £0.05m. The calculated amount of
+£3.12m is rounded **down** to £3.10m; rounding down is required where the calculated amount is not a
+multiple of the rounding increment, so that materiality is never set above the percentage applied.
 
 **Why 5% and not 10%?** The lower end of the range is appropriate because:
 

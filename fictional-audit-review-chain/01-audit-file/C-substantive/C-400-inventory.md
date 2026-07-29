@@ -186,7 +186,8 @@ misstatement C1 at `D-100`.
 ### 5.6 Conclusion on provisioning
 
 Following the £1.24m adjustment, the provision is £19.84m, an effective rate of 8.5% of gross
-inventory and 42.9% of the slow-moving band. Recorded conclusion: adequate.
+inventory and 39.9% of the slow-moving band (£16.44m provided against £41.2m gross, up from 36.9%).
+Recorded conclusion: adequate.
 
 ## 6. Presentation and disclosure
 

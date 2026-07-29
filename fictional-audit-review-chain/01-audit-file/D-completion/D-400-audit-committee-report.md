@@ -52,7 +52,7 @@ related to going concern, an emphasis of matter, or any other matter paragraph.
 
 | | |
 |---|---|
-| **What we found** | We tested twelve contracts representing 66.8% of Equipment & Systems revenue. Across the tested portfolio the aggregate estimate of total contract costs fell by £2.3m in Q4. **The entire net reduction is attributable to a single contract, CN-4471**, on which management reduced the estimated cost to complete by £4.1m. |
+| **What we found** | We tested twelve contracts with a combined contract value of £496.2m, on which £227.8m of revenue was recognised in FY20X4 — 30.7% of Equipment & Systems revenue. Across the tested portfolio the aggregate estimate of total contract costs fell by £2.3m in Q4. **The entire net reduction is attributable to a single contract, CN-4471**, on which management reduced the estimated cost to complete by £4.1m. |
 | **The effect** | The change in estimate increased FY20X4 revenue and profit before tax by **£3.5m**, which is above our materiality of £3.10m. The contract's forecast margin moved from 18.2% to 22.4%, against a portfolio average of 8.4%. |
 | **Management's explanation** | Value engineering savings of £2.6m on the bogie assembly, £1.1m from a reduced certification scope following the Authority's acceptance of a revised test protocol, and a £0.4m reduction in programme contingency. |
 | **Our work** | We obtained management's revised cost forecast, correspondence from the Project Director, and a record of our discussion with her. We read the December Contract Review Board minutes, which record the change. We tested costs incurred, recalculated the percentage complete, and reviewed the contract terms and variations. |

@@ -92,7 +92,8 @@ immediate effect on the amount of revenue and margin recognised. There is a risk
 to complete are understated, resulting in the overstatement of revenue and profit. We identified this as
 an area at risk of fraud.
 
-**Our response.** We selected twelve contracts, representing 66.8% of segment revenue, on the basis of
+**Our response.** We selected twelve contracts with a combined contract value of £496.2m, on which £227.8m of revenue was
+recognised in the period, representing 30.7% of segment revenue, on the basis of
 size, movement in forecast margin, loss-making status and random selection. For each we:
 
 - agreed the contract price to the executed contract and any variations;
