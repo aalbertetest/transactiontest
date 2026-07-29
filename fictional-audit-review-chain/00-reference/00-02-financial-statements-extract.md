@@ -267,9 +267,14 @@ Sensitivity of the Industrial Systems CGU (**not disclosed in the financial stat
 | Discount rate | Value in use | Headroom / (impairment) |
 |---:|---:|---:|
 | 9.1% (as used) | 190.3 | 3.9 |
-| 9.5% | 183.1 | (3.3) |
-| **10.2% (specialist's lower bound)** | **171.6** | **(14.8)** |
-| 11.6% (specialist's upper bound) | 151.2 | (35.2) |
+| 9.3% | 184.9 | (1.5) |
+| 9.5% | 179.9 | (6.5) |
+| **10.2% (specialist's lower bound)** | **164.3** | **(22.1)** |
+| 11.6% (specialist's upper bound) | 140.0 | (46.4) |
+
+The £16.2m impairment that ARG actually recognised in this CGU six months later (August 20X5, see
+`00-01` §9) implies a discount rate of approximately **10.0%** — inside the specialist's range and
+0.9 percentage points above the rate management used.
 
 See `ISS-06` / `C-600`. The firm's own valuation specialist's range is **10.2%–11.6%**, which does
 not include the 9.1% used.
@@ -334,16 +339,25 @@ Conclusion recorded: *"Aggregate uncorrected misstatements of £2.37m are below 
 
 Not known to the engagement team, the manager or the partner. Reproduced here for orientation.
 
-| Issue | Description | Potential PBT effect £m |
-|---|---|---:|
-| `ISS-01` | CN-4471 estimated costs to complete | 3.5 |
-| `ISS-02` | Cut-off — incremental over the £1.9m already listed | 5.1 |
-| `ISS-05` | Contingent consideration understated | 4.4 |
-| `ISS-06` | Industrial Systems CGU impairment | 14.8 |
-| | **Aggregate** | **27.8** |
-| | **As % of reported PBT of £62.4m** | **44.6%** |
+| Issue | Description | Potential PBT effect £m | Effect on adjusted EPS? |
+|---|---|---:|---|
+| `ISS-01` | CN-4471 estimated costs to complete | 3.5 | **Yes — 6.1p** |
+| `ISS-02` | Cut-off — incremental over the £1.9m already listed | 5.1 | **Yes — 8.9p** |
+| `ISS-05` | Contingent consideration understated | 4.4 | No — remeasurement is an adjusting item |
+| `ISS-06` | Industrial Systems CGU impairment | 22.1 | No — impairment is an adjusting item |
+| | **Aggregate** | **35.1** | |
+| | **As % of reported PBT of £62.4m** | **56.3%** | |
 
 Plus `ISS-03`: revenue overstated by up to **£26.8m** (2.1% of revenue) with no effect on profit.
+
+The final column matters for understanding motive, and it cuts both ways. Only two of the four
+issues would have moved the metric on which the CFO's LTIP vests — but those two are precisely the
+two that would have moved it below the vesting threshold. The other two (`ISS-05` and `ISS-06`)
+carry no adjusted-EPS consequence at all, and no covenant consequence either, since goodwill
+impairment and fair-value remeasurement are both excluded from Adjusted EBITDA. Whatever explains
+the treatment of those two, it is not the incentive scheme. The regulator makes this distinction at
+`R-500` §4 and treats it as evidence that the file's problem was general insufficiency of scepticism
+rather than a targeted response to one incentive.
 
 ---
 

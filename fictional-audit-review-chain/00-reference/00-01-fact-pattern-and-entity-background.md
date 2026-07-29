@@ -248,7 +248,8 @@ The firm's own valuation specialist, asked to review the discount rate, conclude
 appropriate post-tax WACC for this CGU lay in the range **10.2% to 11.6%**. That conclusion is on
 the audit file at `C-600/6`.
 
-At 10.2% the value in use falls to £171.6m, producing an **impairment of £14.8m**.
+At 10.2% the value in use falls to £164.3m, producing an **impairment of £22.1m**. A rise of only
+0.2 percentage points, to 9.3%, is enough to eliminate the headroom entirely.
 
 The team's workpaper records the specialist's range and then concludes: *"Management's rate of 9.1%
 is at the low end but within a reasonable range given the Group's actual cost of borrowing.

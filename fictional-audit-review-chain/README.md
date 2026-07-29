@@ -79,7 +79,7 @@ Every level engages with the same numbered issue spine. This is what makes the c
 | **ISS-03** | Reseller channel recognised gross without principal-vs-agent analysis or mandatory consultation | Revenue overstated up to £26.8m (no PBT effect) |
 | **ISS-04** | ERP migration ITGC deficiencies; controls reliance retained without support | Pervasive to revenue, journals, procurement |
 | **ISS-05** | Business combination: contingent consideration fell outside the valuation specialist's scope and nobody owned it | Liability understated up to £4.4m |
-| **ISS-06** | Goodwill: discount rate below the specialist's own range; sensitivity disclosure omitted | Impairment of up to £14.8m not recognised |
+| **ISS-06** | Goodwill: discount rate below the specialist's own range; sensitivity disclosure omitted | Impairment of up to £22.1m not recognised |
 | **ISS-07** | Going concern assessed for 12 months from the balance sheet date, not from approval; refinancing falls outside the window | Material uncertainty disclosure potentially omitted |
 | **ISS-08** | £2.4m paid to an entity connected to the CFO; undisclosed | 24× the specific materiality for related parties |
 | **ISS-09** | Audit report signed two days before the engagement quality review was completed | ISQM 2 breach |

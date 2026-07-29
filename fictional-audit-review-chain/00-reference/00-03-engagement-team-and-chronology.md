@@ -108,7 +108,7 @@ programme, cycle 20X5.
 
 | Role | Name | Notes |
 |---|---|---|
-| Lead inspector | **Nathaniel Ferreira-Osei**, Director | **Was Audit Senior Manager on the ARG engagement in FY20X1 and FY20X2.** See `ISS-11` / `R-200`. |
+| Lead inspector | **Nathaniel Ferreira-Osei**, Director | **Was Audit Senior Manager on the ARG engagement in FY20X1 and FY20X2.** See `R-200` finding `FRAOA-F03`. |
 | Inspector | Rosalind Achebe-Kim, Senior Manager | |
 | Inspector | Gustav Lindberg, Manager | |
 | Report approver | **Marcus Ivanovic-Hale**, Partner, Head of Quality | Also sits on the firm's Partner Remuneration Committee. |
