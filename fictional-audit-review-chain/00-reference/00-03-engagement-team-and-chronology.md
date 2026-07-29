@@ -70,11 +70,11 @@ the starting point of the inspection team's analysis at `I-200` and the regulato
 | Period of review | 24 February – 11 March 20X5 |
 | Hours recorded as review | 61.5 of 118.0 total |
 | Workpapers opened in the e-file | 1,842 of 4,127 (44.6%) |
-| Review notes raised | 45 (`MRN-001` – `MRN-045`) |
+| Review notes raised | 49 (`MRN-001` – `MRN-049`) |
 | Notes open at the audit report date | 0 |
-| Mean days from raising to clearance | 2.3 |
-| Notes cleared **on the day raised** | 10 (22.2%) |
-| Notes cleared **by the preparer rather than the reviewer** | 11 (24.4%) |
+| Mean days from raising to clearance | 1.8 |
+| Notes cleared **on the day raised** | 11 (22.4%) |
+| Notes cleared **by the preparer rather than the reviewer** | 11 (22.4%) |
 | Sections **not opened at all** | `B-200` (ITGC), `C-500` (business combination) |
 
 Ms Lindqvist was managing two other year-end engagements concurrently (both December year ends) and

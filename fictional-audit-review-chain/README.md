@@ -100,7 +100,7 @@ five reviews, and a delay claim nobody connected to it.
 
 **If you want to see how review actually decays.** Read these four in order:
 
-1. `02-manager-review/M-200-review-notes-register.md` — 45 notes, all closed. Look at the clearance dates.
+1. `02-manager-review/M-200-review-notes-register.md` — 49 notes, all closed. Look at the clearance dates.
 2. `03-partner-review/P-200-note-by-note-assessment-of-manager-clearances.md` — the partner assessing those clearances.
 3. `04-inspection-review/I-200-assessment-of-the-partner-review.md` — the inspection team assessing the partner.
 4. `05-regulator-review/R-200-assessment-of-the-firms-internal-inspection.md` — the regulator assessing the inspection team.
