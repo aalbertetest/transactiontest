@@ -129,6 +129,27 @@ stored in functional cents.
 `analytics/analytics_report.md`. The report is the performed analysis for the
 committed dataset; rerun it after regenerating the database.
 
+### Findings from the generated scenario
+
+- European customers produce the largest regional sales value, led by
+  EUR-denominated sales of **$58.73 million USD equivalent**. North American
+  USD and CAD sales follow at $40.52 million and $30.99 million.
+- **$126.88 million** of sales receivables are in the 90+ day aging bucket.
+  This is the dominant collections risk in the scenario; another $5.95 million
+  of open AR belongs to 52 customers currently on hold.
+- Payment operations include **282 failed payments with $4.42 million USD
+  exposure**. ACH has the highest volume, which is consistent with its intended
+  50% generation weight.
+- Office supplies is the highest vendor-spend category at **$21.16 million**,
+  narrowly ahead of logistics and hardware.
+- The posted trial balance balances exactly. The report shows $28.36 million of
+  AR debits and $20.27 million of AP credits in the representative ledger
+  subset.
+
+These results describe the seeded synthetic scenario, not benchmarks or claims
+about a real company. The deliberately high overdue balance makes the data
+useful for collections and audit exercises.
+
 ## Integrity controls
 
 `validate_erp.py` verifies exact requested counts, foreign keys, invoice

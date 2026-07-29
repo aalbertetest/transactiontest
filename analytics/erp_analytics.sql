@@ -38,17 +38,17 @@ ORDER BY spend_usd DESC;
 -- name: AR aging in functional currency
 SELECT
     CASE
-        WHEN date(due_date) >= date('2026-01-31') THEN 'Current'
-        WHEN julianday('2026-01-31') - julianday(due_date) <= 30 THEN '1-30'
-        WHEN julianday('2026-01-31') - julianday(due_date) <= 60 THEN '31-60'
-        WHEN julianday('2026-01-31') - julianday(due_date) <= 90 THEN '61-90'
+        WHEN date(b.due_date) >= date('2026-01-31') THEN 'Current'
+        WHEN julianday('2026-01-31') - julianday(b.due_date) <= 30 THEN '1-30'
+        WHEN julianday('2026-01-31') - julianday(b.due_date) <= 60 THEN '31-60'
+        WHEN julianday('2026-01-31') - julianday(b.due_date) <= 90 THEN '61-90'
         ELSE '90+'
     END AS aging_bucket,
     COUNT(*) AS invoice_count,
     ROUND(SUM(balance_cents * exchange_rate_to_usd) / 100.0, 2) AS balance_usd
 FROM v_invoice_balances b
-JOIN invoices i USING (invoice_id)
-WHERE invoice_type = 'SALES' AND balance_cents > 0
+JOIN invoices i ON i.invoice_id = b.invoice_id
+WHERE b.invoice_type = 'SALES' AND b.balance_cents > 0
 GROUP BY aging_bucket
 ORDER BY CASE aging_bucket
     WHEN 'Current' THEN 1 WHEN '1-30' THEN 2 WHEN '31-60' THEN 3
@@ -90,9 +90,9 @@ ORDER BY account_number;
 -- name: Data quality and risk indicators
 SELECT 'Invoices over 90 days past due' AS indicator, COUNT(*) AS records,
        ROUND(COALESCE(SUM(balance_cents * exchange_rate_to_usd), 0) / 100.0, 2) AS exposure_usd
-FROM v_invoice_balances b JOIN invoices i USING (invoice_id)
-WHERE balance_cents > 0
-  AND julianday('2026-01-31') - julianday(due_date) > 90
+FROM v_invoice_balances b JOIN invoices i ON i.invoice_id = b.invoice_id
+WHERE b.balance_cents > 0
+  AND julianday('2026-01-31') - julianday(b.due_date) > 90
 UNION ALL
 SELECT 'Failed payments', COUNT(*),
        ROUND(COALESCE(SUM(functional_amount_cents), 0) / 100.0, 2)

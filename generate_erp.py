@@ -419,6 +419,7 @@ def generate(args: argparse.Namespace) -> None:
             insert_journals(conn, rng, args.journals)
         conn.execute("PRAGMA wal_checkpoint(TRUNCATE)")
         conn.execute("ANALYZE")
+        conn.execute("PRAGMA journal_mode = DELETE")
     finally:
         conn.close()
     print(f"Generated {args.output}")
